@@ -59,3 +59,17 @@ endif()
 set(GLM_TEST_ENABLE OFF CACHE BOOL "")
 
 add_subdirectory("extern/glm")
+
+add_library(ToyRT2018_lib INTERFACE)
+target_sources( ToyRT2018_lib
+        INTERFACE
+        "${CMAKE_CURRENT_LIST_DIR}/include/"
+        ${GLAD}
+        )
+target_include_directories(ToyRT2018_lib INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/glm/")
+#set_target_properties(ToyRT2018_lib PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(ToyRT2018_lib INTERFACE include/)
+
+
+add_executable(ToyRT2018_exe src/main.cpp)
+target_link_libraries(ToyRT2018_exe PUBLIC ToyRT2018_lib)
