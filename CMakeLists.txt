@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.9)
 
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
@@ -17,16 +17,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-
-if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
-    if (NOT CMAKE_BUILD_TYPE)
-        set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-    endif()
-endif()
-
-
-SET(default_build_type "Release")
-
+set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
     set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
@@ -60,16 +51,22 @@ set(GLM_TEST_ENABLE OFF CACHE BOOL "")
 
 add_subdirectory("extern/glm")
 
+#OpenMP
+find_package(OpenMP REQUIRED)
+
+
 add_library(ToyRT2018_lib INTERFACE)
 target_sources( ToyRT2018_lib
         INTERFACE
         "${CMAKE_CURRENT_LIST_DIR}/include/"
-        ${GLAD}
         )
 target_include_directories(ToyRT2018_lib INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/glm/")
 #set_target_properties(ToyRT2018_lib PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
 
-add_executable(ToyRT2018_exe src/main.cpp)
-target_link_libraries(ToyRT2018_exe PUBLIC ToyRT2018_lib)
+add_executable(ToyRT2018 src/main.cpp)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(ToyRT2018 PUBLIC OpenMP::OpenMP_CXX)
+endif()
+target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
