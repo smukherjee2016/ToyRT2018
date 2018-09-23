@@ -6,7 +6,7 @@ else()
     cmake_policy(VERSION 3.12)
 endif()
 
-project(RayTracing_OpenGLViewer VERSION 0.2.0)
+project(ToyRT2018 VERSION 0.2.0)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
