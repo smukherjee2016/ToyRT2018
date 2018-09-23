@@ -61,7 +61,9 @@ PFMInfo readPFM(std::string file) {
 			t = temp[1];
 			temp[1] = temp[2];
 			temp[2] = t;
-			float r = reinterpret_cast<float&>(temp);
+			float r;
+			memcpy(&r, temp, sizeof(r));
+			//http://dbp-consulting.com/tutorials/StrictAliasing.html
 
 			inFile.read(reinterpret_cast<char*>(temp), sizeof(float));
 			t = temp[0];
@@ -70,7 +72,8 @@ PFMInfo readPFM(std::string file) {
 			t = temp[1];
 			temp[1] = temp[2];
 			temp[2] = t;
-			float g = reinterpret_cast<float&>(temp);
+			float g;
+			memcpy(&g, temp, sizeof(g));
 
 			inFile.read(reinterpret_cast<char*>(temp), sizeof(float));
 			t = temp[0];
@@ -79,7 +82,8 @@ PFMInfo readPFM(std::string file) {
 			t = temp[1];
 			temp[1] = temp[2];
 			temp[2] = t;
-			float b = reinterpret_cast<float&>(temp);
+			float b;
+			memcpy(&b, temp, sizeof(b));
 
 			returnPFM.image.emplace_back(glm::vec3(r, g, b));
 			inFile.peek(); //To set EOF if we have reached EOF, to prevent an extra dummy iteration of this loop
