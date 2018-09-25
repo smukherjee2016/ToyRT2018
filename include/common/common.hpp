@@ -24,6 +24,6 @@ Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& 
 };
 
 struct HitInfo {
-    Point3 hitPoint;
+    Float tIntersection;
     Vector3 normal;
 };
