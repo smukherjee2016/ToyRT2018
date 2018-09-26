@@ -3,6 +3,6 @@
 #include "common/common.hpp"
 
 class Hitable {
-    virtual bool didItHitSomething() = 0;
-    virtual HitInfo returnClosestHit() = 0;
+    virtual bool didItHitSomething(const Ray& ray) = 0;
+    virtual HitInfo returnClosestHit(const Ray& ray) = 0;
 };

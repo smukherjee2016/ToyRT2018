@@ -1,8 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
+#include <glm/glm.hpp>
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -13,7 +12,7 @@ using Float = float;
 using Spectrum = glm::vec3;
 
 const Float Infinity = std::numeric_limits<Float>::max();
-
+const Float M_PI = 3.141592653589793238462643383279502884197169399375105;
 
 
 class Ray

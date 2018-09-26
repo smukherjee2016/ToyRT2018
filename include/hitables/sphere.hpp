@@ -6,7 +6,7 @@
 
 class Sphere : public Hitable {
 public:
-    bool didItHitSomething(const Ray& ray) {
+    bool didItHitSomething(const Ray& ray) override {
         Float a = glm::dot(ray.d, ray.d);
         Float b = 2.0 * glm::dot(ray.d, (ray.o - center));
         Float c = (glm::dot(ray.o - center, ray.o - center) - radius * radius);
@@ -23,7 +23,7 @@ public:
         return true;
     }
 
-    HitInfo returnClosestHit(const Ray& ray) {
+    HitInfo returnClosestHit(const Ray& ray) override {
         Float a = glm::dot(ray.d, ray.d);
         Float b = 2.0 * glm::dot(ray.d, (ray.o - center));
         Float c = (glm::dot(ray.o - center, ray.o - center) - radius * radius);
@@ -55,8 +55,11 @@ public:
         return hitInfo;
 
     }
-
+    Sphere(Point3 _center, Float _radius) {
+        center = _center;
+        radius = _radius;
+    }
 private:
-    Float center = {0, 0, 0};
+    Point3 center = {0, 0, 0};
     Float radius = 1.0;
 };
