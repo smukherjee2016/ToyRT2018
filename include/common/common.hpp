@@ -1,12 +1,20 @@
 #pragma once
 
+#include <vector>
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#define _USE_MATH_DEFINES
+#include <cmath>
 
+using Point2 = glm::vec2;
 using Point3 = glm::vec3;
 using Vector3 = glm::vec3;
 using Float = float;
+using Spectrum = glm::vec3;
 
 const Float Infinity = std::numeric_limits<Float>::max();
+
+
 
 class Ray
 {
