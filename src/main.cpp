@@ -14,7 +14,9 @@ int main(void) {
     PinholeCamera pinholeCamera(Vector3(0.0), Vector3(0.0, 0.0, -1.0), Vector3(0.0, 1.0, 0.0));
     Scene scene;
     scene.makeScene();
-
+    ToyIntegrator toyIntegrator;
+    toyIntegrator.render(pinholeCamera, film);
+    film.writePixels("Assignment1.pfm");
 
     return EXIT_SUCCESS;
 }
