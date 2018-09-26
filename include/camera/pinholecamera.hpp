@@ -29,7 +29,7 @@ public:
         makeBasisVectors();
     }
 
-    Ray generateCameraRay(const int x, const int y, const Film& film) { //Pixel coordinates
+    Ray generateCameraRay(const int x, const int y, const Film& film) const { //Pixel coordinates
         Float u = static_cast<Float>(x) / film.screenWidth;
         Float v = static_cast<Float>(y) / film.screenHeight;
 
