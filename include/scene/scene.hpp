@@ -10,6 +10,6 @@ public:
     std::vector<Sphere> spheres;
 
     void makeScene() {
-        spheres.emplace_back(std::make_unique<Sphere>(Vector3(0.0, 0.0, -1.0), 1.0));
+        spheres.emplace_back(Sphere(Vector3(0.0, 0.0, -1.0), 1.0));
     }
 };
