@@ -4,6 +4,6 @@
 
 class Hitable {
 public:
-    virtual bool didItHitSomething(const Ray& ray) = 0;
-    virtual HitInfo returnClosestHit(const Ray& ray) = 0;
+    virtual bool didItHitSomething(const Ray& ray) const = 0;
+    virtual HitInfo returnClosestHit(const Ray& ray) const = 0;
 };

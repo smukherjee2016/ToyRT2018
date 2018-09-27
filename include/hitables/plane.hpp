@@ -13,7 +13,7 @@ class Plane : public Hitable {
         normal = _normal;
     }
 
-    bool didItHitSomething(const Ray& ray) {
+    bool didItHitSomething(const Ray& ray) const {
         const Float epsilon = 1e-6;
         Float denominator = glm::dot(ray.d, normal);
         if(denominator < epsilon )
@@ -23,14 +23,18 @@ class Plane : public Hitable {
         Float tSolution = numerator / denominator;
         if(tSolution <= 0.0)
             return false;
+
+        return true;
     }
-    HitInfo returnClosestHit(const Ray& ray) {
+    HitInfo returnClosestHit(const Ray& ray) const {
         Float denominator = glm::dot(ray.d, normal);
         Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), normal);
 
         HitInfo hitInfo;
         hitInfo.tIntersection = numerator / denominator;
         hitInfo.normal = glm::dot(ray.d, normal) > 0 ? -normal : normal; //Invert direction toward ray
+
+        return hitInfo;
     }
 
 };

@@ -8,12 +8,12 @@ public:
                 int positionInFilm = y * film.screenWidth + x;
 
                 Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
-                HitInfo closestHit;
+                HitInfo closestHit{};
                 //film.pixels.at(positionInFilm) = Vector3(0.0, 0.1, 0.5);
                 //film.pixels.at(positionInFilm) = cameraRay.d;
-                for(auto sphere: scene.spheres) {
-                    if(sphere.didItHitSomething(cameraRay)) {
-                        closestHit = sphere.returnClosestHit(cameraRay);
+                for(auto & hitable: scene.hitables) {
+                    if(hitable->didItHitSomething(cameraRay)) {
+                        closestHit = hitable->returnClosestHit(cameraRay);
                     }
                     else
                     {
