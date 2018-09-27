@@ -21,7 +21,7 @@ public:
                     }
                 }
                 //film.pixels.at(positionInFilm) = closestHit.normal;
-                film.pixels.at(positionInFilm) = Vector3(closestHit.tIntersection);
+                film.pixels.at(positionInFilm) = Vector3(closestHit.tIntersection * glm::length(cameraRay.d));
             }
         }
     }

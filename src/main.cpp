@@ -7,8 +7,8 @@
 
 int main(void) {
 
-    int resX = 640;
-    int resY = 360;
+    int resX = 1024;
+    int resY = 576;
 
     Film film(M_PI/2.0, 1.0, resX, resY);
     PinholeCamera pinholeCamera(Vector3(0.0), Vector3(0.0, 0.0, -1.0), Vector3(0.0, 1.0, 0.0));
