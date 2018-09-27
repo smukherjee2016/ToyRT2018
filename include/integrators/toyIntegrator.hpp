@@ -9,19 +9,24 @@ public:
 
                 Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
                 HitInfo closestHit{};
+                closestHit.tIntersection = Infinity;
+
+                HitInfo currentHit{};
+                //closestHit.tIntersection = Infinity;
                 //film.pixels.at(positionInFilm) = Vector3(0.0, 0.1, 0.5);
                 //film.pixels.at(positionInFilm) = cameraRay.d;
                 for(auto & hitable: scene.hitables) {
-                    if(hitable->didItHitSomething(cameraRay)) {
-                        closestHit = hitable->returnClosestHit(cameraRay);
-                    }
-                    else
-                    {
-                        closestHit = {0.0, {0.0,0.0,0.0}};
+
+                    if (hitable->didItHitSomething(cameraRay)) {
+                        currentHit = hitable->returnClosestHit(cameraRay);
+
+                        if (currentHit.tIntersection < closestHit.tIntersection) {
+                            closestHit = currentHit;
+                        }
                     }
                 }
-                //film.pixels.at(positionInFilm) = closestHit.normal;
-                film.pixels.at(positionInFilm) = Vector3(closestHit.tIntersection * glm::length(cameraRay.d));
+                film.pixels.at(positionInFilm) = closestHit.normal;
+                //film.pixels.at(positionInFilm) = Vector3(closestHit.tIntersection * glm::length(glm::normalize(cameraRay.d)));
             }
         }
     }
