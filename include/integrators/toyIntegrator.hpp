@@ -1,12 +1,8 @@
-#pragma once
+#include "integrator.hpp"
 
-#include "common/common.hpp"
-#include "camera/pinholecamera.hpp"
-
-class ToyIntegrator {
+class ToyIntegrator : public Integrator {
 public:
-
-    void render(const PinholeCamera& pinholeCamera, Film& film) const {
+    void render(const PinholeCamera& pinholeCamera, Film& film) const override {
         for(int y = 0; y < film.screenHeight; y++) {
             for(int x = 0; x < film.screenWidth; x++) {
                 int positionInFilm = y * film.screenWidth + x;
