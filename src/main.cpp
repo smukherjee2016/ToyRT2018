@@ -16,7 +16,7 @@ int main(void) {
     scene.makeScene();
     ToyIntegrator toyIntegrator;
     toyIntegrator.render(pinholeCamera, film, scene);
-    film.writePixels("Assignment4.pfm");
+    film.writePixels("Assignment4_normals.pfm");
 
     return EXIT_SUCCESS;
 }

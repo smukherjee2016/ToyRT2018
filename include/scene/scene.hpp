@@ -12,7 +12,7 @@ public:
 
     void makeScene() {
 
-        hitables.emplace_back(std::make_unique<Sphere>(Vector3(0.0, 0.0, -1.0), 0.45));
-        hitables.emplace_back(std::make_unique<Plane>(Point3(0.0, 0.0, -8.0), Vector3(0.0,0.0,-1.0)));
+        hitables.emplace_back(std::make_unique<Sphere>(Vector3(0.0, 0.0, 0.0), 0.7));
+        hitables.emplace_back(std::make_unique<Plane>(Point3(0.0, 0.0, -1.0), Vector3(0.0,0.0,1.0)));
     }
 };
