@@ -15,26 +15,30 @@ public:
         normal = _normal;
     }
 
-    bool didItHitSomething(const Ray& ray) const {
+    bool didItHitSomething(const Ray& ray) const  {
+        //TODO: Should we modify the actual normal here and below?
+        Vector3 tempNormal = glm::dot(ray.d, normal) < 0 ? -normal : normal; //Invert direction toward ray
         const Float epsilon = 1e-6;
-        Float denominator = glm::dot(ray.d, normal);
+        Float denominator = glm::dot(ray.d, tempNormal);
         if(denominator < epsilon )
             return false;
 
-        Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), normal);
+        Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), tempNormal);
         Float tSolution = numerator / denominator;
         if(tSolution <= 0.0)
             return false;
 
         return true;
     }
-    HitInfo returnClosestHit(const Ray& ray) const {
-        Float denominator = glm::dot(ray.d, normal);
-        Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), normal);
+    HitInfo returnClosestHit(const Ray& ray) const  {
+        Vector3 tempNormal = glm::dot(ray.d, normal) < 0 ? -normal : normal; //Invert direction toward ray
+
+        Float denominator = glm::dot(ray.d, tempNormal);
+        Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), tempNormal);
 
         HitInfo hitInfo;
         hitInfo.tIntersection = numerator / denominator;
-        hitInfo.normal = glm::dot(ray.d, normal) > 0 ? -normal : normal; //Invert direction toward ray
+        hitInfo.normal = tempNormal;
 
         return hitInfo;
     }
