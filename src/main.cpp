@@ -10,13 +10,13 @@ int main(void) {
     int resX = 640;
     int resY = 360;
 
-    Film film(M_PI/3.0, 1.0, resX, resY);
+    Film film(M_PI/2.0, 1.0, resX, resY);
     PinholeCamera pinholeCamera(Vector3(0.0), Vector3(0.0, 0.0, -1.0), Vector3(0.0, 1.0, 0.0));
     Scene scene;
     scene.makeScene();
     ToyIntegrator toyIntegrator;
-    toyIntegrator.render(pinholeCamera, film);
-    film.writePixels("Assignment2.pfm");
+    toyIntegrator.render(pinholeCamera, film, scene);
+    film.writePixels("Assignment3.pfm");
 
     return EXIT_SUCCESS;
 }
