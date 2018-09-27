@@ -30,7 +30,7 @@ class Plane : public Hitable {
 
         HitInfo hitInfo;
         hitInfo.tIntersection = numerator / denominator;
-        hitInfo.normal = normal;
+        hitInfo.normal = glm::dot(ray.d, normal) > 0 ? -normal : normal; //Invert direction toward ray
     }
 
 };
