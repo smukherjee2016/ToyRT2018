@@ -12,21 +12,33 @@ public:
                 closestHit.tIntersection = Infinity;
 
                 HitInfo currentHit{};
+                Spectrum pixelValue{};
+                bool hitSomething = false;
                 //closestHit.tIntersection = Infinity;
-                //film.pixels.at(positionInFilm) = Vector3(0.0, 0.1, 0.5);
-                //film.pixels.at(positionInFilm) = cameraRay.d;
+                //pixelValue = Vector3(0.0, 0.1, 0.5);
+                //pixelValue = cameraRay.d;
                 for(auto & hitable: scene.hitables) {
 
                     if (hitable->didItHitSomething(cameraRay)) {
                         currentHit = hitable->returnClosestHit(cameraRay);
+                        hitSomething = true;
 
                         if (currentHit.tIntersection < closestHit.tIntersection) {
                             closestHit = currentHit;
                         }
                     }
+
                 }
-                film.pixels.at(positionInFilm) = closestHit.normal;
-                //film.pixels.at(positionInFilm) = Vector3(closestHit.tIntersection * glm::length(glm::normalize(cameraRay.d)));
+
+                if(hitSomething) {
+                    pixelValue = closestHit.normal;
+                    //pixelValue = Vector3(closestHit.tIntersection * glm::length(glm::normalize(cameraRay.d)));
+                }
+                else {
+                    pixelValue = scene.envMap->Le(cameraRay);
+                }
+
+                film.pixels.at(positionInFilm) = pixelValue;
             }
         }
     }
