@@ -3,6 +3,7 @@
 
 #include "hitable.hpp"
 #include "common/common.hpp"
+#include "materials/lambertUniform.hpp"
 
 class Sphere : public Hitable {
 public:
@@ -55,11 +56,13 @@ public:
         return hitInfo;
 
     }
-    Sphere(Point3 _center, Float _radius) {
+    Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr) {
         center = _center;
         radius = _radius;
+        mat = _mat;
     }
 private:
     Point3 center = {0, 0, 0};
     Float radius = 1.0;
+    std::shared_ptr<Material> mat;
 };
