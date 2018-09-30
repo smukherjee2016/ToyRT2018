@@ -16,6 +16,6 @@ public:
 
         hitables.emplace_back(std::make_unique<Sphere>(Vector3(0.0, 0.0, 0.0), 0.7));
         hitables.emplace_back(std::make_unique<Plane>(Point3(0.0, -0.7, 0.0), Vector3(0.0,1.0,0.0)));
-        emitters.emplace_back(std::make_unique<Emitter>());
+        emitters.emplace_back(std::make_unique<EnvironmentMap>());
     }
 };
