@@ -48,6 +48,7 @@ endif()
 set(GLM_TEST_ENABLE OFF CACHE BOOL "")
 
 add_subdirectory("extern/glm")
+add_subdirectory("extern/pcg-cpp")
 
 #OpenMP
 find_package(OpenMP REQUIRED)
@@ -59,6 +60,7 @@ target_sources( ToyRT2018_lib
         "${CMAKE_CURRENT_LIST_DIR}/include/"
         )
 target_include_directories(ToyRT2018_lib INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/glm/")
+target_include_directories(ToyRT2018_lib INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/pcg-cpp/include")
 #set_target_properties(ToyRT2018_lib PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
