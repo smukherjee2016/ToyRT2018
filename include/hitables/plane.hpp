@@ -32,7 +32,7 @@ public:
         return true;
     }
     HitInfo returnClosestHit(const Ray& ray) const  {
-        Vector3 tempNormal = glm::dot(ray.d, normal) < 0 ? -normal : normal; //Invert direction toward ray
+        Vector3 tempNormal = normal; //Invert direction toward ray
 
         Float denominator = glm::dot(ray.d, tempNormal);
         Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), tempNormal);
