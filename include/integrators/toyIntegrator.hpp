@@ -34,9 +34,9 @@ public:
                 }
 
                 if(hitSomething) {
-                    Vector3 outgoingDirection  = closestObject->mat->sampleDirection(cameraRay.d, closestHit.normal);
-                    pixelValue = closestObject->mat->brdf(outgoingDirection, cameraRay.d, closestHit.normal);
-                    pixelValue = outgoingDirection;
+                    Vector3 outgoingDirection  = closestObject->mat->sampleDirection(-cameraRay.d, closestHit.normal);
+                    pixelValue = closestObject->mat->brdf(outgoingDirection, -cameraRay.d, closestHit.normal);
+                    //pixelValue = outgoingDirection;
                     //pixelValue = Vector3(closestHit.tIntersection * glm::length(glm::normalize(cameraRay.d)));
                 }
                 else {
