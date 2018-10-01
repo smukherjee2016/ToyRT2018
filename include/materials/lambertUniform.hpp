@@ -12,6 +12,7 @@ public:
     }
 
     Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const {
+
         Float r1 = rng.generate1DUniform();
         Float r2 = rng.generate1DUniform();
 
@@ -20,10 +21,14 @@ public:
         Float theta = 2 * M_PI * r1;
         Float phi = std::acos(r2);
 
-        //Need local basis to construct outgoing direction wi
-        
+        Float x = std::cos(theta) * std::sin(phi);
+        Float y = std::sin(theta) * std::sin(phi);
+        Float z = std::cos(phi);
 
+        Basis basis;
+        basis.makeOrthonormalBasis(normal);
 
+        return glm::normalize(x * basis.Cx + y * basis.Cy + z * basis.Cz);
 
     }
 

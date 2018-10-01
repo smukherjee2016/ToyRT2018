@@ -12,6 +12,7 @@ public:
                 closestHit.tIntersection = Infinity;
 
                 HitInfo currentHit{};
+                std::shared_ptr<Hitable> closestObject{};
                 Spectrum pixelValue{};
                 bool hitSomething = false;
                 //closestHit.tIntersection = Infinity;
@@ -22,16 +23,20 @@ public:
                     if (hitable->didItHitSomething(cameraRay)) {
                         currentHit = hitable->returnClosestHit(cameraRay);
                         hitSomething = true;
+                        closestObject = hitable;
 
                         if (currentHit.tIntersection < closestHit.tIntersection) {
                             closestHit = currentHit;
+                            closestObject = hitable;
                         }
                     }
 
                 }
 
                 if(hitSomething) {
-                    pixelValue = closestHit.normal;
+                    Vector3 outgoingDirection  = closestObject->mat->sampleDirection(cameraRay.d, closestHit.normal);
+                    pixelValue = closestObject->mat->brdf(outgoingDirection, cameraRay.d, closestHit.normal);
+                    pixelValue = outgoingDirection;
                     //pixelValue = Vector3(closestHit.tIntersection * glm::length(glm::normalize(cameraRay.d)));
                 }
                 else {

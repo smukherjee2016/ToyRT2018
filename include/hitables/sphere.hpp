@@ -61,8 +61,8 @@ public:
         radius = _radius;
         mat = _mat;
     }
-private:
+
     Point3 center = {0, 0, 0};
     Float radius = 1.0;
-    std::shared_ptr<Material> mat;
+
 };

@@ -36,3 +36,26 @@ struct HitInfo {
     Float tIntersection;
     Vector3 normal;
 };
+
+class Basis {
+
+public:
+    Vector3 Cx;
+    Vector3 Cy;
+    Vector3 Cz;
+
+
+    //TODO- Replace by Pixar paper later sometime
+    void makeOrthonormalBasis(const Vector3& normal) {
+        Vector3 in(0.0, 1.0, 0.0); //Arbitrary, set by ourselves
+        if(std::abs(glm::dot(in, normal)) > 0.99) { //If the vectors are too close
+            in = Vector3(0.0, 0.0, 1.0); //Select another vector
+        }
+
+        //Theta = [0, 2*PI], phi = [0, PI/2] for hemisphere, [0,PI] for sphere
+        Vector3 Cz = glm::normalize(glm::cross(normal, in));
+        Vector3 Cx = glm::normalize(glm::cross(normal, Cz));
+        Vector3 Cy = glm::normalize(normal);
+
+    }
+};

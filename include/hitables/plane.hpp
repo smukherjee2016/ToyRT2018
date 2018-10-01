@@ -6,10 +6,11 @@
  */
 class Plane : public Hitable {
 
+public:
     Point3 distanceFromWorldOrigin;
     Vector3 normal;
 
-public:
+
     Plane(const Point3& _distanceFromWorldOrigin, const Vector3& _normal) {
         distanceFromWorldOrigin = _distanceFromWorldOrigin;
         normal = _normal;
