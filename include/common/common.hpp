@@ -14,6 +14,7 @@ using Spectrum = glm::vec3;
 
 const Float Infinity = std::numeric_limits<Float>::max();
 const Float M_PI = 3.141592653589793238462643383279502884197169399375105;
+const Float M_INVPI = 1.0 / M_PI;
 
 
 class Ray

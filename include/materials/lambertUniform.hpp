@@ -1,6 +1,7 @@
 #pragma once
 
 #include "material.hpp"
+#include "util/rng.hpp"
 
 class LambertUniform : public Material {
 public:
@@ -10,16 +11,36 @@ public:
         kD = _kD;
     }
 
-    Vector3 sampleDirection(const Vector3& wi, const Vector3& normal) const {
+    Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const {
+        Float r1 = rng.generate1DUniform();
+        Float r2 = rng.generate1DUniform();
+
+        //Uniform weighted hemisphere sampling
+        //Theta => [0, 2PI], Phi = [0, PI/2]
+        Float theta = 2 * M_PI * r1;
+        Float phi = std::acos(r2);
+
+        //Need local basis to construct outgoing direction wi
+        
+
+
 
     }
 
-    Spectrum brdf(const Vector3& wi, const Vector3& w0, const Vector3& normal) const {
+    Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+        if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
+            return Spectrum(0.0); //Return black value for things below the horizon
+        }
 
+        return kD * M_INVPI;
     }
 
-    virtual Float pdf(const Vector3& wi, const Vector3& w0, const Vector3& normal) const {
+    virtual Float pdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+        if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
+            return 0.0; //Return black value for things below the horizon
+        }
 
+        return M_INVPI / 2.0; // 1/2PI
     }
 
 };
