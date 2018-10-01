@@ -6,6 +6,8 @@
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
 
+const int sampleCount = 1;
+
 int main(void) {
 
     int resX = 1024;
@@ -18,7 +20,7 @@ int main(void) {
     Scene scene;
     scene.makeScene();
     ToyIntegrator toyIntegrator;
-    toyIntegrator.render(pinholeCamera, film, scene);
+    toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
     film.writePixels("Assignment4_normals.pfm");
 
     return EXIT_SUCCESS;
