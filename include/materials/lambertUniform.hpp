@@ -13,17 +13,24 @@ public:
 
     Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const {
 
-        Float r1 = rng.generate1DUniform();
-        Float r2 = rng.generate1DUniform();
+        Float x,y,z;
+        //Vector3 newNormal(1.0, 0.0, 0.0);
+        //std::vector<Vector3> arrays;
+        //for(int i = 0; i < 10000; i++) {
+            Float r1 = rng.generate1DUniform();
+            Float r2 = rng.generate1DUniform();
 
-        //Uniform weighted hemisphere sampling
-        //Theta => [0, 2PI], Phi = [0, PI/2]
-        Float theta = 2 * M_PI * r1;
-        Float phi = std::acos(r2);
+            //Uniform weighted hemisphere sampling
+            //Theta => [0, 2PI], Phi = [0, PI/2]
+            Float theta = 2 * M_PI * r1;
+            Float phi = std::acos(r2);
 
-        Float x = std::cos(theta) * std::sin(phi);
-        Float y = std::sin(theta) * std::sin(phi);
-        Float z = std::cos(phi);
+            x = std::cos(theta) * std::sin(phi);
+            y = std::cos(phi);
+            z = std::sin(theta) * std::sin(phi);
+        //    arrays.emplace_back(Vector3(x,y,z));
+        //}
+        //saveObj("test.obj", arrays);
 
         Basis basis;
         basis.makeOrthonormalBasis(normal);
