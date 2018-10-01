@@ -14,7 +14,7 @@ int main(void) {
     std::cout << rng.generate1DUniform() << std::endl;
 
     Film film(M_PI/4.0, 1.0, resX, resY);
-    PinholeCamera pinholeCamera(Point3(-1.0, 4.0, 5.0), Point3(1.0, -4.0, -5.0), Point3(0.0, 1.0, 0.0));
+    PinholeCamera pinholeCamera(Point3(0.0, 0.0, 1.0), Point3(0.0,0.0,0.0), Point3(0.0, 1.0, 0.0));
     Scene scene;
     scene.makeScene();
     ToyIntegrator toyIntegrator;

@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <fstream>
 
 using Point2 = glm::vec2;
 using Point3 = glm::vec3;
@@ -37,6 +38,19 @@ struct HitInfo {
     Vector3 normal;
 };
 
+void saveObj(const std::string & filename, const std::vector<Vector3>& points)
+{
+    std::ofstream fileWriter;
+    fileWriter.open(filename, std::ios::binary);
+
+    for (const Vector3 &point : points)
+    {
+        fileWriter << "v " << point.x << " " << point.y << " " << point.z << std::endl;
+    }
+
+    fileWriter.close();
+}
+
 class Basis {
 
 public:
@@ -53,9 +67,10 @@ public:
         }
 
         //Theta = [0, 2*PI], phi = [0, PI/2] for hemisphere, [0,PI] for sphere
-        Vector3 Cz = glm::normalize(glm::cross(normal, in));
-        Vector3 Cx = glm::normalize(glm::cross(normal, Cz));
-        Vector3 Cy = glm::normalize(normal);
+        Cz = glm::normalize(glm::cross(normal, in));
+        Cx = glm::normalize(glm::cross(normal, Cz));
+        Cy = glm::normalize(normal);
+
 
     }
 };
