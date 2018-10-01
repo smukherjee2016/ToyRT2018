@@ -18,7 +18,7 @@ public:
 
     bool didItHitSomething(const Ray& ray) const  {
         //TODO: Should we modify the actual normal here and below?
-        Vector3 tempNormal = glm::dot(ray.d, normal) < 0 ? -normal : normal; //Invert direction toward ray
+        Vector3 tempNormal = normal; //Invert direction toward ray
         const Float epsilon = 1e-6;
         Float denominator = glm::dot(ray.d, tempNormal);
         if(denominator < epsilon )

@@ -51,8 +51,8 @@ public:
                 hitInfo.tIntersection = t2;
         }
         Point3 intersectionPoint = ray.o + hitInfo.tIntersection * ray.d;
-        Vector3 uncheckedNormal = glm::normalize( (intersectionPoint - center) / radius );
-        hitInfo.normal = glm::dot(uncheckedNormal, ray.d) < 0 ? -uncheckedNormal : uncheckedNormal; //Invert toward incoming ray
+        hitInfo.normal = glm::normalize( (intersectionPoint - center) / radius );
+
         return hitInfo;
 
     }
