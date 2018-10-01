@@ -40,6 +40,6 @@ std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& s
     if(hitSomething)
         return { closestHitBundle };
 
-    return {};
+    return std::nullopt;
 
 }

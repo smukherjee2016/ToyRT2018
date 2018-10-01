@@ -14,15 +14,23 @@ public:
                 std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(cameraRay, scene);
 
                 if(hitBundle) {
-                    HitBundle validHitBundle = *hitBundle;
+                    HitBundle validHitBundle = hitBundle.value();
                     for(auto i = 0; i < sampleCount; i++) {
                         Vector3 outgoingDirection  = validHitBundle.closestObject->mat->sampleDirection(-cameraRay.d, validHitBundle.hitInfo.normal);
                         Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d, validHitBundle.hitInfo.normal);
                         Point3 hitPoint = cameraRay.o + validHitBundle.hitInfo.tIntersection * cameraRay.d;
                         Ray nextRay(hitPoint, outgoingDirection);
-                        pixelValue = brdf;
+                        std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                        if(nextRayHitBundle) {
+                            validHitBundle = nextRayHitBundle.value();
+                            //TODO Need to make this recursive when not doing directlighting
+                        }
+                        else {
+                            pixelValue += scene.envMap->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal);
+                        }
 
                     }
+                    pixelValue /= sampleCount;
 
                     //pixelValue = outgoingDirection;
                     //pixelValue = Vector3(closestHit.tIntersection * glm::length(glm::normalize(cameraRay.d)));
