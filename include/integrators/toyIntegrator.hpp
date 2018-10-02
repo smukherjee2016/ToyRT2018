@@ -18,6 +18,7 @@ public:
                     for(auto i = 0; i < sampleCount; i++) {
                         Vector3 outgoingDirection  = validHitBundle.closestObject->mat->sampleDirection(-cameraRay.d, validHitBundle.hitInfo.normal);
                         Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d, validHitBundle.hitInfo.normal);
+                        Float pdf = validHitBundle.closestObject->mat->pdf(outgoingDirection, -cameraRay.d, validHitBundle.hitInfo.normal);
                         Point3 hitPoint = cameraRay.o + validHitBundle.hitInfo.tIntersection * cameraRay.d;
                         Ray nextRay(hitPoint, outgoingDirection);
                         std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
@@ -26,7 +27,7 @@ public:
                             //TODO Need to make this recursive when not doing directlighting
                         }
                         else {
-                            pixelValue += scene.envMap->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal);
+                            pixelValue += scene.envMap->Le(nextRay) * brdf  * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdf;
                         }
 
                     }
