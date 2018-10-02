@@ -26,15 +26,16 @@ public:
     Float t;
     Float tmin, tmax;
 
-Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& _t = Infinity, const Float& _tmin = 0.001,
+Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& _t = Infinity, const Float& _tmin = 0.00001,
     const Float& _tmax = Infinity):
-    o(_o), d(glm::normalize(_d)), t(_t), tmin(_tmin), tmax(_tmax) { }
+    o(_o), d(_d), t(_t), tmin(_tmin), tmax(_tmax) { }
 
 };
 
 struct HitInfo {
     Float tIntersection;
     Vector3 normal;
+    Vector3 debug_position;
 };
 
 void saveObj(const std::string & filename, const std::vector<Vector3>& points)

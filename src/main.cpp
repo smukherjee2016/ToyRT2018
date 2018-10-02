@@ -6,17 +6,17 @@
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
 
-const int sampleCount = 64;
+const int sampleCount = 16;
 
 int main(void) {
 
     int resX = 1024;
     int resY = 576;
 
-    std::cout << rng.generate1DUniform() << std::endl;
+    //std::cout << rng.generate1DUniform() << std::endl;
 
     Film film(M_PI/4.0, 1.0, resX, resY);
-    PinholeCamera pinholeCamera(Point3(0.0, 0.0, 1.0), Point3(0.0,0.0,0.0), Point3(0.0, 1.0, 0.0));
+    PinholeCamera pinholeCamera(Point3(0.0, 0.0, 5.0), Point3(0.0,0.0,0.0), Point3(0.0, 1.0, 0.0));
     Scene scene;
     scene.makeScene();
     ToyIntegrator toyIntegrator;
