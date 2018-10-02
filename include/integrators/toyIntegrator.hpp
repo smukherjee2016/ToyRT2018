@@ -3,9 +3,12 @@
 class ToyIntegrator : public Integrator {
 public:
     void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount) const override {
-        for(int y = 0; y < film.screenHeight; y++) {
-            for(int x = 0; x < film.screenWidth; x++) {
-                int positionInFilm = y * film.screenWidth + x;
+#pragma omp parallel for schedule(dynamic, 1)
+        for(int i = 0; i < film.screenHeight * film.screenWidth; i++) {
+                //int positionInFilm = y * film.screenWidth + x;
+                int positionInFilm = i;
+                int x = i % film.screenWidth;
+                int y = film.screenHeight - i / film.screenWidth;
 
                 Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
 
@@ -43,5 +46,5 @@ public:
                 film.pixels.at(positionInFilm) = pixelValue;
             }
         }
-    }
+
 };
