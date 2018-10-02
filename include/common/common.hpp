@@ -24,12 +24,11 @@ public:
     Point3 o;
     Vector3 d;
     Float t;
+    Float tmin, tmax;
 
-Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& _t = Infinity) {
-    o = _o;
-    d = glm::normalize(_d);
-    t = _t;
-}
+Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& _t = Infinity, const Float& _tmin = 0.001,
+    const Float& _tmax = Infinity):
+    o(_o), d(glm::normalize(_d)), t(_t), tmin(_tmin), tmax(_tmax) { }
 
 };
 
