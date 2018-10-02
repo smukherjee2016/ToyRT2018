@@ -5,14 +5,14 @@
 #include "common/common.hpp"
 #include "materials/lambertUniform.hpp"
 
-inline bool solveQuadraticEquation(const float &a, const float &b, const float &c, float &t1, float &t2)
+inline bool solveQuadraticEquation(const Float &a, const Float &b, const Float &c, Float &t1, Float &t2)
 {
-    float discriminant = b * b - 4 * a * c;
+    Float discriminant = b * b - 4 * a * c;
     if (discriminant < 0) return false; //No intersection
     else if (discriminant == 0) t1 = t2 = - 0.5 * b / a; //Same solution
     else {
         //Numerically more robust method
-        float q = (b > 0) ?
+        Float q = (b > 0) ?
                   -0.5 * (b + sqrt(discriminant)) :
                   -0.5 * (b - sqrt(discriminant));
         t1 = q / a;
