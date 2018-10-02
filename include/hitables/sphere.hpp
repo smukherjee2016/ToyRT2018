@@ -12,9 +12,14 @@ inline bool solveQuadraticEquation(const Float &a, const Float &b, const Float &
     else if (discriminant == 0) t1 = t2 = - 0.5 * b / a; //Same solution
     else {
         //Numerically more robust method
-        Float q = (b > 0) ?
-                  -0.5 * (b + sqrt(discriminant)) :
-                  -0.5 * (b - sqrt(discriminant));
+        Float q;
+        if(b > 0.0) {
+            q = -0.5 * (b + sqrt(discriminant));
+        }
+        else {
+            q = -0.5 * (b - sqrt(discriminant));
+        }
+
         t1 = q / a;
         t2 = c / q;
     }
