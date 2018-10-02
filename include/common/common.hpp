@@ -35,7 +35,6 @@ Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& 
 struct HitInfo {
     Float tIntersection;
     Vector3 normal;
-    Vector3 debug_position;
 };
 
 void saveObj(const std::string & filename, const std::vector<Vector3>& points)
