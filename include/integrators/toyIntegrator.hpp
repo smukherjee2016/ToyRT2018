@@ -29,8 +29,7 @@ public:
                         Float pdf = validHitBundle.closestObject->mat->pdf(outgoingDirection, -cameraRay.d,
                                                                            validHitBundle.hitInfo.normal);
                         Point3 hitPoint = cameraRay.o + validHitBundle.hitInfo.tIntersection * cameraRay.d;
-                        Float bias = (1.0 - 1e-4);
-                        Ray nextRay(hitPoint, outgoingDirection * bias);
+                        Ray nextRay(hitPoint, outgoingDirection);
                         std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                         if (nextRayHitBundle) {
                             HitBundle nextHitBundle = nextRayHitBundle.value();
@@ -38,8 +37,8 @@ public:
                             //TODO Need to make this recursive when not doing directlighting
                                 pixelValue += Vector3(0.0);
                             else
-                                pixelValue += scene.envMap->Le(nextRay) * brdf
-                                              * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdf;
+                                pixelValue += Vector3(0.0);
+
                         } else {
                             pixelValue += scene.envMap->Le(nextRay) * brdf
                                            * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdf;
