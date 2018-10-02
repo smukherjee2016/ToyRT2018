@@ -58,10 +58,11 @@ public:
     }
 
     Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr) :
-    center(_center), radius(_radius), mat(_mat) {}
+    center(_center), radius(_radius) {
+            mat = _mat; //Base class members apparently doesn't work otherwise...
+    }
 
     Point3 center = {0, 0, 0};
     Float radius = 1.0;
-    std::shared_ptr<Material> mat;
 
 };
