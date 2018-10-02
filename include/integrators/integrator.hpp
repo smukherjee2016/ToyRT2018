@@ -25,8 +25,10 @@ std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& s
     //pixelValue = cameraRay.d;
     for(auto & hitable: scene.hitables) {
 
-        if (hitable->didItHitSomething(ray)) {
-            currentHitBundle.hitInfo = hitable->returnClosestHit(ray);
+        std::optional<HitInfo> hitInfoOptional = hitable->checkIntersectionAndClosestHit(ray);
+
+        if (hitInfoOptional) {
+            currentHitBundle.hitInfo = hitInfoOptional.value();
             hitSomething = true;
             currentHitBundle.closestObject = hitable;
 

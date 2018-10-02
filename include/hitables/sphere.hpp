@@ -7,53 +7,41 @@
 
 class Sphere : public Hitable {
 public:
-    bool didItHitSomething(const Ray& ray) const override {
+
+    std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override {
         Float a = glm::dot(ray.d, ray.d);
         Float b = 2.0 * glm::dot(ray.d, (ray.o - center));
         Float c = (glm::dot(ray.o - center, ray.o - center) - radius * radius);
         Float determinant = (b * b) - (4.0 * a * c);
+
         if(determinant < 0.0)
-            return false;
-        else if(determinant > 0.0) {
-            Float t1 = (-b + determinant) / (2.0 * a);
-            Float t2 = (-b - determinant) / (2.0 * a);
-            if(t1 < 0.0 && t2 < 0.0) //Both points lie behind camera
-                return false;
-        }
-
-        return true;
-    }
-
-    HitInfo returnClosestHit(const Ray& ray) const override {
-        Float a = glm::dot(ray.d, ray.d);
-        Float b = 2.0 * glm::dot(ray.d, (ray.o - center));
-        Float c = (glm::dot(ray.o - center, ray.o - center) - radius * radius);
-        Float determinant = (b * b) - (4.0 * a * c);
+            return std::nullopt;
 
         HitInfo hitInfo;
 
-        if(determinant < 0.0) {
-            hitInfo.tIntersection = 0.0;
-            hitInfo.normal = {0.0, 0.0, 0.0};
-        }
-        else {
-            Float t1 = (-b + determinant) / (2.0 * a);
-            Float t2 = (-b - determinant) / (2.0 * a);
+        Float t1 = (-b + determinant) / (2.0 * a);
+        Float t2 = (-b - determinant) / (2.0 * a);
 
-            if(determinant == 0.0)
-                hitInfo.tIntersection = t1;
+        if(t1 < 0.0 && t2 < 0.0)
+            return std::nullopt;
 
-            if(t1 > 0.0 && t2 > 0.0)
-                hitInfo.tIntersection = std::min(t1, t2);
-            else if(t1 > 0.0 && t2 < 0.0)
-                hitInfo.tIntersection =  t1;
-            else if(t1 < 0.0 && t2 > 0.0)
-                hitInfo.tIntersection = t2;
-        }
+        if(determinant == 0.0)
+            hitInfo.tIntersection = t1;
+
+        if(t1 > 0.0 && t2 > 0.0)
+            hitInfo.tIntersection = std::min(t1, t2);
+        else if(t1 > 0.0 && t2 < 0.0)
+            hitInfo.tIntersection =  t1;
+        else if(t1 < 0.0 && t2 > 0.0)
+            hitInfo.tIntersection = t2;
+
+        if(hitInfo.tIntersection < ray.tmin || hitInfo.tIntersection > ray.tmax)
+            return std::nullopt;
+
         Point3 intersectionPoint = ray.o + hitInfo.tIntersection * ray.d;
         hitInfo.normal = glm::normalize( (intersectionPoint - center) / radius );
 
-        return hitInfo;
+        return {hitInfo};
 
     }
     Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr) {

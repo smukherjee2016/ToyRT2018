@@ -11,37 +11,30 @@ public:
     Vector3 normal;
 
 
-    Plane(const Point3& _distanceFromWorldOrigin, const Vector3& _normal) {
-        distanceFromWorldOrigin = _distanceFromWorldOrigin;
-        normal = _normal;
-    }
+    Plane(const Point3& _distanceFromWorldOrigin, const Vector3& _normal) :
+    distanceFromWorldOrigin(_distanceFromWorldOrigin), normal(_normal) {}
 
-    bool didItHitSomething(const Ray& ray) const  {
-        //TODO: Should we modify the actual normal here and below?
+
+    std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const  {
         Vector3 tempNormal = normal; //Invert direction toward ray
-        const Float epsilon = 1e-6;
-        Float denominator = glm::dot(ray.d, tempNormal);
-        if(denominator < epsilon )
-            return false;
 
+        const Float epsilon = 1e-5;
+        Float denominator = glm::dot(ray.d, tempNormal);
         Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), tempNormal);
+
+        if(denominator < epsilon)
+            return std::nullopt;
+
         Float tSolution = numerator / denominator;
-        if(tSolution <= 0.0)
-            return false;
 
-        return true;
-    }
-    HitInfo returnClosestHit(const Ray& ray) const  {
-        Vector3 tempNormal = normal; //Invert direction toward ray
-
-        Float denominator = glm::dot(ray.d, tempNormal);
-        Float numerator = glm::dot((distanceFromWorldOrigin - ray.o), tempNormal);
+        if(tSolution < 0.0 || tSolution < ray.tmin || tSolution > ray.tmax)
+            return std::nullopt;
 
         HitInfo hitInfo;
         hitInfo.tIntersection = numerator / denominator;
         hitInfo.normal = tempNormal;
 
-        return hitInfo;
+        return {hitInfo};
     }
 
 };

@@ -3,11 +3,11 @@
 #include <memory>
 #include <materials/material.hpp>
 #include "common/common.hpp"
+#include <optional>
 
 
 class Hitable {
 public:
-    virtual bool didItHitSomething(const Ray& ray) const = 0;
-    virtual HitInfo returnClosestHit(const Ray& ray) const = 0;
+    virtual std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const = 0;
     std::shared_ptr<Material> mat;
 };
