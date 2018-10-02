@@ -27,7 +27,7 @@ public:
 
 Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& _t = Infinity) {
     o = _o;
-    d = _d;
+    d = glm::normalize(_d);
     t = _t;
 }
 
