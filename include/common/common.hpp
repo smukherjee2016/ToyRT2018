@@ -73,3 +73,13 @@ public:
 
     }
 };
+
+inline Point3 sphericaltoCartesian(const Float theta, const Float phi) {
+    //Y axis up, theta = [0, 2PI], phi=[0,PI/2] for hemisphere
+    Point3  point;
+    point.x = std::cos(theta) * std::sin(phi);
+    point.y = std::cos(phi);
+    point.z = std::sin(theta) * std::sin(phi);
+
+    return point;
+}

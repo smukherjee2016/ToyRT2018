@@ -25,9 +25,8 @@ public:
             Float theta = 2 * M_PI * r1;
             Float phi = std::acos(r2);
 
-            x = std::cos(theta) * std::sin(phi);
-            y = std::cos(phi);
-            z = std::sin(theta) * std::sin(phi);
+            Point3 pointInCartesian = sphericaltoCartesian(theta, phi);
+
         //    arrays.emplace_back(Vector3(x,y,z));
         //}
         //saveObj("test.obj", arrays);
@@ -35,7 +34,7 @@ public:
         Basis basis;
         basis.makeOrthonormalBasis(normal);
 
-        return glm::normalize(x * basis.Cx + y * basis.Cy + z * basis.Cz);
+        return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
 
     }
 
