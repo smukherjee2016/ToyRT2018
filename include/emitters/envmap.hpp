@@ -38,4 +38,13 @@ public:
             return Spectrum(0.0, 0.0, 0.0);
         }
     }
+
+    Point3 samplePointOnEmitter(const Vector3& wo, const Vector3& normal) const override {
+        return Point3(0.0);
+    }
+
+    Float pdfEmitter(const Vector3& wi, const Vector3& wo, const Vector3& normal) const override {
+        return 0.0;
+    }
+
 };
