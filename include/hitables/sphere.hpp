@@ -94,10 +94,8 @@ public:
         //}
         //saveObj("test.obj", arrays);
 
-        Basis basis;
-        basis.makeOrthonormalBasis(normal);
-
-        return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+        //This cartesian point is w.r.t center of the sphere, so return the point in world space
+        return (pointInCartesian + center);
 
     }
 
