@@ -1,10 +1,10 @@
 #pragma once
 
-#include "hitable.hpp"
+#include "objects/object.hpp"
 /*
  * A plane is defined by a point and a normal.
  */
-class Plane : public Hitable {
+class Plane : public Object {
 
 public:
     Point3 distanceFromWorldOrigin;
@@ -15,7 +15,7 @@ public:
     distanceFromWorldOrigin(_distanceFromWorldOrigin), normal(_normal) {}
 
 
-    std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const  {
+    std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override {
         Vector3 tempNormal = normal; //Invert direction toward ray
 
         const Float epsilon = 1e-5;
@@ -35,6 +35,16 @@ public:
         hitInfo.normal = tempNormal;
 
         return {hitInfo};
+    }
+
+    //Emitter
+    virtual Spectrum Le(const Ray& incomingRay) const override {
+        return Vector3(0.0);
+    }
+
+    //IsEmitter
+    bool isEmitter() const override {
+        return false;
     }
 
 };

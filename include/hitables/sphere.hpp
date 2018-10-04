@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "hitable.hpp"
+#include "objects/object.hpp"
 #include "common/common.hpp"
 #include "materials/lambertUniform.hpp"
 
@@ -28,9 +28,9 @@ inline bool solveQuadraticEquation(const Float &a, const Float &b, const Float &
     return true;
 }
 
-class Sphere : public Hitable {
+class Sphere : public Object {
 public:
-        std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const {
+        std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override{
         Float a = glm::dot(ray.d, ray.d);
         Float b = 2.0 * glm::dot(ray.d, (ray.o - center));
         Float c = (glm::dot(ray.o - center, ray.o - center) - radius * radius);
@@ -60,6 +60,16 @@ public:
 
         return {hitInfo};
 
+    }
+
+    //Emitter
+    virtual Spectrum Le(const Ray& incomingRay) const override {
+        return Vector3(0.0);
+    }
+
+    //IsEmitter
+    bool isEmitter() const override {
+        return false;
     }
 
     Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr) :

@@ -11,7 +11,7 @@ class Integrator {
 
 struct HitBundle {
     HitInfo hitInfo;
-    std::shared_ptr<Hitable> closestObject;
+    std::shared_ptr<Object> closestObject;
 };
 
 std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& scene) {
@@ -21,14 +21,14 @@ std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& s
     HitBundle currentHitBundle{};
     bool hitSomething = false;
 
-    for(auto & hitable: scene.hitables) {
+    for(auto & object: scene.objects) {
 
-        std::optional<HitInfo> hitInfoOptional = hitable->checkIntersectionAndClosestHit(ray);
+        std::optional<HitInfo> hitInfoOptional = object->checkIntersectionAndClosestHit(ray);
 
         if (hitInfoOptional) {
             currentHitBundle.hitInfo = hitInfoOptional.value();
             hitSomething = true;
-            currentHitBundle.closestObject = hitable;
+            currentHitBundle.closestObject = object;
 
             if (currentHitBundle.hitInfo.tIntersection < closestHitBundle.hitInfo.tIntersection) {
                 closestHitBundle = currentHitBundle;

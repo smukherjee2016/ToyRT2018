@@ -1,9 +1,9 @@
 #pragma once
 
-#include "emitter.hpp"
+#include "objects/object.hpp"
 #include "util/pfmutils.hpp"
 
-class EnvironmentMap : public Emitter {
+class EnvironmentMap : public Object {
 
     bool isConstColorEnvMap;
     PFMInfo envMap;
@@ -17,6 +17,16 @@ public:
         else {
             isConstColorEnvMap = true;
         }
+    }
+
+    //IsEmitter
+    bool isEmitter() const override {
+        return true;
+    }
+
+    //Object
+    std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override {
+        return std::nullopt;
     }
 
     Spectrum Le(const Ray& incomingRay) const override {
