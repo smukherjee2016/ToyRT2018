@@ -77,7 +77,9 @@ public:
 
     Point3 samplePointOnEmitter(const Vector3& wo, const Vector3& normal) const override {
         Float x,y,z;
-        //Vector3 newNormal(1.0, 0.0, 0.0);
+        Point2 thetaPhi;
+        Point3 pointInCartesian;
+
         //std::vector<Vector3> arrays;
         //for(int i = 0; i < 10000; i++) {
         Float r1 = rng.generate1DUniform();
@@ -85,12 +87,12 @@ public:
 
         //Uniform weighted sphere sampling
         //Theta => [0, 2PI], Phi = [0, PI/2]
-        Point2 thetaPhi = uniformSphereSample(r1, r2);
+        thetaPhi = uniformSphereSample(r1, r2);
 
-        Point3 pointInCartesian = sphericaltoCartesian(thetaPhi.x, thetaPhi.y);
+        pointInCartesian = sphericaltoCartesian(thetaPhi.x, thetaPhi.y);
 
 
-        //    arrays.emplace_back(Vector3(x,y,z));
+        //    arrays.emplace_back(pointInCartesian);
         //}
         //saveObj("test.obj", arrays);
 
