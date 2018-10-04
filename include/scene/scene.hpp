@@ -19,7 +19,7 @@ public:
         std::shared_ptr<LambertUniform> lambertUniformPtr = std::make_shared<LambertUniform>(Spectrum(0.1, 0.4, 0.9));
         std::shared_ptr<LambertUniform> lambertUniformPtr2 = std::make_shared<LambertUniform>(Spectrum(0.9, 0.4, 0.1));
 
-        objects.emplace_back(std::make_unique<Sphere>(Vector3(-1.0, 0.0, 0.0), 1.0, lambertUniformPtr));
+        objects.emplace_back(std::make_unique<Sphere>(Vector3(-1.0, 0.0, 0.0), 1.0, lambertUniformPtr, Spectrum(10.0, 10.0, 10.0)));
         objects.emplace_back(std::make_unique<Sphere>(Vector3(0.2, 0.0, 0.0), 1.0, lambertUniformPtr2));
 
 

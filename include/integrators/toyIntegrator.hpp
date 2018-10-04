@@ -23,23 +23,39 @@ public:
 
                     if (hitBundle) {
                         HitBundle validHitBundle = hitBundle.value();
-                        Vector3 outgoingDirection = validHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
-                                                                                                       validHitBundle.hitInfo.normal);
-                        Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
-                                                                                validHitBundle.hitInfo.normal);
-                        Float pdf = validHitBundle.closestObject->mat->pdf(outgoingDirection, -cameraRay.d,
-                                                                           validHitBundle.hitInfo.normal);
-                        Point3 hitPoint = cameraRay.o + validHitBundle.hitInfo.tIntersection * cameraRay.d;
-                        Ray nextRay(hitPoint, outgoingDirection);
-                        std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
-                        if (nextRayHitBundle) {
-                            HitBundle nextBundle = nextRayHitBundle.value();
-                            pixelValue += Vector3(0.0);
 
-                        } else {
-                            pixelValue += scene.envMap->Le(nextRay) * brdf
-                                           * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdf;
+                        //If hit the emitter, return its Le
+                        if(validHitBundle.closestObject->isEmitter())
+                            pixelValue += validHitBundle.closestObject->Le(cameraRay);
+                        else {
+                            Vector3 outgoingDirection = validHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
+                                                                                                           validHitBundle.hitInfo.normal);
+                            Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
+                                                                                    validHitBundle.hitInfo.normal);
+                            Float pdf = validHitBundle.closestObject->mat->pdf(outgoingDirection, -cameraRay.d,
+                                                                               validHitBundle.hitInfo.normal);
+                            Point3 hitPoint = cameraRay.o + validHitBundle.hitInfo.tIntersection * cameraRay.d;
+                            Ray nextRay(hitPoint, outgoingDirection);
+                            std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                            if (nextRayHitBundle) {
+                                HitBundle nextBundle = nextRayHitBundle.value();
+
+                                //If hit a light source, return its Le
+                                if(nextBundle.closestObject->isEmitter()) {
+                                    pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdf;
+                                }
+                                else {
+                                    pixelValue += Vector3(0.0); //Since this is direct lighting, ignore bounce on other object
+                                }
+
+
+                            }
+                            else {
+                                pixelValue += scene.envMap->Le(nextRay) * brdf
+                                              * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdf;
+                            }
                         }
+
                     } else { //Did not hit any object so hit environment map
                         pixelValue += scene.envMap->Le(cameraRay);
                     }

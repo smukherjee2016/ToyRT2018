@@ -31,7 +31,7 @@ public:
 
     Spectrum Le(const Ray& incomingRay) const override {
         if(isConstColorEnvMap) {
-            return Spectrum(1.0, 1.0, 1.0); //White env map by default
+            return Spectrum(0.0, 0.0, 1.0); //Blue env map by default
         }
         else {
             //TODO Implement envmap sampling
