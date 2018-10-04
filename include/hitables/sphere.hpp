@@ -63,21 +63,55 @@ public:
     }
 
     //Emitter
-    virtual Spectrum Le(const Ray& incomingRay) const override {
-        return Vector3(0.0);
+    Spectrum Le(const Ray& incomingRay) const override {
+        return LeIntensity;
     }
 
     //IsEmitter
     bool isEmitter() const override {
-        return false;
+        if(LeIntensity == Vector3(0.0))
+            return false;
+        else
+            return true;
     }
 
-    Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr) :
-    center(_center), radius(_radius) {
+    Point3 samplePointOnEmitter(const Vector3& wo, const Vector3& normal) const override {
+        Float x,y,z;
+        //Vector3 newNormal(1.0, 0.0, 0.0);
+        //std::vector<Vector3> arrays;
+        //for(int i = 0; i < 10000; i++) {
+        Float r1 = rng.generate1DUniform();
+        Float r2 = rng.generate1DUniform();
+
+        //Uniform weighted sphere sampling
+        //Theta => [0, 2PI], Phi = [0, PI/2]
+        Point2 thetaPhi = uniformSphereSample(r1, r2);
+
+        Point3 pointInCartesian = sphericaltoCartesian(thetaPhi.x, thetaPhi.y);
+
+
+        //    arrays.emplace_back(Vector3(x,y,z));
+        //}
+        //saveObj("test.obj", arrays);
+
+        Basis basis;
+        basis.makeOrthonormalBasis(normal);
+
+        return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+
+    }
+
+    Float pdfEmitter(const Vector3& wi, const Vector3& wo, const Vector3& normal) const override {
+        return 0.25 * M_INVPI; // 1/4PI
+    }
+
+    Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr, Spectrum _Le = Vector3(0.0)) :
+    center(_center), radius(_radius), LeIntensity(_Le) {
             mat = _mat; //Base class members apparently doesn't work otherwise...
     }
 
     Point3 center = {0, 0, 0};
     Float radius = 1.0;
+    Spectrum LeIntensity;
 
 };
