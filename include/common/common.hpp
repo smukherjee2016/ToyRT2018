@@ -83,3 +83,33 @@ inline Point3 sphericaltoCartesian(const Float theta, const Float phi) {
 
     return point;
 }
+
+/*
+ * All these sampling domain conversions assume:
+ * u1, u2 -> [0,1]
+ * theta -> [0, 2PI]
+ * phi -> [0, PI/2] for hemisphere, [0, PI] for sphere
+ */
+inline Point2 uniformHemisphereSample(const Float u1, const Float u2) {
+    Point2 thetaphi;
+
+    Float theta = 2 * M_PI * u1;
+    Float phi = std::acos(u2);
+
+    thetaphi.x = theta;
+    thetaphi.y = phi;
+
+    return thetaphi;
+}
+
+inline Point2 uniformSphereSample(const Float u1, const Float u2) {
+    Point2 thetaphi;
+
+    Float theta = 2 * M_PI * u1;
+    Float phi = std::acos(1.0 - 2.0 * u2);
+
+    thetaphi.x = theta;
+    thetaphi.y = phi;
+
+    return thetaphi;
+}
