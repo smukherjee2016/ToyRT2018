@@ -15,7 +15,6 @@ public:
     void makeScene() {
 
         envMap = std::make_shared<EnvironmentMap>();
-        //emitters.emplace_back(envMap);
 
         std::shared_ptr<LambertUniform> lambertUniformPtr = std::make_shared<LambertUniform>(Spectrum(0.1, 0.4, 0.9));
         std::shared_ptr<LambertUniform> lambertUniformPtr2 = std::make_shared<LambertUniform>(Spectrum(0.9, 0.4, 0.1));
