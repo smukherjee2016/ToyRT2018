@@ -9,7 +9,7 @@
 
 class Film {
 public:
-    Float xFOV = M_PI / 4.0;
+    Float FOV = M_PI / 4.0;
     Float distanceToFilm = 1.0;
     Float aspectRatio = 16.0 / 9.0;
     int screenWidth;
@@ -17,8 +17,8 @@ public:
 
     std::vector<Spectrum> pixels;
 
-    Film(Float _xFOV, Float _distanceToFilm, int _screenWidth, int _screenHeight) {
-        xFOV = _xFOV;
+    Film(Float _FOV, Float _distanceToFilm, int _screenWidth, int _screenHeight) {
+        FOV = _FOV;
         distanceToFilm = _distanceToFilm;
         screenWidth = _screenWidth;
         screenHeight = _screenHeight;

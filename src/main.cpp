@@ -6,12 +6,12 @@
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
 
-const int sampleCount = 1024;
+const int sampleCount = 16;
 
 int main(void) {
 
-    int resX = 1024;
-    int resY = 576;
+    int resX = 1200;
+    int resY = 800;
 
     //std::cout << rng.generate1DUniform() << std::endl;
 

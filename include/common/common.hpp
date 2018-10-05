@@ -6,6 +6,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <fstream>
+//#define USE_X_FOV
 
 using Point2 = glm::vec2;
 using Point3 = glm::vec3;
