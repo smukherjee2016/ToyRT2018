@@ -13,8 +13,7 @@ public:
 
     Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const {
 
-        Float x,y,z;
-        //Vector3 newNormal(1.0, 0.0, 0.0);
+        Point3 pointInCartesian;
         //std::vector<Vector3> arrays;
         //for(int i = 0; i < 10000; i++) {
             Float r1 = rng.generate1DUniform();
@@ -25,9 +24,9 @@ public:
             Float theta = 2 * M_PI * r1;
             Float phi = std::acos(r2);
 
-            Point3 pointInCartesian = sphericaltoCartesian(theta, phi);
+            pointInCartesian = sphericaltoCartesian(theta, phi);
 
-        //    arrays.emplace_back(Vector3(x,y,z));
+          //  arrays.emplace_back(Vector3(pointInCartesian.x,pointInCartesian.y,pointInCartesian.z));
         //}
         //saveObj("test.obj", arrays);
 
@@ -46,7 +45,7 @@ public:
         return kD * M_INVPI;
     }
 
-    virtual Float pdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+    Float pdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
         if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
             return 0.0; //Return black value for things below the horizon
         }
