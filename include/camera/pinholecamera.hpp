@@ -32,10 +32,13 @@ public:
     Ray generateCameraRay(const int x, const int y, const Film& film) const { //Pixel coordinates
         Float u = (static_cast<Float>(x) + 0.5) / film.screenWidth; //Shoot ray from pixel center
         Float v = (static_cast<Float>(y) + 0.5) / film.screenHeight;
-
-        Float widthImagePlane = 2.0 * film.distanceToFilm * std::tan(film.xFOV / 2.0);
+#ifdef USE_X_FOV
+        Float widthImagePlane = 2.0 * film.distanceToFilm * std::tan(film.FOV / 2.0);
         Float heightImagePlane = widthImagePlane / film.aspectRatio;
-
+#else
+        Float heightImagePlane = 2.0 * film.distanceToFilm * std::tan(film.FOV / 2.0);
+        Float widthImagePlane = heightImagePlane / film.aspectRatio;
+#endif
         Float xImagePlane = (u - 0.5) * widthImagePlane;
         Float yImagePlane = (v - 0.5) * heightImagePlane;
 
