@@ -3,6 +3,7 @@
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
 #include "scene/scene.hpp"
+#include "util/rng.hpp"
 #include <optional>
 
 class Integrator {
@@ -42,4 +43,29 @@ std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& s
 
     return std::nullopt;
 
+}
+
+struct EmitterBundle {
+    std::shared_ptr<Object> emitter;
+    Float pdfSelectEmitter;
+};
+
+inline std::optional<EmitterBundle> selectRandomEmitter(const Scene& scene) {
+    std::vector<std::shared_ptr<Object>> emitters;
+    for(auto& object : scene.objects) {
+        if(object->isEmitter())
+            emitters.emplace_back(object);
+    }
+
+    if(emitters.size() == 0)
+        return std::nullopt;
+
+    //Select random light source uniformly
+    int randomEmitterIndex = rng.generateRandomInt(emitters.size() - 1);
+
+    EmitterBundle ret;
+    ret.emitter = emitters.at(randomEmitterIndex);
+    ret.pdfSelectEmitter = 1.0 / static_cast<Float>(emitters.size());
+
+    return ret;
 }

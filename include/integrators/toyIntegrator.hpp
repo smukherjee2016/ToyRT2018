@@ -28,6 +28,31 @@ public:
                         if(validHitBundle.closestObject->isEmitter())
                             pixelValue += validHitBundle.closestObject->Le(cameraRay);
                         else {
+#ifdef USE_LIGHT_SAMPLING
+                            std::optional<EmitterBundle> emitterOptionalBundle = selectRandomEmitter(scene);
+                            if(emitterOptionalBundle) {
+                                EmitterBundle emitterBundle = emitterOptionalBundle.value();
+                                Point3 pointOnLightSource = emitterBundle.emitter->samplePointOnEmitter(-cameraRay.d, validHitBundle.hitInfo.normal);
+                                Vector3 outgoingDirection = glm::normalize(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
+                                Float pdfOfLightSource = emitterBundle.emitter->pdfEmitter(outgoingDirection, -cameraRay.d, validHitBundle.hitInfo.normal);
+
+                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - 1e-5;
+                                Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,1e-5,tMax);
+                                std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                                if (!nextRayHitBundle) {
+                                    //Unoccluded so we can reach light source
+                                    pixelValue += Vector3(0.0);
+
+                                }
+                                else {
+                                    pixelValue += Vector3(0.0); //Light sample occluded so discard it
+                                }
+
+                            }
+                            else { //No light sources in scene, so try to sample from envmap or return error
+                                pixelValue += scene.envMap->Le(cameraRay);
+                            }
+#else
                             Vector3 outgoingDirection = validHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
                                                                                                            validHitBundle.hitInfo.normal);
                             Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
@@ -53,6 +78,7 @@ public:
                                 pixelValue += scene.envMap->Le(nextRay) * brdf
                                               * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdf;
                             }
+#endif
                         }
 
                     } else { //Did not hit any object so hit environment map
