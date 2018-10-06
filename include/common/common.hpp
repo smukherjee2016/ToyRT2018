@@ -7,12 +7,21 @@
 #include <cmath>
 #include <fstream>
 //#define USE_X_FOV
+//#define USE_DOUBLE_PRECISION
 
+#ifdef USE_DOUBLE_PRECISION
+using Point2 = glm::dvec2;
+using Point3 = glm::dvec3;
+using Vector3 = glm::dvec3;
+using Float = double;
+using Spectrum = glm::dvec3;
+#else
 using Point2 = glm::vec2;
 using Point3 = glm::vec3;
 using Vector3 = glm::vec3;
 using Float = float;
 using Spectrum = glm::vec3;
+#endif
 
 const Float Infinity = std::numeric_limits<Float>::max();
 const Float M_PI = 3.141592653589793238462643383279502884197169399375105;
@@ -35,6 +44,7 @@ Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& 
 
 struct HitInfo {
     Float tIntersection;
+    Point3 intersectionPoint;
     Vector3 normal;
 };
 
