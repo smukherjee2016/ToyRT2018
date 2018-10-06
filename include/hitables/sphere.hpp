@@ -5,14 +5,14 @@
 #include "common/common.hpp"
 #include "materials/lambertUniform.hpp"
 
-inline bool solveQuadraticEquation(const Float &a, const Float &b, const Float &c, Float &t1, Float &t2)
+inline bool solveQuadraticEquation(const double a, const double b, const double c, double* t1, double* t2)
 {
-    Float discriminant = b * b - 4 * a * c;
+    double discriminant = b * b - 4 * a * c;
     if (discriminant < 0) return false; //No intersection
-    else if (discriminant == 0) t1 = t2 = - 0.5 * b / a; //Same solution
+    else if (discriminant == 0) *t1 = *t2 = - 0.5 * b / a; //Same solution
     else {
         //Numerically more robust method
-        Float q;
+        double q;
         if(b > 0.0) {
             q = -0.5 * (b + sqrt(discriminant));
         }
@@ -20,8 +20,8 @@ inline bool solveQuadraticEquation(const Float &a, const Float &b, const Float &
             q = -0.5 * (b - sqrt(discriminant));
         }
 
-        t1 = q / a;
-        t2 = c / q;
+        *t1 = q / a;
+        *t2 = c / q;
     }
     if (t1 > t2) std::swap(t1, t2);
 
@@ -31,34 +31,38 @@ inline bool solveQuadraticEquation(const Float &a, const Float &b, const Float &
 class Sphere : public Object {
 public:
         std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override{
-        Float a = glm::dot(ray.d, ray.d);
-        Float b = 2.0 * glm::dot(ray.d, (ray.o - center));
-        Float c = (glm::dot(ray.o - center, ray.o - center) - radius * radius);
+            glm::dvec3 highPrecisionOrigin = ray.o;
+            glm::dvec3 highPrecisionDirection = ray.d;
 
-        HitInfo hitInfo;
+            double a = glm::dot(highPrecisionDirection, highPrecisionDirection);
+            double b = 2.0 * glm::dot(highPrecisionDirection, (highPrecisionOrigin - center));
+            double c = (glm::dot(highPrecisionOrigin - center, highPrecisionOrigin - center) - radius * radius);
 
-        Float t1, t2;
-        if(!solveQuadraticEquation(a, b, c, t1, t2)) //Filters out cases when quadratic equation has no solution
-            return std::nullopt;
+            HitInfo hitInfo;
 
-        if(t1 > t2) std::swap(t1, t2); //Keep the least value in t1 with intention of returning it
-        if(t1 < 0.0) { //If t1 is not positive, try to use t2
-            t1 = t2;
-            if(t1 < 0.0) { //If t2 (put into t1) is also not positive, no hope
+            double t1, t2;
+            if(!solveQuadraticEquation(a, b, c, &t1, &t2)) //Filters out cases when quadratic equation has no solution
                 return std::nullopt;
+
+            if(t1 > t2) std::swap(t1, t2); //Keep the least value in t1 with intention of returning it
+            if(t1 < 0.0) { //If t1 is not positive, try to use t2
+                t1 = t2;
+                if(t1 < 0.0) { //If t2 (put into t1) is also not positive, no hope
+                    return std::nullopt;
+                }
             }
-        }
 
-        hitInfo.tIntersection = t1; //The last bastion
+            hitInfo.tIntersection = t1; //The last bastion
 
-        if(hitInfo.tIntersection < ray.tmin || hitInfo.tIntersection > ray.tmax) { //Prevent self-intersection
-          return std::nullopt;
-        }
+            if(hitInfo.tIntersection < ray.tmin || hitInfo.tIntersection > ray.tmax) { //Prevent self-intersection
+              return std::nullopt;
+            }
 
-        Point3 intersectionPoint = ray.o + hitInfo.tIntersection * ray.d;
-        hitInfo.normal = (intersectionPoint - center) / radius;
+            glm::dvec3 intersectionPoint = ray.o + hitInfo.tIntersection * ray.d;
+            hitInfo.intersectionPoint = intersectionPoint;
+            hitInfo.normal = (intersectionPoint - center) / radius;
 
-        return {hitInfo};
+            return {hitInfo};
 
     }
 
@@ -97,7 +101,7 @@ public:
         //saveObj("test.obj", arrays);
 
         //This cartesian point is w.r.t center of the sphere, so return the point in world space
-        return (pointInCartesian + center);
+        return (pointInCartesian + static_cast<Point3>(center));
 
     }
 
@@ -110,8 +114,8 @@ public:
             mat = _mat; //Base class members apparently doesn't work otherwise...
     }
 
-    Point3 center = {0, 0, 0};
-    Float radius = 1.0;
+    glm::dvec3 center = {0, 0, 0};
+    double radius = 1.0;
     Spectrum LeIntensity;
 
 };

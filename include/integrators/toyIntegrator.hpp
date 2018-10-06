@@ -34,8 +34,7 @@ public:
                                                                                     validHitBundle.hitInfo.normal);
                             Float pdf = validHitBundle.closestObject->mat->pdf(outgoingDirection, -cameraRay.d,
                                                                                validHitBundle.hitInfo.normal);
-                            Point3 hitPoint = cameraRay.o + validHitBundle.hitInfo.tIntersection * cameraRay.d;
-                            Ray nextRay(hitPoint, outgoingDirection);
+                            Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                             if (nextRayHitBundle) {
                                 HitBundle nextBundle = nextRayHitBundle.value();
