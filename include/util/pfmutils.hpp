@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/vec3.hpp>
+#include "common/common.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -95,7 +95,7 @@ PFMInfo readPFM(std::string file) {
 	return returnPFM;
 }
 
-void writePFM(std::string file, std::vector<glm::vec3> image, int w, int h) {
+void writePFM(std::string file, std::vector<Spectrum> image, int w, int h) {
 	//Write Big-endian colorful image
 	std::ofstream outFile(file, std::ios::out | std::ios::binary);
 	float sfEndianness = -1.0f;
