@@ -101,9 +101,13 @@ void writePFM(std::string file, std::vector<Spectrum> image, int w, int h) {
 	float sfEndianness = -1.0f;
 	outFile << "PF" << std::endl << w << " " << h << std::endl << sfEndianness << std::endl;
 	for (auto& v : image) {
-		outFile.write(reinterpret_cast<char*>(&v.x), sizeof(float));
-		outFile.write(reinterpret_cast<char*>(&v.y), sizeof(float));
-		outFile.write(reinterpret_cast<char*>(&v.z), sizeof(float));
+		float x = static_cast<float>(v.x);
+        float y = static_cast<float>(v.y);
+        float z = static_cast<float>(v.z);
+
+        outFile.write(reinterpret_cast<char*>(&x), sizeof(float));
+		outFile.write(reinterpret_cast<char*>(&y), sizeof(float));
+		outFile.write(reinterpret_cast<char*>(&z), sizeof(float));
 	}
 	outFile.close();
 }
