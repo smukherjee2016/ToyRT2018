@@ -36,8 +36,8 @@ public:
                                 Vector3 outgoingDirection = glm::normalize(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
                                 Float pdfOfLightSource = emitterBundle.emitter->pdfEmitter(outgoingDirection, -cameraRay.d, validHitBundle.hitInfo.normal);
 
-                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - 1e-5;
-                                Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,1e-5,tMax);
+                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - epsilon;
+                                Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
                                 std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                                 if (!nextRayHitBundle) {
                                     //Unoccluded so we can reach light source
