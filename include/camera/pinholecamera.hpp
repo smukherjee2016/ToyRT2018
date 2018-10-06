@@ -2,6 +2,7 @@
 
 #include "common/common.hpp"
 #include "film/film.hpp"
+#include "util/rng.hpp"
 
 class PinholeCamera {
 
@@ -30,8 +31,8 @@ public:
     }
 
     Ray generateCameraRay(const int x, const int y, const Film& film) const { //Pixel coordinates
-        Float u = (static_cast<Float>(x) + 0.5) / film.screenWidth; //Shoot ray from pixel center
-        Float v = (static_cast<Float>(y) + 0.5) / film.screenHeight;
+        Float u = (static_cast<Float>(x) + rng.generate1DUniform()) / film.screenWidth; //Shoot ray randomly to do AntiAliasing
+        Float v = (static_cast<Float>(y) + rng.generate1DUniform()) / film.screenHeight;
 #ifdef USE_X_FOV
         Float widthImagePlane = 2.0 * film.distanceToFilm * std::tan(film.FOV / 2.0);
         Float heightImagePlane = widthImagePlane / film.aspectRatio;
