@@ -15,6 +15,12 @@ public:
         std::uniform_real_distribution<Float> uniformRealDistribution(0.0, 1.0);
         return uniformRealDistribution(rng);
     }
+
+    int generateRandomInt(int maxValue) {
+        std::uniform_int_distribution<int> uniformIntDistribution(0, maxValue);
+        return uniformIntDistribution(rng);
+    }
+
 private:
     pcg64_oneseq rng;
 
