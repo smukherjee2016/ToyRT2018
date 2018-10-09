@@ -7,7 +7,7 @@
 #include <cmath>
 #include <fstream>
 //#define USE_X_FOV
-//#define USE_DOUBLE_PRECISION
+#define USE_DOUBLE_PRECISION
 #define USE_LIGHT_SAMPLING
 
 #ifdef USE_DOUBLE_PRECISION

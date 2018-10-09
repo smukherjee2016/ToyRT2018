@@ -33,7 +33,8 @@ public:
         objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<LambertUniform>(Spectrum(.75)))); //Floor (after modification)
         objects.emplace_back(std::make_unique<Sphere>(Point3(27,16.5,47)       , 16.5, std::make_shared<LambertUniform>(Spectrum(.999))));
         objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertUniform>(Spectrum(.999))));
-        objects.emplace_back(std::make_unique<Sphere>(Point3(50,681.6-.27,81.6), 600 , std::make_shared<LambertUniform>(Spectrum(0.0)), Spectrum(12)));
+        //objects.emplace_back(std::make_unique<Sphere>(Point3(50,681.6-.27,81.6), 600 , std::make_shared<LambertUniform>(Spectrum(0.0)), Spectrum(12)));
+        objects.emplace_back(std::make_unique<Sphere>(Point3(50,52,81.6), 6 , std::make_shared<LambertUniform>(Spectrum(0.0)), Spectrum(12)));
 
     }
 };

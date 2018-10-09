@@ -43,8 +43,11 @@ public:
         return Point3(0.0);
     }
 
-    Float pdfEmitter(const Vector3& wi, const Vector3& wo, const Vector3& normal) const override {
+    Float pdfEmitter(const Vector3& wi, const Point3 & point) const override {
         return 0.0;
     }
 
+    Vector3 getNormalForEmitter(const Point3& point) const override {
+        return Vector3(0.0);
+    }
 };
