@@ -47,9 +47,9 @@ public:
                                     //Unoccluded so we can reach light source
                                     Vector3 emitterNormal = emitterBundle.emitter->getNormalForEmitter(pointOnLightSource);
 
-                                    Float distance = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
+                                    Float squaredDistance = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
                                     Float geometryTerm =  glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * glm::dot(emitterNormal, -outgoingDirection)
-                                            / distance;
+                                            / squaredDistance;
                                     pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm  / pdfOfLightSource;
                                     pixelValue /= emitterBundle.pdfSelectEmitter;
 
