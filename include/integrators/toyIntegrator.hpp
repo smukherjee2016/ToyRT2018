@@ -38,18 +38,20 @@ public:
 
                                 Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
                                                                                         validHitBundle.hitInfo.normal);
-                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - epsilon;
+
+                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - 2.0 * epsilon;
                                 Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
+                                //Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection);
+
                                 std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                                 if (!nextRayHitBundle) {
                                     //Unoccluded so we can reach light source
-                                    Ray actualRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection);
-                                    pixelValue += emitterBundle.emitter->Le(actualRay) * brdf / pdfOfLightSource;
+                                    pixelValue += emitterBundle.emitter->Le(nextRay) * brdf / pdfOfLightSource;
                                     pixelValue /= emitterBundle.pdfSelectEmitter;
 
                                 }
                                 else {
-                                    pixelValue += Vector3(1.0, 0.0, 0.0); //Light sample occluded so discard it
+                                    pixelValue += Vector3(0.0, 0.0, 0.0); //Light sample occluded so discard it
                                 }
 
                             }
