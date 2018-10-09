@@ -101,12 +101,17 @@ public:
         //saveObj("test.obj", arrays);
 
         //This cartesian point is w.r.t center of the sphere, so return the point in world space
-        return (pointInCartesian + static_cast<Point3>(center));
+        return (pointInCartesian * radius + static_cast<Point3>(center));
 
     }
 
-    Float pdfEmitter(const Vector3& wi, const Vector3& wo, const Vector3& normal) const override {
-        return 0.25 * M_INVPI; // 1/4PI
+    Float pdfEmitter(const Vector3& wi, const Point3 & point) const override {
+        Float pdfAreaDomain = 1.0 / (4.0 * M_PI * radius * radius); // 1/4PI
+        return pdfAreaDomain;
+    }
+
+    Vector3 getNormalForEmitter(const Point3& point) const override {
+        return glm::normalize((point - center) / radius);
     }
 
     Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr, Spectrum _Le = Vector3(0.0)) :
