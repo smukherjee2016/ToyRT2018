@@ -34,19 +34,23 @@ public:
                                 EmitterBundle emitterBundle = emitterOptionalBundle.value();
                                 Point3 pointOnLightSource = emitterBundle.emitter->samplePointOnEmitter(-cameraRay.d, validHitBundle.hitInfo.normal);
                                 Vector3 outgoingDirection = glm::normalize(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
-                                Float pdfOfLightSource = emitterBundle.emitter->pdfEmitter(outgoingDirection, -cameraRay.d, validHitBundle.hitInfo.normal);
+                                Float pdfOfLightSource = emitterBundle.emitter->pdfEmitter(outgoingDirection, validHitBundle.hitInfo.intersectionPoint);
 
                                 Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
                                                                                         validHitBundle.hitInfo.normal);
-
-                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - 2.0 * epsilon;
+                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - epsilon;
                                 Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
                                 //Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection);
 
                                 std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                                 if (!nextRayHitBundle) {
                                     //Unoccluded so we can reach light source
-                                    pixelValue += emitterBundle.emitter->Le(nextRay) * brdf / pdfOfLightSource;
+                                    Vector3 emitterNormal = emitterBundle.emitter->getNormalForEmitter(pointOnLightSource);
+
+                                    Float distance = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
+                                    Float geometryTerm =  glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * glm::dot(emitterNormal, -outgoingDirection)
+                                            / distance;
+                                    pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm  / pdfOfLightSource;
                                     pixelValue /= emitterBundle.pdfSelectEmitter;
 
                                 }
