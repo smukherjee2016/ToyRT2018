@@ -5,6 +5,9 @@
 #include "hitables/sphere.hpp"
 #include "hitables/plane.hpp"
 #include "emitters/envmap.hpp"
+#include "materials/lambertUniform.hpp"
+#include "materials/lambertCosine.hpp"
+
 
 class Scene
 {

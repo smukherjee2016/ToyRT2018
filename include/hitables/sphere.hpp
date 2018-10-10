@@ -3,9 +3,7 @@
 
 #include "objects/object.hpp"
 #include "common/common.hpp"
-#include "materials/lambertUniform.hpp"
-#include "materials/lambertCosine.hpp"
-
+#include "materials/material.hpp"
 
 inline bool solveQuadraticEquation(const double a, const double b, const double c, double* t1, double* t2)
 {
