@@ -6,15 +6,15 @@
 class Phong : public Material {
 public:
     Spectrum kS;
-    int g; //Glossiness
+    int phongExponent; //Glossiness
 
     Phong(const Spectrum& _kS, const int _g = 1) {
         kS = _kS;
-        g = _g;
+        phongExponent = _g;
     }
 
-    Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const {
-
+    Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const override {
+#if 0
         Point3 pointInCartesian;
         //std::vector<Vector3> arrays;
         //for(int i = 0; i < 10000; i++) {
@@ -36,6 +36,30 @@ public:
         basis.makeOrthonormalBasis(normal);
 
         return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+#else
+        Vector3 reflectedVector = glm::reflect(-wo, normal);
+        Point3 pointInCartesian;
+        //std::vector<Vector3> arrays;
+        //for(int i = 0; i < 10000; i++) {
+        Float r1 = rng.generate1DUniform();
+        Float r2 = rng.generate1DUniform();
+
+        //Cosine weighted hemisphere sampling
+        //Theta => [0, 2PI], Phi = [0, PI/2]
+        Float theta = 2 * M_PI * r1;
+        Float phi = std::acos(std::pow(r2, 1.0 / (phongExponent + 1.0)));
+
+        pointInCartesian = sphericaltoCartesian(theta, phi);
+
+        //  arrays.emplace_back(Vector3(pointInCartesian.x,pointInCartesian.y,pointInCartesian.z));
+        //}
+        //saveObj("test.obj", arrays);
+
+        Basis basis;
+        basis.makeOrthonormalBasis(reflectedVector); //Sample cone and transform
+
+        return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+#endif
 
     }
 
@@ -45,19 +69,34 @@ public:
         }
 
         Vector3 reflectedVector = glm::reflect(-wi, normal);
-        Float normalizationFactor = (static_cast<Float>(g) + 2.0) * 0.5 * M_INVPI;
+        Float normalizationFactor = (static_cast<Float>(phongExponent) + 2.0) * 0.5 * M_INVPI;
 
-        Float glossiness = normalizationFactor * std::pow(std::max(0.0, glm::dot(wo, reflectedVector)), g);
+        Float glossiness = normalizationFactor * std::pow(std::max(0.0, glm::dot(wo, reflectedVector)), phongExponent);
 
         return kS * glossiness;
     }
 
     Float pdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+
+#if 0
         if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
             return 0.0; //Return black value for things below the horizon
         }
 
         return M_INVPI * glm::dot(wi, normal); // cos(Phi) / PI = dot(sampledDirection, normal) / PI
+#else
+
+        if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
+            return 0.0; //Return black value for things below the horizon
+        }
+
+        Vector3 reflectedVector = glm::reflect(-wi, normal);
+        Float cosReflect = std::max(0.0, glm::dot(wo, reflectedVector));
+        if(cosReflect <= 0.0) return 0.0;
+
+        Float importanceSamplingPdf = (phongExponent + 1.0) * 0.5 * M_INVPI; //(n+1)/2PI
+        return importanceSamplingPdf;
+#endif
     }
 
 };
