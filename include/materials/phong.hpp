@@ -94,7 +94,7 @@ public:
         Float cosReflect = std::max(0.0, glm::dot(wo, reflectedVector));
         if(cosReflect <= 0.0) return 0.0;
 
-        Float importanceSamplingPdf = (phongExponent + 1.0) * 0.5 * M_INVPI; //(n+1)/2PI
+        Float importanceSamplingPdf = (phongExponent + 1.0) * 0.5 * M_INVPI * std::pow(cosReflect, phongExponent); //(n+1)/2PI
         return importanceSamplingPdf;
 #endif
     }
