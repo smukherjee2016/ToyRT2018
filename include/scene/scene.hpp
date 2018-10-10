@@ -7,7 +7,7 @@
 #include "emitters/envmap.hpp"
 #include "materials/lambertUniform.hpp"
 #include "materials/lambertCosine.hpp"
-
+#include "materials/blinnphong.hpp"
 
 class Scene
 {
@@ -32,12 +32,13 @@ public:
         objects.emplace_back(std::make_unique<Sphere>(Point3(1e5+99,40.8,81.6)  , 1e5 , std::make_shared<LambertCosine>(Spectrum(.25,.25,.75)))); // Right wall (after modification
         objects.emplace_back(std::make_unique<Sphere>(Point3(-1e5+1,40.8,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(.75,.25,.25)))); //Left wall (after modification)
         objects.emplace_back(std::make_unique<Sphere>(Point3(50,40.8,-1e5)      , 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)))); //Front wall (after modification)
-        objects.emplace_back(std::make_unique<Sphere>(Point3(50,1e5+81.6,81.6)      , 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)), Spectrum(2))); //Ceiling (after modification)
+        objects.emplace_back(std::make_unique<Sphere>(Point3(50,1e5+81.6,81.6)      , 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)))); //Ceiling (after modification)
         objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)))); //Floor (after modification)
         objects.emplace_back(std::make_unique<Sphere>(Point3(27,16.5,47)       , 16.5, std::make_shared<LambertCosine>(Spectrum(.999))));
-        objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(.999))));
+        //objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(.999))));
+        objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<BlinnPhong>(Spectrum(0.0, 0.5, 1.0), 50)));
         //objects.emplace_back(std::make_unique<Sphere>(Point3(50,681.6-.27,81.6), 600 , std::make_shared<LambertUniform>(Spectrum(0.0)), Spectrum(12)));
-        //objects.emplace_back(std::make_unique<Sphere>(Point3(50,52,81.6), 6 , std::make_shared<LambertCosine>(Spectrum(0.0)), Spectrum(12)));
+        objects.emplace_back(std::make_unique<Sphere>(Point3(80,52,81.6), 6 , std::make_shared<LambertCosine>(Spectrum(0.0)), Spectrum(12)));
 
     }
 };

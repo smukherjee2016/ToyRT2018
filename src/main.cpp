@@ -6,7 +6,7 @@
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
 
-const int sampleCount = 256;
+const int sampleCount = 64;
 
 int main(void) {
 
