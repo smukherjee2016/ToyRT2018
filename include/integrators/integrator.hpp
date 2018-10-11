@@ -69,3 +69,9 @@ inline std::optional<EmitterBundle> selectRandomEmitter(const Scene& scene) {
 
     return ret;
 }
+
+inline Float PowerHeuristic(int nF, Float pdfF, int nG, Float pdfG) {
+    Float f = nF * pdfF;
+    Float g = nG * pdfG;
+    return (f * f) / (f * f + g * g);
+}

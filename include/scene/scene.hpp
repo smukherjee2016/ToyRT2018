@@ -39,7 +39,7 @@ public:
         //objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(.999))));
         objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<Phong>(Spectrum(0.01, 0.5, 0.999), 10)));
         //objects.emplace_back(std::make_unique<Sphere>(Point3(50,681.6-.27,81.6), 600 , std::make_shared<LambertUniform>(Spectrum(0.0)), Spectrum(12)));
-        objects.emplace_back(std::make_unique<Sphere>(Point3(80,52,81.6), 6 , std::make_shared<LambertCosine>(Spectrum(0.0001)), Spectrum(12)));
+        objects.emplace_back(std::make_unique<Sphere>(Point3(60,52,81.6), 6 , std::make_shared<LambertCosine>(Spectrum(0.0001)), Spectrum(60)));
 
     }
 };

@@ -15,7 +15,7 @@ public:
     //Emitter
     virtual Spectrum Le(const Ray& incomingRay) const = 0;
     virtual Point3 samplePointOnEmitter(const Vector3& wo, const Vector3& normal) const = 0;
-    virtual Float pdfEmitter(const Vector3& wi, const Point3 & point) const = 0;
+    virtual Float pdfEmitter(const Point3 & point) const = 0;
     virtual Vector3 getNormalForEmitter(const Point3& point) const = 0;
 
     //IsEmitter
