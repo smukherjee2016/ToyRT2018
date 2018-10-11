@@ -44,7 +44,7 @@ public:
         Float r1 = rng.generate1DUniform();
         Float r2 = rng.generate1DUniform();
 
-        //Cosine weighted hemisphere sampling
+        //Phong importance sampling
         //Theta => [0, 2PI], Phi = [0, PI/2]
         Float theta = 2 * M_PI * r1;
         Float phi = std::acos(std::pow(r2, 1.0 / (phongExponent + 1.0)));
