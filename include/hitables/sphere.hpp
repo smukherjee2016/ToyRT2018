@@ -105,7 +105,7 @@ public:
 
     }
 
-    Float pdfEmitter(const Point3 & point) const override {
+    Float pdfEmitterA(const Point3 &point) const override {
         Float pdfAreaDomain = 1.0 / (4.0 * M_PI * radius * radius); // 1/4PI
         return pdfAreaDomain;
     }

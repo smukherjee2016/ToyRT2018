@@ -45,7 +45,7 @@ public:
         return kD * M_INVPI;
     }
 
-    Float pdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+    Float pdfW(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) const {
         if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
             return 0.0; //Return black value for things below the horizon
         }

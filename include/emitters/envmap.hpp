@@ -43,7 +43,7 @@ public:
         return Point3(0.0);
     }
 
-    Float pdfEmitter(const Point3 & point) const override {
+    Float pdfEmitterA(const Point3 &point) const override {
         return 0.0;
     }
 

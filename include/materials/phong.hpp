@@ -76,7 +76,7 @@ public:
         return kS * glossiness;
     }
 
-    Float pdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+    Float pdfW(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) const {
 
 #if 0
         if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
