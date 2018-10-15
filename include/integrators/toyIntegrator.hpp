@@ -22,41 +22,41 @@ public:
                     std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(cameraRay, scene);
 
                     if (hitBundle) {
-                        HitBundle validHitBundle = hitBundle.value();
+                        HitBundle cameraRayHitBundle = hitBundle.value();
 
                         //If hit the emitter, return its Le
-                        if(validHitBundle.closestObject->isEmitter())
-                            pixelValue += validHitBundle.closestObject->Le(cameraRay);
+                        if(cameraRayHitBundle.closestObject->isEmitter())
+                            pixelValue += cameraRayHitBundle.closestObject->Le(cameraRay);
                         else {
                             //Emitter Sampling
                             std::optional<EmitterBundle> emitterOptionalBundle = selectRandomEmitter(scene);
                             if(emitterOptionalBundle) {
                                 EmitterBundle emitterBundle = emitterOptionalBundle.value();
-                                Point3 pointOnLightSource = emitterBundle.emitter->samplePointOnEmitter(-cameraRay.d, validHitBundle.hitInfo.normal);
-                                Vector3 outgoingDirection = glm::normalize(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
+                                Point3 pointOnLightSource = emitterBundle.emitter->samplePointOnEmitter(-cameraRay.d, cameraRayHitBundle.hitInfo.normal);
+                                Vector3 outgoingDirection = glm::normalize(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint);
                                 Float pdfEmitterA_EmitterSampling = emitterBundle.emitter->pdfEmitterA(
-                                        validHitBundle.hitInfo.intersectionPoint);
+                                        cameraRayHitBundle.hitInfo.intersectionPoint);
 
-                                Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
-                                                                                        validHitBundle.hitInfo.normal);
-                                Float pdfBSDF_EmitterSampling = validHitBundle.closestObject->mat->pdfW(
+                                Spectrum brdf = cameraRayHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
+                                                                                        cameraRayHitBundle.hitInfo.normal);
+                                Float pdfBSDF_EmitterSampling = cameraRayHitBundle.closestObject->mat->pdfW(
                                         outgoingDirection, -cameraRay.d,
-                                        validHitBundle.hitInfo.normal);
+                                        cameraRayHitBundle.hitInfo.normal);
 
-                                Float tMax = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) - epsilon;
-                                Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
-                                //Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection);
+                                Float tMax = glm::length(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint) - epsilon;
+                                Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
+                                //Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
 
                                 std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                                 if (!nextRayHitBundle) {
                                     //Unoccluded so we can reach light source
                                     Vector3 emitterNormal = emitterBundle.emitter->getNormalForEmitter(pointOnLightSource);
 
-                                    Float squaredDistance = glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - validHitBundle.hitInfo.intersectionPoint);
-                                    Float geometryTerm =  glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * glm::dot(emitterNormal, -outgoingDirection)
+                                    Float squaredDistance = glm::length(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint);
+                                    Float geometryTerm =  glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) * glm::dot(emitterNormal, -outgoingDirection)
                                             / squaredDistance;
 
-                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
+                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
 
                                     Float misWeight = 1.0;//PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
                                     pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
@@ -73,14 +73,14 @@ public:
                             }
 
                             //BSDF sampling
-                            Vector3 outgoingDirection = validHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
-                                                                                                           validHitBundle.hitInfo.normal);
-                            Spectrum brdf = validHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
-                                                                                    validHitBundle.hitInfo.normal);
-                            Float pdfBSDF_BSDFSampling = validHitBundle.closestObject->mat->pdfW(outgoingDirection,
+                            Vector3 outgoingDirection = cameraRayHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
+                                                                                                           cameraRayHitBundle.hitInfo.normal);
+                            Spectrum brdf = cameraRayHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
+                                                                                    cameraRayHitBundle.hitInfo.normal);
+                            Float pdfBSDF_BSDFSampling = cameraRayHitBundle.closestObject->mat->pdfW(outgoingDirection,
                                                                                                  -cameraRay.d,
-                                                                                                 validHitBundle.hitInfo.normal);
-                            Ray nextRay(validHitBundle.hitInfo.intersectionPoint, outgoingDirection);
+                                                                                                 cameraRayHitBundle.hitInfo.normal);
+                            Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                             if (nextRayHitBundle) {
                                 HitBundle nextBundle = nextRayHitBundle.value();
@@ -91,13 +91,13 @@ public:
                                             nextBundle.hitInfo.intersectionPoint);
 
                                     //Convert the SA BSDF pdf into Area domain for MIS calculation
-                                    Float squaredDistance = glm::length(nextBundle.hitInfo.intersectionPoint - validHitBundle.hitInfo.intersectionPoint) *
-                                                            glm::length(nextBundle.hitInfo.intersectionPoint - validHitBundle.hitInfo.intersectionPoint);
+                                    Float squaredDistance = glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint) *
+                                                            glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
-                                    Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / squaredDistance;
+                                    Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) / squaredDistance;
                                     Float misweight = 0.0;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
 
-                                    pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
+                                    pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
                                 else {
                                     pixelValue += Vector3(0.0); //Since this is direct lighting, ignore bounce on other object
