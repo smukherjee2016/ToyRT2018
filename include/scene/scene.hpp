@@ -40,6 +40,8 @@ public:
         objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<Phong>(Spectrum(0.01, 0.5, 0.999), 10)));
         //objects.emplace_back(std::make_unique<Sphere>(Point3(50,681.6-.27,81.6), 600 , std::make_shared<LambertUniform>(Spectrum(0.0)), Spectrum(12)));
         objects.emplace_back(std::make_unique<Sphere>(Point3(60,52,81.6), 6 , std::make_shared<LambertCosine>(Spectrum(0.0001)), Spectrum(60)));
+        objects.emplace_back(std::make_unique<Sphere>(Point3(50,40.8,1e5-300), 1e5 , std::make_shared<LambertCosine>(Spectrum(.0001)))); //Back wall to block out envmap light to work around Mitsuba bug
+
 
     }
 };
