@@ -58,7 +58,7 @@ public:
 
                                     Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
 
-                                    Float misWeight = PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+                                    Float misWeight = 1.0;//PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
                                     pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
                                     pixelValue /= emitterBundle.pdfSelectEmitter;
 
@@ -69,7 +69,7 @@ public:
 
                             }
                             else { //No light sources in scene, so try to sample from envmap or return error
-                                pixelValue += scene.envMap->Le(cameraRay);
+                                pixelValue += Vector3(0.0);
                             }
 
                             //BSDF sampling
@@ -95,7 +95,7 @@ public:
                                                             glm::length(nextBundle.hitInfo.intersectionPoint - validHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
                                     Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / squaredDistance;
-                                    Float misweight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
+                                    Float misweight = 0.0;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
 
                                     pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
@@ -106,8 +106,9 @@ public:
 
                             }
                             else {
-                                pixelValue += scene.envMap->Le(nextRay) * brdf
-                                              * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling;
+                                //Did not hit any light source so zero contribution
+                                //TODO Stop using env map as a special emitter and merge into existing emitter implementation
+                                pixelValue += Vector3(0.0);
                             }
 
                         }
