@@ -56,9 +56,9 @@ public:
                                     Float geometryTerm =  glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * glm::dot(emitterNormal, -outgoingDirection)
                                             / squaredDistance;
 
-                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * squaredDistance / glm::dot(outgoingDirection, validHitBundle.hitInfo.normal); //Convert to area domain
+                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
 
-                                    Float misWeight = 0.5;//PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+                                    Float misWeight = PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
                                     pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
                                     pixelValue /= emitterBundle.pdfSelectEmitter;
 
@@ -94,8 +94,8 @@ public:
                                     Float squaredDistance = glm::length(nextBundle.hitInfo.intersectionPoint - validHitBundle.hitInfo.intersectionPoint) *
                                                             glm::length(nextBundle.hitInfo.intersectionPoint - validHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
-                                    Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * squaredDistance / glm::dot(outgoingDirection, validHitBundle.hitInfo.normal);
-                                    Float misweight = 0.5;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
+                                    Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) / squaredDistance;
+                                    Float misweight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
 
                                     pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
