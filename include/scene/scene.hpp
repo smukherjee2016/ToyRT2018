@@ -15,6 +15,7 @@ class Scene
 public:
     std::vector<std::shared_ptr<Object>> objects;
     std::shared_ptr<EnvironmentMap> envMap;
+    std::vector<std::shared_ptr<Object>> emitters;
 
     void makeScene() {
 
@@ -43,5 +44,27 @@ public:
         //objects.emplace_back(std::make_unique<Sphere>(Point3(50,40.8,1e5-300), 1e5 , std::make_shared<LambertCosine>(Spectrum(.0001)))); //Back wall to block out envmap light to work around Mitsuba bug
 
 
+        //Create the emitter list
+        for(auto& object : objects) {
+                if(object->isEmitter())
+                    emitters.emplace_back(object);
+        }
     }
+
+    std::optional<std::shared_ptr<Object>> selectRandomEmitter() const {
+
+            if(emitters.size() == 0)
+                    return std::nullopt;
+
+            //Select random light source uniformly
+            int randomEmitterIndex = rng.generateRandomInt(emitters.size() - 1);
+
+            std::shared_ptr<Object> ret = emitters.at(randomEmitterIndex);
+            return ret;
+    }
+
+    Float pdfSelectEmitter(std::shared_ptr<Object> emitter) const {
+            return 1.0 / emitters.size();
+    }
+
 };
