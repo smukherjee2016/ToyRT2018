@@ -58,8 +58,7 @@ public:
 
                                     Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * squaredDistance / glm::dot(outgoingDirection, validHitBundle.hitInfo.normal); //Convert to area domain
 
-                                    Float misWeight = PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1,
-                                                                     pdfBSDFA_EmitterSampling);
+                                    Float misWeight = 0.5;//PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
                                     pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
                                     pixelValue /= emitterBundle.pdfSelectEmitter;
 
@@ -96,10 +95,9 @@ public:
                                                             glm::length(nextBundle.hitInfo.intersectionPoint - validHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
                                     Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * squaredDistance / glm::dot(outgoingDirection, validHitBundle.hitInfo.normal);
-                                    Float misweight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1,
-                                                                     pdfEmitter_BSDFSampling);
+                                    Float misweight = 0.5;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
 
-                                    //pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
+                                    pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, validHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
                                 else {
                                     pixelValue += Vector3(0.0); //Since this is direct lighting, ignore bounce on other object
@@ -120,8 +118,7 @@ public:
                 }
 
             }
-            //TODO Check the division by two and samplecount
-            pixelValue /= (2.0 * sampleCount);
+            pixelValue /= (sampleCount);
             film.pixels.at(positionInFilm) = pixelValue;
         }
     }
