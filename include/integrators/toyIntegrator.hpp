@@ -58,9 +58,11 @@ public:
 
                                     Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
 
-                                    Float misWeight = PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
-                                    pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
-                                    pixelValue /= emitterBundle.pdfSelectEmitter;
+                                    Float compositeEmitterPdfA_EmitterSampling = pdfEmitterA_EmitterSampling * emitterBundle.pdfSelectEmitter;
+
+                                    Float misWeight = PowerHeuristic(1, compositeEmitterPdfA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+                                    pixelValue += emitterBundle.emitter->Le(nextRay) * brdf * geometryTerm * misWeight / compositeEmitterPdfA_EmitterSampling;
+                                    //pixelValue /= emitterBundle.pdfSelectEmitter;
 
                                 }
                                 else {
@@ -88,7 +90,7 @@ public:
                                 //If hit a light source, return its Le
                                 if(nextBundle.closestObject->isEmitter()) {
                                     Float pdfEmitter_BSDFSampling = nextBundle.closestObject->pdfEmitterA(
-                                            nextBundle.hitInfo.intersectionPoint);
+                                            nextBundle.hitInfo.intersectionPoint) * 0.5;
 
                                     //Convert the SA BSDF pdf into Area domain for MIS calculation
                                     Float squaredDistance = glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint) *
