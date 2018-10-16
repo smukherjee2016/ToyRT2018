@@ -38,7 +38,7 @@ public:
         Float heightImagePlane = widthImagePlane / film.aspectRatio;
 #else
         Float heightImagePlane = 2.0 * film.distanceToFilm * std::tan(film.FOV / 2.0);
-        Float widthImagePlane = heightImagePlane / film.aspectRatio;
+        Float widthImagePlane = heightImagePlane * film.aspectRatio;
 #endif
         Float xImagePlane = (u - 0.5) * widthImagePlane;
         Float yImagePlane = (v - 0.5) * heightImagePlane;
