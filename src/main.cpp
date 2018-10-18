@@ -2,11 +2,13 @@
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
 #include "integrators/toyIntegrator.hpp"
+#include "integrators/pt.hpp"
 #include "film/film.hpp"
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
 
 const int sampleCount = 64;
+const int numBounces = 1;
 
 int main(void) {
 
@@ -19,8 +21,11 @@ int main(void) {
     PinholeCamera pinholeCamera(Point3(50,52,295.6), Point3(50,52,295.6) + Point3(0, -0.042612, -1), Point3(0.0, 1.0, 0.0));
     Scene scene;
     scene.makeScene();
-    ToyIntegrator toyIntegrator;
-    toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
+    //ToyIntegrator toyIntegrator;
+    //toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
+    PathTracingIntegrator ptIntegrator;
+    ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
+
     film.writePixels("Assignment4_normals.pfm");
 
     return EXIT_SUCCESS;
