@@ -1,10 +1,8 @@
 #include "integrator.hpp"
 
-const int numBounces = 1;
-
 class ToyIntegrator : public Integrator {
 public:
-    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount) const override {
+    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces = 1) const override {
 #pragma omp parallel for schedule(dynamic, 1)
         for(int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 

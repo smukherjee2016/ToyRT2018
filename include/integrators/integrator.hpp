@@ -7,7 +7,7 @@
 #include <optional>
 
 class Integrator {
-    virtual void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount) const = 0;
+    virtual void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces) const = 0;
 };
 
 struct HitBundle {
