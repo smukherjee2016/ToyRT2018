@@ -16,12 +16,12 @@ public:
             Spectrum pixelValue{};
             for (int j = 0; j < sampleCount; j++) {
 
-                for(int k = 0; k < numBounces; k++) {
-                    Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
+                Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
 
-                    std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(cameraRay, scene);
+                std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(cameraRay, scene);
+                if (hitBundle) {
+                    for(int k = 0; k < numBounces; k++) {
 
-                    if (hitBundle) {
                         HitBundle cameraRayHitBundle = hitBundle.value();
 
                         //If hit the emitter, return its Le
@@ -60,18 +60,19 @@ public:
                                 }
 
 
-                            }
-                            else {
-                                //Did not hit any light source so zero contribution
-                                //TODO Stop using env map as a special emitter and merge into existing emitter implementation
-                                pixelValue += Vector3(0.0);
-                            }
+                        }
+                        else {
+                            //Did not hit any light source so zero contribution
+                            //TODO Stop using env map as a special emitter and merge into existing emitter implementation
+                            pixelValue += Vector3(0.0);
+                        }
 
                         }
 
-                    } else { //Did not hit any object so hit environment map
-                        pixelValue += scene.envMap->Le(cameraRay);
                     }
+                }
+                else { //Did not hit any object so hit environment map
+                    pixelValue += scene.envMap->Le(cameraRay);
                 }
 
             }
