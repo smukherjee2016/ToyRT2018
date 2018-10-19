@@ -51,7 +51,7 @@ public:
                                                             glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
                                     Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) / squaredDistance;
-                                    Float misweight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
+                                    Float misweight = 1.0;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
 
                                     pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
