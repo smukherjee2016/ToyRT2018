@@ -38,9 +38,8 @@ public:
                             Float pdfBSDF_BSDFSampling = prevRayHitBundle.closestObject->mat->pdfW(outgoingDirection,
                                                                                                      -prevRay.d,
                                                                                                      prevRayHitBundle.hitInfo.normal);
-                            //if(pdfBSDF_BSDFSampling == 0.0)
-                                //std::cout << glm::dot(outgoingDirection,prevRayHitBundle.hitInfo.normal) << "  " << glm::dot(-prevRay.d, prevRayHitBundle.hitInfo.normal) << std::endl;
-                                //continue;
+                            if(pdfBSDF_BSDFSampling == 0.0)
+                                continue;
 
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
