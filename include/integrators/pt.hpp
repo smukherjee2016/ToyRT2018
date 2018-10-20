@@ -17,26 +17,28 @@ public:
             for (int j = 0; j < sampleCount; j++) {
 
                 Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
+                Ray prevRay = cameraRay;
 
-                std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(cameraRay, scene);
-                if (hitBundle) {
-                    for(int k = 0; k < numBounces; k++) {
+                Float throughput = 1.0;
+                for(int k = 0; k < numBounces; k++) {
+                    std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(prevRay, scene);
+                    if (hitBundle) {
 
-                        HitBundle cameraRayHitBundle = hitBundle.value();
+                        HitBundle prevRayHitBundle = hitBundle.value();
 
                         //If hit the emitter, return its Le
-                        if(cameraRayHitBundle.closestObject->isEmitter())
-                            pixelValue += cameraRayHitBundle.closestObject->Le(cameraRay);
+                        if(prevRayHitBundle.closestObject->isEmitter())
+                            pixelValue += prevRayHitBundle.closestObject->Le(cameraRay);
                         else {
                             //BSDF sampling
-                            Vector3 outgoingDirection = cameraRayHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
-                                                                                                               cameraRayHitBundle.hitInfo.normal);
-                            Spectrum brdf = cameraRayHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
-                                                                                        cameraRayHitBundle.hitInfo.normal);
-                            Float pdfBSDF_BSDFSampling = cameraRayHitBundle.closestObject->mat->pdfW(outgoingDirection,
+                            Vector3 outgoingDirection = prevRayHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
+                                                                                                               prevRayHitBundle.hitInfo.normal);
+                            Spectrum brdf = prevRayHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
+                                                                                        prevRayHitBundle.hitInfo.normal);
+                            Float pdfBSDF_BSDFSampling = prevRayHitBundle.closestObject->mat->pdfW(outgoingDirection,
                                                                                                      -cameraRay.d,
-                                                                                                     cameraRayHitBundle.hitInfo.normal);
-                            Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
+                                                                                                     prevRayHitBundle.hitInfo.normal);
+                            Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                             if (nextRayHitBundle) {
                                 HitBundle nextBundle = nextRayHitBundle.value();
@@ -47,13 +49,13 @@ public:
                                             nextBundle.hitInfo.intersectionPoint) * scene.pdfSelectEmitter(nextBundle.closestObject);
 
                                     //Convert the SA BSDF pdf into Area domain for MIS calculation
-                                    Float squaredDistance = glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint) *
-                                                            glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint);
+                                    Float squaredDistance = glm::length(nextBundle.hitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint) *
+                                                            glm::length(nextBundle.hitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
-                                    Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) / squaredDistance;
+                                    Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / squaredDistance;
                                     Float misweight = 1.0;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
 
-                                    pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
+                                    pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
                                 else {
                                     pixelValue += Vector3(0.0); //Since this is direct lighting, ignore bounce on other object
@@ -70,9 +72,10 @@ public:
                         }
 
                     }
-                }
-                else { //Did not hit any object so hit environment map
-                    pixelValue += scene.envMap->Le(cameraRay);
+                    else { //Did not hit any object so hit environment map
+                        pixelValue += scene.envMap->Le(cameraRay);
+                        continue;
+                    }
                 }
 
             }
