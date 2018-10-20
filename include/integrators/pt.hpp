@@ -19,7 +19,7 @@ public:
                 Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
                 Ray prevRay = cameraRay;
 
-                Float throughput = 1.0;
+                Spectrum throughput(1.0);
                 for(int k = 0; k < numBounces; k++) {
                     std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(prevRay, scene);
                     if (hitBundle) {
@@ -28,16 +28,20 @@ public:
 
                         //If hit the emitter, return its Le
                         if(prevRayHitBundle.closestObject->isEmitter())
-                            pixelValue += prevRayHitBundle.closestObject->Le(cameraRay);
+                            pixelValue += prevRayHitBundle.closestObject->Le(prevRay);
                         else {
                             //BSDF sampling
-                            Vector3 outgoingDirection = prevRayHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
+                            Vector3 outgoingDirection = prevRayHitBundle.closestObject->mat->sampleDirection(-prevRay.d,
                                                                                                                prevRayHitBundle.hitInfo.normal);
-                            Spectrum brdf = prevRayHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
+                            Spectrum brdf = prevRayHitBundle.closestObject->mat->brdf(outgoingDirection, -prevRay.d,
                                                                                         prevRayHitBundle.hitInfo.normal);
                             Float pdfBSDF_BSDFSampling = prevRayHitBundle.closestObject->mat->pdfW(outgoingDirection,
-                                                                                                     -cameraRay.d,
+                                                                                                     -prevRay.d,
                                                                                                      prevRayHitBundle.hitInfo.normal);
+                            //if(pdfBSDF_BSDFSampling == 0.0)
+                                //std::cout << glm::dot(outgoingDirection,prevRayHitBundle.hitInfo.normal) << "  " << glm::dot(-prevRay.d, prevRayHitBundle.hitInfo.normal) << std::endl;
+                                //continue;
+
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
                             if (nextRayHitBundle) {
@@ -55,26 +59,30 @@ public:
                                     Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / squaredDistance;
                                     Float misweight = 1.0;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
 
-                                    pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
+                                    pixelValue += nextBundle.closestObject->Le(nextRay) * throughput * brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
                                 else {
-                                    pixelValue += Vector3(0.0); //Since this is direct lighting, ignore bounce on other object
+                                    throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling);
+                                    if(glm::any(glm::equal(throughput, Vector3(0.0f))) || glm::any(glm::isnan(throughput))) break;
+                                    prevRay = nextRay;
                                 }
 
 
                         }
                         else {
-                            //Did not hit any light source so zero contribution
+                            //Did not hit any emitter so hit env map. Thus get contribution from envmap with losses at material hits
                             //TODO Stop using env map as a special emitter and merge into existing emitter implementation
-                            pixelValue += Vector3(0.0);
+                            if(glm::any(glm::equal(throughput, Vector3(0.0f))) || glm::any(glm::isnan(throughput))) break;
+                            pixelValue += scene.envMap->Le(prevRay) * throughput * brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling;
+                            break;
                         }
 
                         }
 
                     }
                     else { //Did not hit any object so hit environment map
-                        pixelValue += scene.envMap->Le(cameraRay);
-                        continue;
+                        pixelValue += scene.envMap->Le(prevRay);
+                        break;
                     }
                 }
 
