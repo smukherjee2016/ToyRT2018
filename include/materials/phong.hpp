@@ -23,7 +23,7 @@ public:
 
         //Cosine weighted hemisphere sampling
         //Theta => [0, 2PI], Phi = [0, PI/2]
-        Float theta = 2 * M_PI * r1;
+        Float theta = 2 * PI * r1;
         Float phi = std::acos(std::sqrt(r2));
 
         pointInCartesian = sphericaltoCartesian(theta, phi);
@@ -46,7 +46,7 @@ public:
 
         //Phong importance sampling
         //Theta => [0, 2PI], Phi = [0, PI/2]
-        Float theta = 2 * M_PI * r1;
+        Float theta = 2 * PI * r1;
         Float phi = std::acos(std::pow(r2, 1.0 / (phongExponent + 1.0)));
 
         pointInCartesian = sphericaltoCartesian(theta, phi);

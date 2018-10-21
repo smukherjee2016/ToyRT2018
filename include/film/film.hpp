@@ -9,7 +9,7 @@
 
 class Film {
 public:
-    Float FOV = M_PI / 4.0;
+    Float FOV = PI / 4.0;
     Float distanceToFilm = 1.0;
     Float aspectRatio = 16.0 / 9.0;
     int screenWidth;

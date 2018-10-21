@@ -17,7 +17,7 @@ int main(void) {
 
     //std::cout << rng.generate1DUniform() << std::endl;
 
-    Film film(M_PI/6.0, 1.0, resX, resY);
+    Film film(PI/6.0, 1.0, resX, resY);
     PinholeCamera pinholeCamera(Point3(50,52,295.6), Point3(50,52,295.6) + Point3(0, -0.042612, -1), Point3(0.0, 1.0, 0.0));
     Scene scene;
     scene.makeScene();

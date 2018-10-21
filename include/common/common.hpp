@@ -25,8 +25,8 @@ using Spectrum = glm::vec3;
 #endif
 
 const Float Infinity = std::numeric_limits<Float>::max();
-const Float M_PI = 3.141592653589793238462643383279502884197169399375105;
-const Float M_INVPI = 1.0 / M_PI;
+const Float PI = 3.141592653589793238462643383279502884197169399375105;
+const Float M_INVPI = 1.0 / PI;
 const Float epsilon = 1e-5;
 
 
@@ -106,7 +106,7 @@ inline Point3 sphericaltoCartesian(const Float theta, const Float phi) {
 inline Point2 uniformHemisphereSample(const Float u1, const Float u2) {
     Point2 thetaphi;
 
-    Float theta = 2 * M_PI * u1;
+    Float theta = 2 * PI * u1;
     Float phi = std::acos(u2);
 
     thetaphi.x = theta;
@@ -118,7 +118,7 @@ inline Point2 uniformHemisphereSample(const Float u1, const Float u2) {
 inline Point2 uniformSphereSample(const Float u1, const Float u2) {
     Point2 thetaphi;
 
-    Float theta = 2 * M_PI * u1;
+    Float theta = 2 * PI * u1;
     Float phi = std::acos(1.0 - 2.0 * u2);
 
     thetaphi.x = theta;
