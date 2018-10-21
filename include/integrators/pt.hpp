@@ -41,7 +41,7 @@ public:
                                                                                                      -prevRay.d,
                                                                                                      prevRayHitBundle.hitInfo.normal);
                             if(pdfBSDF_BSDFSampling == 0.0)
-                                continue;
+                                break;
 
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
