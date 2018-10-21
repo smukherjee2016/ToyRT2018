@@ -27,8 +27,10 @@ public:
                         HitBundle prevRayHitBundle = hitBundle.value();
 
                         //If hit the emitter, return its Le
-                        if(prevRayHitBundle.closestObject->isEmitter())
+                        if(prevRayHitBundle.closestObject->isEmitter()){
                             pixelValue += prevRayHitBundle.closestObject->Le(prevRay);
+                            break;
+                        }
                         else {
                             //BSDF sampling
                             Vector3 outgoingDirection = prevRayHitBundle.closestObject->mat->sampleDirection(-prevRay.d,
