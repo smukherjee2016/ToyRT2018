@@ -29,11 +29,61 @@ public:
 
                         //If hit the emitter, return its Le multiplied by throughput
                         if(prevRayHitBundle.closestObject->isEmitter()){
-                            L = prevRayHitBundle.closestObject->Le(prevRay) * Throughput;
+#ifdef USE_LIGHT_SAMPLING //Must not double-count BSDF sampling->emitter
+                            L += Vector3(0.0);
+#else
+                            L += prevRayHitBundle.closestObject->Le(prevRay) * Throughput;
+#endif
                             break;
                         }
                         else {
-                            //
+#ifdef USE_LIGHT_SAMPLING
+                            //Emitter Sampling
+                            std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
+                            if(emitterOptionalBundle) {
+                                std::shared_ptr<Object> emitter = emitterOptionalBundle.value();
+                                Point3 pointOnLightSource = emitter->samplePointOnEmitter(-prevRay.d,
+                                                                                          prevRayHitBundle.hitInfo.normal);
+                                Vector3 outgoingDirection = glm::normalize(
+                                        pointOnLightSource - prevRayHitBundle.hitInfo.intersectionPoint);
+                                Float pdfEmitterA_EmitterSampling = emitter->pdfEmitterA(
+                                        prevRayHitBundle.hitInfo.intersectionPoint);
+
+                                Spectrum brdf = prevRayHitBundle.closestObject->mat->brdf(outgoingDirection,
+                                                                                            -prevRay.d,
+                                                                                          prevRayHitBundle.hitInfo.normal);
+                                Float pdfBSDF_EmitterSampling = prevRayHitBundle.closestObject->mat->pdfW(
+                                        outgoingDirection, -prevRay.d,
+                                        prevRayHitBundle.hitInfo.normal);
+
+                                Float tMax =
+                                        glm::length(pointOnLightSource - prevRayHitBundle.hitInfo.intersectionPoint) -
+                                        epsilon;
+                                Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection, Infinity,
+                                            epsilon, tMax);
+
+                                std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                                if (!nextRayHitBundle) {
+                                    //Unoccluded so we can reach light source
+                                    Vector3 emitterNormal = emitter->getNormalForEmitter(pointOnLightSource);
+
+                                    Float squaredDistance = glm::length(pointOnLightSource - prevRayHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - prevRayHitBundle.hitInfo.intersectionPoint);
+                                    Float geometryTerm =  std::max(0.0, glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal)) * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection))
+                                                          / squaredDistance;
+
+                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
+
+                                    Float compositeEmitterPdfA_EmitterSampling = pdfEmitterA_EmitterSampling * scene.pdfSelectEmitter(emitter);
+
+                                    Float misWeight = 0.5;//PowerHeuristic(1, compositeEmitterPdfA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+                                    L += emitter->Le(nextRay) * Throughput * brdf * geometryTerm * misWeight / compositeEmitterPdfA_EmitterSampling;
+                                    //pixelValue /= emitterBundle.pdfSelectEmitter;
+
+                                }
+
+                            }
+#endif
+                            //BSDF Sampling
                             Vector3 outgoingDirection = prevRayHitBundle.closestObject->mat->sampleDirection(-prevRay.d,
                                                                                                                prevRayHitBundle.hitInfo.normal);
                             Spectrum brdf = prevRayHitBundle.closestObject->mat->brdf(outgoingDirection, -prevRay.d,
@@ -45,7 +95,7 @@ public:
                                 break;
 
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
-                            Throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling);
+                            Throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling) * 0.5;
                             prevRay = nextRay;
 
                         }
