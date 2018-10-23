@@ -95,7 +95,7 @@ public:
                                 break;
 
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
-                            Throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling) * 0.5;
+                            Throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling);
                             prevRay = nextRay;
 
                         }
