@@ -21,9 +21,6 @@ public:
 
                 Spectrum L(0.0);
                 Spectrum Throughput (1.0);
-                Spectrum accumulatedBSDFpdfA(1.0);
-                HitInfo previousHitInfo{};
-                Vector3 previousSampledDirection{};
                 for(int k = 1; k <= numBounces; k++) {
                     std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(prevRay, scene);
                     if (hitBundle) {
@@ -35,7 +32,7 @@ public:
 #ifdef USE_LIGHT_SAMPLING //Must not double-count BSDF sampling->emitter
                             L += Vector3(0.0);
 #else
-                            L += prevRayHitBundle.closestObject->Le(prevRay) * Throughput / accumulatedBSDFpdfA;
+                            L += prevRayHitBundle.closestObject->Le(prevRay) * Throughput;
 #endif
                             break;
                         }
@@ -97,20 +94,10 @@ public:
                             if(pdfBSDF_BSDFSampling == 0.0)
                                 break;
 
-                            //Convert the SA BSDF pdf of previous point into Area domain
-                            Float squaredDistance = glm::length(previousHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint) *
-                                                    glm::length(previousHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint);
-                            //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
-                            accumulatedBSDFpdfA *= glm::dot(previousSampledDirection, previousHitInfo.normal) / squaredDistance;
-                            Float misweight = 1.0;//PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
-
-
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
-                            Throughput *= brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal);
-                            accumulatedBSDFpdfA *= pdfBSDF_BSDFSampling; //Pass in SA pdf for this iteration, convert to Area in next iteration
+                            Throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal) / pdfBSDF_BSDFSampling) * 0.5;
                             prevRay = nextRay;
-                            previousHitInfo = prevRayHitBundle.hitInfo; //Save this hitpoint for SA to Area pdf conversion in next iteration
-                            previousSampledDirection = outgoingDirection;
+
                         }
 
                     }
@@ -118,7 +105,7 @@ public:
                         //Did not hit any emitter so hit env map. Thus get contribution from envmap with losses at material hits
                         //TODO Stop using env map as a special emitter and merge into existing emitter implementation
                         if(glm::any(glm::equal(Throughput, Vector3(0.0f))) || glm::any(glm::isnan(Throughput))) break;
-                        L = scene.envMap->Le(prevRay) * Throughput / accumulatedBSDFpdfA;
+                        L = scene.envMap->Le(prevRay) * Throughput;
                         break;
                     }
 
