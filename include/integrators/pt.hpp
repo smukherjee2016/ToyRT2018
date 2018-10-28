@@ -125,7 +125,7 @@ public:
                               //  __debugbreak();
 
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
-                            Throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal));
+                            Throughput *= brdf;
                             accumulatedBSDFpdfW *= pdfBSDF_BSDFSampling;
                             prevRay = nextRay;
                             lastBounceHitInfo = prevRayHitBundle.hitInfo;
