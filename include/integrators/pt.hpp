@@ -37,14 +37,18 @@ public:
 #ifdef USE_LIGHT_SAMPLING //Must not double-count BSDF sampling->emitter
                             L += Vector3(0.0);
 #else
-                            //Geometry term from previous bounce
-                            Float squaredDistance = glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint) * glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint);
-                            Float geometryTerm =  std::max(0.0, glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal))  //Previous bounce dot product
-                                                  * std::max(0.0, glm::dot(prevRayHitBundle.hitInfo.normal, -lastBounceSampledDirection)) //Current bounce dot product
-                                                  / squaredDistance;
-                            accumulatedGeometryTerms *= geometryTerm;
+                            if(k >= 2) {
+                                //Geometry term from previous bounce
+                                Float squaredDistance = glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint) * glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint);
+                                Float geometryTerm =  std::max(0.0, glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal))  //Previous bounce dot product
+                                                      * std::max(0.0, glm::dot(prevRayHitBundle.hitInfo.normal, -lastBounceSampledDirection)) //Current bounce dot product
+                                                      / squaredDistance;
+                                accumulatedGeometryTerms *= geometryTerm;
 
-                            accumulatedBSDFWAConversionFactor *=  glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal) / squaredDistance;
+
+                                accumulatedBSDFWAConversionFactor *=  glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal) / squaredDistance;
+
+                            }
                             L += prevRayHitBundle.closestObject->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
 #endif
                             break;
@@ -107,14 +111,18 @@ public:
                             if(pdfBSDF_BSDFSampling == 0.0)
                                 break;
 
-                            //Area domain conversion and geometry term from previous bounce
-                            Float squaredDistance = glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint) * glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint);
-                            Float geometryTerm =  std::max(0.0, glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal))  //Previous bounce dot product
-                                    * std::max(0.0, glm::dot(prevRayHitBundle.hitInfo.normal, -lastBounceSampledDirection)) //Current bounce dot product
-                                                  / squaredDistance;
-                            accumulatedGeometryTerms *= geometryTerm;
+                            if(k >= 2) {
+                                //Area domain conversion and geometry term from previous bounce
+                                Float squaredDistance = glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint) * glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint);
+                                Float geometryTerm =  std::max(0.0, glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal))  //Previous bounce dot product
+                                                      * std::max(0.0, glm::dot(prevRayHitBundle.hitInfo.normal, -lastBounceSampledDirection)) //Current bounce dot product
+                                                      / squaredDistance;
+                                accumulatedGeometryTerms *= geometryTerm;
 
-                            accumulatedBSDFWAConversionFactor *=  glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal) / squaredDistance ;
+                                accumulatedBSDFWAConversionFactor *=  glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal) / squaredDistance ;
+                            }
+                            //if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedGeometryTerms == 0.0 || accumulatedBSDFpdfW == 0.0)
+                              //  __debugbreak();
 
                             Ray nextRay(prevRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             Throughput *= (brdf * glm::dot(outgoingDirection, prevRayHitBundle.hitInfo.normal));
