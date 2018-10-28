@@ -46,10 +46,10 @@ public:
                                 accumulatedGeometryTerms *= geometryTerm;
 
 
-                                accumulatedBSDFWAConversionFactor *=  glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal) / squaredDistance;
+                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal)) / squaredDistance;
 
                             }
-                            L += prevRayHitBundle.closestObject->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
+                            L = prevRayHitBundle.closestObject->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
 #endif
                             break;
                         }
@@ -111,7 +111,7 @@ public:
                             if(pdfBSDF_BSDFSampling == 0.0)
                                 break;
 
-                            if(k >= 2) {
+                            if(k >= 2) { //Should accumulate previous terms only after the first bounce
                                 //Area domain conversion and geometry term from previous bounce
                                 Float squaredDistance = glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint) * glm::length(lastBounceHitInfo.intersectionPoint - prevRayHitBundle.hitInfo.intersectionPoint);
                                 Float geometryTerm =  std::max(0.0, glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal))  //Previous bounce dot product
@@ -119,7 +119,7 @@ public:
                                                       / squaredDistance;
                                 accumulatedGeometryTerms *= geometryTerm;
 
-                                accumulatedBSDFWAConversionFactor *=  glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal) / squaredDistance ;
+                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(lastBounceSampledDirection, lastBounceHitInfo.normal)) / squaredDistance ;
                             }
                             //if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedGeometryTerms == 0.0 || accumulatedBSDFpdfW == 0.0)
                               //  __debugbreak();
