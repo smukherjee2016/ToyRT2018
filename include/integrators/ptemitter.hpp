@@ -34,28 +34,15 @@ public:
 
                         //If hit the emitter, return its Le multiplied by throughput
                         if(currentHitBundle.closestObject->isEmitter()){
-#ifdef USE_LIGHT_SAMPLING //Must not double-count BSDF sampling->emitter
-                            L += Vector3(0.0);
-#else
-                            if(k >= 2) {
-                                Vector3 emitterNormal = currentHitBundle.closestObject->getNormalForEmitter(currentHitBundle.hitInfo.intersectionPoint);
-                                //Geometry term from previous bounce
-                                Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
-                                Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
-                                                      * std::max(0.0, glm::dot(emitterNormal, -prevBounceSampledDirection)) //Current bounce dot product
-                                                      / squaredDistance;
-                                accumulatedGeometryTerms *= geometryTerm;
-
-
-                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(emitterNormal, -prevBounceSampledDirection)) / squaredDistance;
-
+                            if(k == 1) {
+                                L += currentHitBundle.closestObject->Le(prevRay); //Direct hit emitter
                             }
-                            L = currentHitBundle.closestObject->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
-#endif
+                            else {
+                                L += Vector3(0.0); //Must not double-count any emitter hit at the end of the path
+                            }
                             break;
                         }
                         else {
-#ifdef USE_LIGHT_SAMPLING
                             //Emitter Sampling
                             std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
                             if(emitterOptionalBundle) {
@@ -68,39 +55,12 @@ public:
                                         currentHitBundle.hitInfo.intersectionPoint);
 
                                 Spectrum brdf = currentHitBundle.closestObject->mat->brdf(outgoingDirection,
-                                                                                            -prevRay.d,
-                                                                                          currentHitBundle.hitInfo.normal);
-                                Float pdfBSDF_EmitterSampling = currentHitBundle.closestObject->mat->pdfW(
-                                        outgoingDirection, -prevRay.d,
-                                        currentHitBundle.hitInfo.normal);
+                                                                                            -prevRay.d, currentHitBundle.hitInfo.normal);
 
-                                Float tMax =
-                                        glm::length(pointOnLightSource - currentHitBundle.hitInfo.intersectionPoint) -
-                                        epsilon;
-                                Ray nextRay(currentHitBundle.hitInfo.intersectionPoint, outgoingDirection, Infinity,
-                                            epsilon, tMax);
-
-                                std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
-                                if (!nextRayHitBundle) {
-                                    //Unoccluded so we can reach light source
-                                    Vector3 emitterNormal = emitter->getNormalForEmitter(pointOnLightSource);
-
-                                    Float squaredDistance = glm::length(pointOnLightSource - currentHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - currentHitBundle.hitInfo.intersectionPoint);
-                                    Float geometryTerm =  std::max(0.0, glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal)) * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection))
-                                                          / squaredDistance;
-
-                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
-
-                                    Float compositeEmitterPdfA_EmitterSampling = pdfEmitterA_EmitterSampling * scene.pdfSelectEmitter(emitter);
-
-                                    Float misWeight = 0.5;//PowerHeuristic(1, compositeEmitterPdfA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
-                                    L += emitter->Le(nextRay) * Throughput * brdf * geometryTerm * misWeight / compositeEmitterPdfA_EmitterSampling;
-                                    //pixelValue /= emitterBundle.pdfSelectEmitter;
-
-                                }
+                                //TODO Finish emitter sampling
 
                             }
-#endif
+
                             //BSDF Sampling
                             Vector3 outgoingDirection = currentHitBundle.closestObject->mat->sampleDirection(-prevRay.d,
                                                                                                              currentHitBundle.hitInfo.normal);
@@ -139,7 +99,7 @@ public:
                         //Did not hit any emitter so hit env map. Thus get contribution from envmap with losses at material hits
                         //TODO Stop using env map as a special emitter and merge into existing emitter implementation
                         if(glm::any(glm::equal(Throughput, Vector3(0.0f)))) break;
-                        L = scene.envMap->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
+                        //L = scene.envMap->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
                         break;
                     }
 

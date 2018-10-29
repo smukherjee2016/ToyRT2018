@@ -7,7 +7,7 @@
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
 
-const int sampleCount = 4096;
+const int sampleCount = 16;
 const int numBounces = 5;
 
 int main(void) {
