@@ -2,12 +2,12 @@
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
 #include "integrators/toyIntegrator.hpp"
-#include "integrators/pt.hpp"
+#include "integrators/ptemitter.hpp"
 #include "film/film.hpp"
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
 
-const int sampleCount = 16;
+const int sampleCount = 4096;
 const int numBounces = 5;
 
 int main(void) {
@@ -23,7 +23,7 @@ int main(void) {
     scene.makeScene();
     //ToyIntegrator toyIntegrator;
     //toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
-    PathTracingIntegrator ptIntegrator;
+    PathTracingIntegratorEmitterSampling ptIntegrator;
     ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
 
     film.writePixels("Assignment4_normals.pfm");
