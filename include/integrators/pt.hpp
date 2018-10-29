@@ -137,8 +137,8 @@ public:
                     else {
                         //Did not hit any emitter so hit env map. Thus get contribution from envmap with losses at material hits
                         //TODO Stop using env map as a special emitter and merge into existing emitter implementation
-                        if(glm::any(glm::equal(Throughput, Vector3(0.0f))) || glm::any(glm::isnan(Throughput))) break;
-                        L = scene.envMap->Le(prevRay) * Throughput / accumulatedBSDFpdfW;
+                        if(glm::any(glm::equal(Throughput, Vector3(0.0f)))) break;
+                        L = scene.envMap->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
                         break;
                     }
 
