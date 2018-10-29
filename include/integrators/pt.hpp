@@ -47,7 +47,7 @@ public:
                                 accumulatedGeometryTerms *= geometryTerm;
 
 
-                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal)) / squaredDistance;
+                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(emitterNormal, -prevBounceSampledDirection)) / squaredDistance;
 
                             }
                             L = currentHitBundle.closestObject->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
@@ -120,7 +120,7 @@ public:
                                                       / squaredDistance;
                                 accumulatedGeometryTerms *= geometryTerm;
 
-                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal)) / squaredDistance ;
+                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) / squaredDistance ;
                             }
                             //if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedGeometryTerms == 0.0 || accumulatedBSDFpdfW == 0.0)
                               //  __debugbreak();
