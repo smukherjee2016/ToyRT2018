@@ -38,10 +38,11 @@ public:
                             L += Vector3(0.0);
 #else
                             if(k >= 2) {
+                                Vector3 emitterNormal = currentHitBundle.closestObject->getNormalForEmitter(currentHitBundle.hitInfo.intersectionPoint);
                                 //Geometry term from previous bounce
                                 Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
                                 Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
-                                                      * std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) //Current bounce dot product
+                                                      * std::max(0.0, glm::dot(emitterNormal, -prevBounceSampledDirection)) //Current bounce dot product
                                                       / squaredDistance;
                                 accumulatedGeometryTerms *= geometryTerm;
 
