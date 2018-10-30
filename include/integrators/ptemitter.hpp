@@ -57,8 +57,8 @@ public:
 
                                 accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) / squaredDistance ;
                             }
-                            //if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedGeometryTerms == 0.0 || accumulatedBSDFpdfW == 0.0)
-                            //  __debugbreak();
+                            if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedBSDFpdfW == 0.0)
+                              break; //Prevent NaNs due to too small denominators possibly getting truncated sometimes
 
                             //Emitter Sampling
                             std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
@@ -129,7 +129,7 @@ public:
                         //Did not hit any emitter so hit env map. Thus get contribution from envmap with losses at material hits
                         //TODO Stop using env map as a special emitter and merge into existing emitter implementation
                         if(glm::any(glm::equal(Throughput, Vector3(0.0f)))) break;
-                        //L = scene.envMap->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
+                        L += scene.envMap->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
                         break;
                     }
 
