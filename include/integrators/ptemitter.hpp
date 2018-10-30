@@ -43,21 +43,63 @@ public:
                             break;
                         }
                         else {
+                            /*
+                            * First convert the previous BSDF term into Area domain and accumulate.
+                             * Then do emitter sampling at the current point, and finally, BSDF sampling for the next direction.
+                            */
+                            if(k >= 2) { //Should accumulate previous terms only after the first bounce
+                                //Area domain conversion and geometry term from previous bounce
+                                Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
+                                Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
+                                                      * std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) //Current bounce dot product
+                                                      / squaredDistance;
+                                accumulatedGeometryTerms *= geometryTerm;
+
+                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) / squaredDistance ;
+                            }
+                            //if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedGeometryTerms == 0.0 || accumulatedBSDFpdfW == 0.0)
+                            //  __debugbreak();
+
                             //Emitter Sampling
                             std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
                             if(emitterOptionalBundle) {
                                 std::shared_ptr<Object> emitter = emitterOptionalBundle.value();
-                                Point3 pointOnLightSource = emitter->samplePointOnEmitter(-prevRay.d,
+                                Point3 pointOnEmitter = emitter->samplePointOnEmitter(-prevRay.d,
                                                                                           currentHitBundle.hitInfo.normal);
                                 Vector3 outgoingDirection = glm::normalize(
-                                        pointOnLightSource - currentHitBundle.hitInfo.intersectionPoint);
+                                        pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint);
                                 Float pdfEmitterA_EmitterSampling = emitter->pdfEmitterA(
                                         currentHitBundle.hitInfo.intersectionPoint);
 
                                 Spectrum brdf = currentHitBundle.closestObject->mat->brdf(outgoingDirection,
                                                                                             -prevRay.d, currentHitBundle.hitInfo.normal);
+                                Float pdfBSDF_EmitterSampling = currentHitBundle.closestObject->mat->pdfW(
+                                        outgoingDirection, -cameraRay.d,
+                                        currentHitBundle.hitInfo.normal);
 
-                                //TODO Finish emitter sampling
+                                Float tMax = glm::length(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint) - epsilon;
+                                Ray nextRay(currentHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
+                                //Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
+
+                                std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                                if (!nextRayHitBundle) {
+                                    //Unoccluded so we can reach light source
+                                    Vector3 emitterNormal = emitter->getNormalForEmitter(pointOnEmitter);
+
+                                    Float squaredDistance = glm::length(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint);
+                                    Float geometryTerm =  std::max(0.0, glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal)) * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection))
+                                                          / squaredDistance;
+
+                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
+
+                                    Float compositeEmitterPdfA_EmitterSampling = pdfEmitterA_EmitterSampling * scene.pdfSelectEmitter(emitter);
+
+                                    //Float misWeight = PowerHeuristic(1, compositeEmitterPdfA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+
+                                    Spectrum accumulatedFactors = Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
+                                    L += emitter->Le(nextRay) * brdf * geometryTerm * accumulatedFactors / compositeEmitterPdfA_EmitterSampling;
+                                }
+
 
                             }
 
@@ -72,18 +114,6 @@ public:
                             if(pdfBSDF_BSDFSampling == 0.0)
                                 break;
 
-                            if(k >= 2) { //Should accumulate previous terms only after the first bounce
-                                //Area domain conversion and geometry term from previous bounce
-                                Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
-                                Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
-                                                      * std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) //Current bounce dot product
-                                                      / squaredDistance;
-                                accumulatedGeometryTerms *= geometryTerm;
-
-                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) / squaredDistance ;
-                            }
-                            //if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedGeometryTerms == 0.0 || accumulatedBSDFpdfW == 0.0)
-                            //  __debugbreak();
 
                             Ray nextRay(currentHitBundle.hitInfo.intersectionPoint, outgoingDirection);
                             Throughput *= brdf;
