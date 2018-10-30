@@ -90,7 +90,7 @@ public:
                                     Float geometryTerm =  std::max(0.0, glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal)) * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection))
                                                           / squaredDistance;
 
-                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal) / squaredDistance ; //Convert to area domain
+                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection)) / squaredDistance ; //Convert to area domain
 
                                     Float compositeEmitterPdfA_EmitterSampling = pdfEmitterA_EmitterSampling * scene.pdfSelectEmitter(emitter);
 
