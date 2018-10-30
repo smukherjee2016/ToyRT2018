@@ -32,6 +32,24 @@ public:
 
                         HitBundle currentHitBundle = hitBundle.value();
 
+                        /*
+                        * First convert the previous BSDF term into Area domain and accumulate.
+                        * Then do emitter sampling at the current point, and finally, BSDF sampling for the next direction.
+                        */
+                        if(k >= 2) { //Should accumulate previous terms only after the first bounce
+                            //Area domain conversion and geometry term from previous bounce
+                            Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
+                            Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
+                                                  * std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) //Current bounce dot product
+                                                  / squaredDistance;
+                            accumulatedGeometryTerms *= geometryTerm;
+
+                            accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) / squaredDistance ;
+                        }
+                        if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedBSDFpdfW == 0.0)
+                            break; //Prevent NaNs due to too small denominators possibly getting truncated sometimes
+
+
                         //If hit the emitter, return its Le multiplied by throughput
                         if(currentHitBundle.closestObject->isEmitter()){
                             if(k == 1) {
@@ -43,22 +61,6 @@ public:
                             break;
                         }
                         else {
-                            /*
-                            * First convert the previous BSDF term into Area domain and accumulate.
-                             * Then do emitter sampling at the current point, and finally, BSDF sampling for the next direction.
-                            */
-                            if(k >= 2) { //Should accumulate previous terms only after the first bounce
-                                //Area domain conversion and geometry term from previous bounce
-                                Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
-                                Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
-                                                      * std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) //Current bounce dot product
-                                                      / squaredDistance;
-                                accumulatedGeometryTerms *= geometryTerm;
-
-                                accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) / squaredDistance ;
-                            }
-                            if(accumulatedBSDFWAConversionFactor == 0.0 || accumulatedBSDFpdfW == 0.0)
-                              break; //Prevent NaNs due to too small denominators possibly getting truncated sometimes
 
                             //Emitter Sampling
                             std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
