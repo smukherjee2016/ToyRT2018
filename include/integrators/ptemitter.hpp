@@ -38,7 +38,7 @@ public:
                         */
                         if(k >= 2) { //Should accumulate previous terms only after the first bounce
                             //Area domain conversion and geometry term from previous bounce
-                            Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
+                            Float squaredDistance = glm::length2(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
                             Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
                                                   * std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) //Current bounce dot product
                                                   / squaredDistance;
@@ -88,7 +88,7 @@ public:
                                     //Unoccluded so we can reach light source
                                     Vector3 emitterNormal = emitter->getNormalForEmitter(pointOnEmitter);
 
-                                    Float squaredDistance = glm::length(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint);
+                                    Float squaredDistance = glm::length2(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint);
                                     Float geometryTerm =  std::max(0.0, glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal)) * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection))
                                                           / squaredDistance;
 

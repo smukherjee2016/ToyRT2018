@@ -37,7 +37,7 @@ public:
                             if(k >= 2) {
                                 Vector3 emitterNormal = currentHitBundle.closestObject->getNormalForEmitter(currentHitBundle.hitInfo.intersectionPoint);
                                 //Geometry term from previous bounce
-                                Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
+                                Float squaredDistance = glm::length2(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
                                 Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
                                                       * std::max(0.0, glm::dot(emitterNormal, -prevBounceSampledDirection)) //Current bounce dot product
                                                       / squaredDistance;
@@ -64,7 +64,7 @@ public:
 
                             if(k >= 2) { //Should accumulate previous terms only after the first bounce
                                 //Area domain conversion and geometry term from previous bounce
-                                Float squaredDistance = glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint) * glm::length(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
+                                Float squaredDistance = glm::length2(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
                                 Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
                                                       * std::max(0.0, glm::dot(currentHitBundle.hitInfo.normal, -prevBounceSampledDirection)) //Current bounce dot product
                                                       / squaredDistance;

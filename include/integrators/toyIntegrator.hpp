@@ -50,7 +50,7 @@ public:
                                     //Unoccluded so we can reach light source
                                     Vector3 emitterNormal = emitter->getNormalForEmitter(pointOnLightSource);
 
-                                    Float squaredDistance = glm::length(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint) * glm::length(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint);
+                                    Float squaredDistance = glm::length2(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint);
                                     Float geometryTerm =  std::max(0.0, glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal)) * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection))
                                             / squaredDistance;
 
@@ -91,8 +91,7 @@ public:
                                             nextBundle.hitInfo.intersectionPoint) * scene.pdfSelectEmitter(nextBundle.closestObject);
 
                                     //Convert the SA BSDF pdf into Area domain for MIS calculation
-                                    Float squaredDistance = glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint) *
-                                                            glm::length(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint);
+                                    Float squaredDistance = glm::length2(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
                                     Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) / squaredDistance;
                                     Float misweight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);

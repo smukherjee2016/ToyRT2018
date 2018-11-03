@@ -3,6 +3,7 @@
 #include <vector>
 #define GLM_FORCE_INLINE
 #include <glm/glm.hpp>
+#include <glm/gtx/norm.hpp>
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <fstream>
