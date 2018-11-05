@@ -93,7 +93,7 @@ public:
                                     Spectrum accumulatedFactors = Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
                                     Spectrum Le = emitter->Le(nextRay);
                                     Spectrum contribution = Le * brdf * geometryTerm * accumulatedFactors / compositeEmitterPdfA_EmitterSampling;
-                                    L += L + contribution;
+                                    L += contribution;
                                 }
 
 
