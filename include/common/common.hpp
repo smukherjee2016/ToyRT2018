@@ -2,6 +2,7 @@
 
 #include <vector>
 #define GLM_FORCE_INLINE
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
 #define _USE_MATH_DEFINES
