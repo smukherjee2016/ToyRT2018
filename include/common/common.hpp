@@ -40,10 +40,9 @@ public:
     Float t;
     Float tmin, tmax;
 
-Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& _t = Infinity, const Float& _tmin = epsilon,
+Ray(const Point3& _o = Vector3(0), const Vector3& _d = Vector3(0), const Float& _tmin = epsilon,
     const Float& _tmax = Infinity):
-    o(_o), d(_d), t(_t), tmin(_tmin), tmax(_tmax) { }
-
+    o(_o), d(_d), tmin(_tmin), tmax(_tmax) { t = Infinity;}
 };
 
 struct HitInfo {

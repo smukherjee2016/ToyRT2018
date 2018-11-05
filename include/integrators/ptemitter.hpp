@@ -76,7 +76,7 @@ public:
                                 Spectrum brdf = currentHitBundle.closestObject->mat->brdf(outgoingDirection,
                                                                                             -prevRay.d, currentHitBundle.hitInfo.normal);
                                 Float tMax = glm::length(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint) - epsilon;
-                                Ray nextRay(currentHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
+                                Ray nextRay(currentHitBundle.hitInfo.intersectionPoint, outgoingDirection,epsilon,tMax);
                                 //Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
 
                                 std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
@@ -93,8 +93,7 @@ public:
                                     Spectrum accumulatedFactors = Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
                                     Spectrum Le = emitter->Le(nextRay);
                                     Spectrum contribution = Le * brdf * geometryTerm * accumulatedFactors / compositeEmitterPdfA_EmitterSampling;
-                                    L = L + contribution;
-                                    Float debug = 1.0;
+                                    L += L + contribution;
                                 }
 
 
