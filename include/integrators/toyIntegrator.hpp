@@ -30,7 +30,7 @@ public:
                             std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
                             if(emitterOptionalBundle) {
                                 std::shared_ptr<Object> emitter = emitterOptionalBundle.value();
-                                Point3 pointOnLightSource = emitter->samplePointOnEmitter(-cameraRay.d, cameraRayHitBundle.hitInfo.normal);
+                                Point3 pointOnLightSource = emitter->samplePointOnEmitter();
                                 Vector3 outgoingDirection = glm::normalize(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint);
                                 Float pdfEmitterA_EmitterSampling = emitter->pdfEmitterA(
                                         cameraRayHitBundle.hitInfo.intersectionPoint);
@@ -42,7 +42,7 @@ public:
                                         cameraRayHitBundle.hitInfo.normal);
 
                                 Float tMax = glm::length(pointOnLightSource - cameraRayHitBundle.hitInfo.intersectionPoint) - epsilon;
-                                Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
+                                Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection,epsilon,tMax);
                                 //Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
 
                                 std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
