@@ -79,7 +79,7 @@ public:
             return true;
     }
 
-    Point3 samplePointOnEmitter(const Vector3& wo, const Vector3& normal) const override {
+    Point3 samplePointOnEmitter() const override {
         Float x,y,z;
         Point2 thetaPhi;
         Point3 pointInCartesian;
@@ -117,7 +117,8 @@ public:
     Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr, Spectrum _Le = Vector3(0.0)) :
     center(_center), radius(_radius) {
             mat = _mat; //Base class members apparently doesn't work otherwise...
-            LeIntensity = _Le / (4 * PI * _radius * _radius);
+            //LeIntensity = _Le / (4 * PI * _radius * _radius);
+            LeIntensity = _Le;
     }
 
     glm::dvec3 center = {0, 0, 0};

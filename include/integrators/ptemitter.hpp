@@ -31,6 +31,8 @@ public:
                     if (hitBundle) {
 
                         HitBundle currentHitBundle = hitBundle.value();
+                        //if(x == 11 && y == 13 && k == 5)
+                        //    __debugbreak();
 
                         /*
                         * First convert the previous BSDF term into Area domain and accumulate.
@@ -66,8 +68,7 @@ public:
                             std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
                             if(emitterOptionalBundle) {
                                 std::shared_ptr<Object> emitter = emitterOptionalBundle.value();
-                                Point3 pointOnEmitter = emitter->samplePointOnEmitter(-prevRay.d,
-                                                                                          currentHitBundle.hitInfo.normal);
+                                Point3 pointOnEmitter = emitter->samplePointOnEmitter();
                                 Vector3 outgoingDirection = glm::normalize(
                                         pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint);
                                 Float pdfEmitterA_EmitterSampling = emitter->pdfEmitterA(
@@ -75,10 +76,6 @@ public:
 
                                 Spectrum brdf = currentHitBundle.closestObject->mat->brdf(outgoingDirection,
                                                                                             -prevRay.d, currentHitBundle.hitInfo.normal);
-                                Float pdfBSDF_EmitterSampling = currentHitBundle.closestObject->mat->pdfW(
-                                        outgoingDirection, -cameraRay.d,
-                                        currentHitBundle.hitInfo.normal);
-
                                 Float tMax = glm::length(pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint) - epsilon;
                                 Ray nextRay(currentHitBundle.hitInfo.intersectionPoint, outgoingDirection,Infinity,epsilon,tMax);
                                 //Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
@@ -92,14 +89,13 @@ public:
                                     Float geometryTerm =  std::max(0.0, glm::dot(outgoingDirection, currentHitBundle.hitInfo.normal)) * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection))
                                                           / squaredDistance;
 
-                                    Float pdfBSDFA_EmitterSampling = pdfBSDF_EmitterSampling * std::max(0.0, glm::dot(emitterNormal, -outgoingDirection)) / squaredDistance ; //Convert to area domain
-
                                     Float compositeEmitterPdfA_EmitterSampling = pdfEmitterA_EmitterSampling * scene.pdfSelectEmitter(emitter);
 
-                                    //Float misWeight = PowerHeuristic(1, compositeEmitterPdfA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
-
                                     Spectrum accumulatedFactors = Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
-                                    L += emitter->Le(nextRay) * brdf * geometryTerm * accumulatedFactors / compositeEmitterPdfA_EmitterSampling;
+                                    Spectrum Le = emitter->Le(nextRay);
+                                    Spectrum contribution = Le * brdf * geometryTerm * accumulatedFactors / compositeEmitterPdfA_EmitterSampling;
+                                    L = L + contribution;
+                                    Float debug = 1.0;
                                 }
 
 

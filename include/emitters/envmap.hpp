@@ -39,7 +39,7 @@ public:
         }
     }
 
-    Point3 samplePointOnEmitter(const Vector3& wo, const Vector3& normal) const override {
+    Point3 samplePointOnEmitter() const override {
         return Point3(0.0);
     }
 
