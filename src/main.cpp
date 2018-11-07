@@ -2,11 +2,13 @@
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
 #include "integrators/toyIntegrator.hpp"
+#include "integrators/pt.hpp"
 #include "integrators/ptemitter.hpp"
 #include "integrators/ptemitterv2.hpp"
 #include "film/film.hpp"
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
+#include <chrono>
 
 const int sampleCount = 16;
 const int numBounces = 2;
@@ -24,12 +26,17 @@ int main(void) {
     scene.makeScene();
     //ToyIntegrator toyIntegrator;
     //toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
-    //PathTracingIntegratorEmitterSampling ptIntegrator;
+    PathTracingIntegrator ptIntegrator;
     //ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
-    PathTracingEmitterv2 ptIntegrator;
+    //PathTracingEmitterv2 ptIntegrator;
+    auto start = std::chrono::steady_clock::now();
     ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
+    auto end = std::chrono::steady_clock::now();
 
     film.writePixels("Assignment4_normals.pfm");
 
+    std::cout << "Time taken to render a " << resX << " by " << resY << " image using "
+        << sampleCount << " samples and " << numBounces << " bounces: "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << " ms.\n";
     return EXIT_SUCCESS;
 }
