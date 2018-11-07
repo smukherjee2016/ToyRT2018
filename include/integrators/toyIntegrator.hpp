@@ -14,7 +14,7 @@ public:
             Spectrum pixelValue{};
             for (int j = 0; j < sampleCount; j++) {
 
-                for(int k = 0; k < numBounces; k++) {
+                for(int k = 1; k <= numBounces; k++) {
                     Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
 
                     std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(cameraRay, scene);
