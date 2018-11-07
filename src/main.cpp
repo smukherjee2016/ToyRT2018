@@ -5,6 +5,7 @@
 #include "integrators/pt.hpp"
 #include "integrators/ptemitter.hpp"
 #include "integrators/ptemitterv2.hpp"
+#include "integrators/ptemitterv3.hpp"
 #include "film/film.hpp"
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
@@ -29,6 +30,7 @@ int main(void) {
     PathTracingIntegrator ptIntegrator;
     //ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
     //PathTracingEmitterv2 ptIntegrator;
+    PathTracingEmitterv3 ptIntegrator;
     auto start = std::chrono::steady_clock::now();
     ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
     auto end = std::chrono::steady_clock::now();

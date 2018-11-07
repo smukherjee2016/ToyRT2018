@@ -15,6 +15,14 @@ struct HitBundle {
     std::shared_ptr<Object> closestObject;
 };
 
+struct Path {
+    std::vector<HitBundle> vertices;
+    std::vector<Spectrum> bsdfs;
+    std::vector<Float> pdfBSDFWs;
+    std::vector<Float> pdfBSDFAs;
+    std::vector<Float> G_xi_ximinus1s;
+};
+
 std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& scene) {
     HitBundle closestHitBundle{};
      closestHitBundle.hitInfo.tIntersection = Infinity;
