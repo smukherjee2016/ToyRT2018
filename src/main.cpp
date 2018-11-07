@@ -11,7 +11,7 @@
 #include "util/rng.hpp"
 #include <chrono>
 
-const int sampleCount = 16;
+const int sampleCount = 512;
 const int numBounces = 2;
 
 int main(void) {
@@ -27,7 +27,7 @@ int main(void) {
     scene.makeScene();
     //ToyIntegrator toyIntegrator;
     //toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
-    PathTracingIntegrator ptIntegrator;
+    //PathTracingIntegrator ptIntegrator;
     //ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
     //PathTracingEmitterv2 ptIntegrator;
     PathTracingEmitterv3 ptIntegrator;

@@ -44,7 +44,7 @@ public:
                         currentSampleBSDFPath.pdfBSDFWs.emplace_back(pdfW);
 
                         //Keep geometry term, throughput, and area-domain pdf to 1. Will be filled after whole path is constructed
-                        currentSampleBSDFPath.pdfBSDFAs.emplace_back(Spectrum(1.0));
+                        currentSampleBSDFPath.pdfBSDFAs.emplace_back(1.0);
                         currentSampleBSDFPath.G_xi_ximinus1s.emplace_back(1.0);
 
                         //Generate next ray and make it current
@@ -82,6 +82,9 @@ public:
                 }
 
                 //If final vertex is on an emitter, add contribution : BSDF sampling
+                if(currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->isEmitter()) {
+
+                }
 
 
 

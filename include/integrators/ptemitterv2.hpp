@@ -80,7 +80,7 @@ public:
                                 Float pdfEmitterA_2 = emitter->pdfEmitterA(sampledPointOnEmitter);
                                 Float compositePdfEmitterA_2 = pdfEmitterA_2 * scene.pdfSelectEmitter(emitter);
                                 Spectrum Le = emitter->Le(shadowRay);
-                                Spectrum contribution = Le * throughput * bsdf_2 * geometryTerm / pdfEmitterA_2;
+                                Spectrum contribution = Le * throughput * bsdf_2 * geometryTerm / compositePdfEmitterA_2;
                                 L += contribution;
                             }
 
