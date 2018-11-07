@@ -32,6 +32,7 @@ public:
                     {
                         //L += hitInfoBundle_Bounce1.closestObject->Le(thisRay);
                         L += Vector3(0.0);
+                        pixelValue += L;
                         continue;
                     }
 
@@ -53,6 +54,7 @@ public:
                         if(hitInfoBundle_Bounce2.closestObject->isEmitter())
                         {
                             L += Vector3(0.0);
+                            pixelValue += L;
                             continue;
                         }
 
@@ -64,10 +66,6 @@ public:
                             Point3 sampledPointOnEmitter = emitter->samplePointOnEmitter();
                             Vector3 outgoingDirection_Emitter = glm::normalize(sampledPointOnEmitter - hitInfoBundle_Bounce2.hitInfo.intersectionPoint);
                             Spectrum bsdf_2 = hitInfoBundle_Bounce2.closestObject->mat->brdf(outgoingDirection_Emitter, -ray_2.d, hitInfoBundle_Bounce2.hitInfo.normal);
-                            Float pdfBSDFW_2 = hitInfoBundle_Bounce2.closestObject->mat->pdfW(outgoingDirection_Emitter, -ray_2.d, hitInfoBundle_Bounce2.hitInfo.normal);
-
-                            if(pdfBSDFW_2 == 0.0)
-                                continue;
 
                             Float tMax = glm::length(sampledPointOnEmitter - hitInfoBundle_Bounce2.hitInfo.intersectionPoint) - epsilon;
                             Ray shadowRay(hitInfoBundle_Bounce2.hitInfo.intersectionPoint, outgoingDirection_Emitter, epsilon, tMax);
