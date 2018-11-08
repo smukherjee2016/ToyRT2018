@@ -5,7 +5,7 @@
 class PathTracingEmitterv3 : public Integrator {
 public:
     void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces = 2) const override {
-//#pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for schedule(dynamic, 1)
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 
             int positionInFilm = i;
@@ -51,6 +51,12 @@ public:
                         //Generate next ray and make it current
                         Ray nextRay(hitPoint, sampledNextBSDFDirection);
                         currentRay = nextRay;
+
+                        //Finish making the path if current vertex is an emitter
+                        if(currentHitBundle.closestObject->isEmitter()) {
+                            currentSampleBSDFPath.isTerminateAtEmitter = true;
+                            break;
+                        }
                     }
                     else
                         break; //Don't do any (more) bounces if didn't hit anything
@@ -83,25 +89,31 @@ public:
                 }
 
                 //If final vertex is on an emitter, add contribution : BSDF sampling
-                if(pathLength >= 1 && currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->isEmitter()) {
-                    //Reconstruct final shot ray before hitting the emitter
-                    Ray finalBounceRay{};
-                    finalBounceRay.o = currentSampleBSDFPath.vertices.at(pathLength - 2).hitInfo.intersectionPoint;
-                    finalBounceRay.d = glm:: normalize(currentSampleBSDFPath.vertices.at(pathLength - 1).hitInfo.intersectionPoint
-                                        - currentSampleBSDFPath.vertices.at(pathLength - 2).hitInfo.intersectionPoint);
-
-                    //Find Le in the given direction of final shot ray
-                    L = currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->Le(finalBounceRay);
-                    //Calculate light transported along this given path to the camera
-                    for(auto vertexIndex = pathLength - 1; vertexIndex >= 0; vertexIndex--) {
-                        //Visibility term implicitly 1 along this path
-                        Float geometryTerm = currentSampleBSDFPath.G_xi_ximinus1s.at(vertexIndex);
-                        Float pdfBSDFA = currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex);
-                        Spectrum bsdf = currentSampleBSDFPath.bsdfs.at(vertexIndex);
-
-                        L *= (bsdf * geometryTerm) / pdfBSDFA;
-
+                if(pathLength >= 1 && currentSampleBSDFPath.isTerminateAtEmitter) {
+                    if(pathLength == 1) { //Direct hit emitter
+                        L = currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->Le(cameraRay);
                     }
+                    else {
+                        //Reconstruct final shot ray before hitting the emitter
+                        Ray finalBounceRay{};
+                        finalBounceRay.o = currentSampleBSDFPath.vertices.at(pathLength - 2).hitInfo.intersectionPoint;
+                        finalBounceRay.d = glm:: normalize(currentSampleBSDFPath.vertices.at(pathLength - 1).hitInfo.intersectionPoint
+                                                           - currentSampleBSDFPath.vertices.at(pathLength - 2).hitInfo.intersectionPoint);
+
+                        //Find Le in the given direction of final shot ray
+                        L = currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->Le(finalBounceRay);
+                        //Calculate light transported along this given path to the camera
+                        for(int vertexIndex = pathLength - 1; vertexIndex < 0; vertexIndex--) {
+                            //Visibility term implicitly 1 along this path
+                            Float geometryTerm = currentSampleBSDFPath.G_xi_ximinus1s.at(vertexIndex);
+                            Float pdfBSDFA = currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex);
+                            Spectrum bsdf = currentSampleBSDFPath.bsdfs.at(vertexIndex);
+
+                            L *= (bsdf * geometryTerm) / pdfBSDFA;
+
+                        }
+                    }
+
                 }
                 pixelValue += L; //Add sample contribution
             }

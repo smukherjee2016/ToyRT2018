@@ -21,6 +21,7 @@ struct Path {
     std::vector<Float> pdfBSDFWs;
     std::vector<Float> pdfBSDFAs;
     std::vector<Float> G_xi_ximinus1s;
+    bool isTerminateAtEmitter = false;
 };
 
 std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& scene) {
