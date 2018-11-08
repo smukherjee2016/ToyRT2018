@@ -103,7 +103,7 @@ public:
                         //Find Le in the given direction of final shot ray
                         L = currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->Le(finalBounceRay);
                         //Calculate light transported along this given path to the camera
-                        for(int vertexIndex = pathLength - 1; vertexIndex < 0; vertexIndex--) {
+                        for(int vertexIndex = pathLength - 1; vertexIndex >= 0; vertexIndex--) {
                             //Visibility term implicitly 1 along this path
                             Float geometryTerm = currentSampleBSDFPath.G_xi_ximinus1s.at(vertexIndex);
                             Float pdfBSDFA = currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex);
