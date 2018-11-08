@@ -76,14 +76,14 @@ public:
                                 * std::max(0.0, glm::dot(-directionPrevToThis, thisVertex.hitInfo.normal)) //cos(Phi)_i
                                 / squaredDistance;
 
-                        Float bsdfWAConversionFactor_XiPlus1GivenXi = std::max(0.0, glm::dot(-directionPrevToThis, thisVertex.hitInfo.normal)) //cos(Phi)_i
+                        Float pdfWAConversionFactor_XiPlus1GivenXi = std::max(0.0, glm::dot(-directionPrevToThis, thisVertex.hitInfo.normal)) //cos(Phi)_i
                                                                / squaredDistance;
 
-                        Float bsdfA_XiPlus1GivenXi = currentSampleBSDFPath.pdfBSDFWs.at(vertexIndex) * bsdfWAConversionFactor_XiPlus1GivenXi;
+                        Float pdfA_XiPlus1GivenXi = currentSampleBSDFPath.pdfBSDFWs.at(vertexIndex) * pdfWAConversionFactor_XiPlus1GivenXi;
 
                         //Store geometry terms and area domain BSDFs
                         currentSampleBSDFPath.G_xi_ximinus1s.at(vertexIndex) = geometryTerm;
-                        currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex) = bsdfA_XiPlus1GivenXi;
+                        currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex) = pdfA_XiPlus1GivenXi;
 
                     }
                 }
@@ -109,7 +109,8 @@ public:
                             Float pdfBSDFA = currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex);
                             Spectrum bsdf = currentSampleBSDFPath.bsdfs.at(vertexIndex);
 
-                            L *= (bsdf * geometryTerm) / pdfBSDFA;
+                            Spectrum attenuation = bsdf * geometryTerm / pdfBSDFA;
+                            L *= attenuation;
 
                         }
                     }
