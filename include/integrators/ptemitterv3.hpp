@@ -27,6 +27,20 @@ public:
                     if(didCurrentRayHitObject) {
                         HitBundle currentHitBundle = didCurrentRayHitObject.value();
 
+                        //If hit an emitter, store only the hitBundle object and terminate the path
+                        if(currentHitBundle.closestObject->isEmitter()) {
+                            currentSampleBSDFPath.isTerminateAtEmitter = true;
+
+                            currentSampleBSDFPath.vertices.emplace_back(currentHitBundle);
+                            currentSampleBSDFPath.bsdfs.emplace_back(Vector3(1.0));
+                            currentSampleBSDFPath.pdfBSDFWs.emplace_back(1.0);
+
+                            //Keep geometry term, throughput, and area-domain pdf to 1. Will be filled after whole path is constructed
+                            currentSampleBSDFPath.pdfBSDFAs.emplace_back(1.0);
+                            currentSampleBSDFPath.G_xi_ximinus1s.emplace_back(1.0);
+                            break;
+                        }
+
                         //Calculate shading point values
                         Vector3 hitPointNormal = currentHitBundle.hitInfo.normal;
                         Vector3 hitPoint = currentHitBundle.hitInfo.intersectionPoint;
@@ -52,11 +66,6 @@ public:
                         Ray nextRay(hitPoint, sampledNextBSDFDirection);
                         currentRay = nextRay;
 
-                        //Finish making the path if current vertex is an emitter
-                        if(currentHitBundle.closestObject->isEmitter()) {
-                            currentSampleBSDFPath.isTerminateAtEmitter = true;
-                            break;
-                        }
                     }
                     else
                         break; //Don't do any (more) bounces if didn't hit anything
