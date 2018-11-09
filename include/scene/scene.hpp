@@ -9,6 +9,7 @@
 #include "materials/lambertCosine.hpp"
 #include "materials/blinnphong.hpp"
 #include "materials/phong.hpp"
+#include "materials/transparentMaterial.hpp"
 
 class Scene
 {

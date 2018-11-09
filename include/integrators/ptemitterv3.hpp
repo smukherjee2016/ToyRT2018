@@ -21,7 +21,13 @@ public:
                 Path currentSampleBSDFPath{};
                 Spectrum L(0.0);
 
-                //Accumulate path, assume first vertex on the path is the first hitpoint, not the camera
+                //Add the camera vertex
+                HitBundle cameraPointBundle{};
+                cameraPointBundle.vertexType = SENSOR;
+                cameraPointBundle.hitInfo.intersectionPoint = cameraRay.o;
+                cameraPointBundle.closestObject->mat = std::make_shared<TransparentMaterial>();
+
+                //Accumulate path
                 for(int k = 1; k <= numBounces; k++) {
                     std::optional<HitBundle> didCurrentRayHitObject = traceRayReturnClosestHit(currentRay, scene);
                     if(didCurrentRayHitObject) {
