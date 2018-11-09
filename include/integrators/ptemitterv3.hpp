@@ -21,16 +21,43 @@ public:
                 Path currentSampleBSDFPath{};
                 Spectrum L(0.0);
 
-                //Add the camera vertex
+                //Add the camera vertex, a tiny tiny transparent sphere
                 HitBundle cameraPointBundle{};
                 cameraPointBundle.hitInfo.intersectionPoint = cameraRay.o;
-                //cameraPointBundle.closestObject->mat = std::make_shared<TransparentMaterial>();
+                cameraPointBundle.closestObject = std::make_unique<Sphere>(cameraRay.o, epsilon , std::make_shared<TransparentMaterial>());
+                //Fill in normal, geoTerm and pdfA later so they cancel out
+
+                Vertex cameraVertex{};
+                cameraVertex.hitPointAndMaterial = cameraPointBundle;
+                cameraVertex.pdfBSDFW = 1.0; //Probability of sampling this vertex in SA domain is always 1
+                cameraVertex.bsdf_xi_xiplus1 = Spectrum(1.0); //Pass all the light through
+                //Set pdfA and Geoterm later
+                cameraVertex.pdfBSDFA = 1.0;
+                cameraVertex.G_xi_xiplus1 = 1.0;
+
+                //Set camera  vertex to have SENSOR type
+                cameraVertex.vertexType = SENSOR;
+
+
+                currentSampleBSDFPath.vertices.emplace_back(cameraVertex);
 
                 //Accumulate path
                 for(int k = 1; k <= numBounces; k++) {
                     std::optional<HitBundle> didCurrentRayHitObject = traceRayReturnClosestHit(currentRay, scene);
                     if(didCurrentRayHitObject) {
                         HitBundle currentHitBundle = didCurrentRayHitObject.value();
+
+                        //Special processing for the sensor vertex: Set normal to be the same direction as towards
+                        //the first hitPoint so that cos(theta) = 1 and cos(phi)/d^2 and the geoTerm cancel out
+                        if(k == 1 && currentSampleBSDFPath.vertices.at(0).vertexType == SENSOR) {
+                            Point3 cameraPosition = currentSampleBSDFPath.vertices.at(0).hitPointAndMaterial.hitInfo.intersectionPoint;
+                            Point3 firstHitPointPosition = currentHitBundle.hitInfo.intersectionPoint;
+
+                            currentSampleBSDFPath.vertices.at(0).hitPointAndMaterial.hitInfo.normal
+                            = glm::normalize(firstHitPointPosition - cameraPosition);
+
+
+                        }
 
                         //If hit an emitter, store only the hitBundle object and terminate the path
                         if(currentHitBundle.closestObject->isEmitter()) {
