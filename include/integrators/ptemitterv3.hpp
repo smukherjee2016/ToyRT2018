@@ -35,9 +35,9 @@ public:
                             currentSampleBSDFPath.bsdfs.emplace_back(Vector3(1.0));
                             currentSampleBSDFPath.pdfBSDFWs.emplace_back(1.0);
 
-                            //Keep geometry term, throughput, and area-domain pdf to 1. Will be filled after whole path is constructed
+                            //Keep geometry term and area pdf to 1 if hit emitter
                             currentSampleBSDFPath.pdfBSDFAs.emplace_back(1.0);
-                            currentSampleBSDFPath.G_xi_ximinus1s.emplace_back(1.0);
+                            currentSampleBSDFPath.G_xi_xiplus1s.emplace_back(1.0);
                             break;
                         }
 
@@ -60,7 +60,7 @@ public:
 
                         //Keep geometry term, throughput, and area-domain pdf to 1. Will be filled after whole path is constructed
                         currentSampleBSDFPath.pdfBSDFAs.emplace_back(1.0);
-                        currentSampleBSDFPath.G_xi_ximinus1s.emplace_back(1.0);
+                        currentSampleBSDFPath.G_xi_xiplus1s.emplace_back(1.0);
 
                         //Generate next ray and make it current
                         Ray nextRay(hitPoint, sampledNextBSDFDirection);
@@ -71,27 +71,27 @@ public:
                         break; //Don't do any (more) bounces if didn't hit anything
                 }
 
-                auto pathLength = currentSampleBSDFPath.vertices.size();
+                int pathLength = currentSampleBSDFPath.vertices.size();
                 //Process the path and fill in geometry term, throughput and area-domain pdf
-                for(auto vertexIndex = 0; vertexIndex < pathLength; vertexIndex++) {
-                    if(pathLength >= 1 && vertexIndex >= 1) { //Only start processing from the 2nd vertex, should cancel out for 1st vertex and camera
+                for(auto vertexIndex = 0; vertexIndex < pathLength - 1; vertexIndex++) {
+                    if(pathLength > 1) { //Skip the last vertex of the path, TODO it might need special processing for NEE?
                         //Extract current and previous vertices for calculation
                         HitBundle thisVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
-                        HitBundle prevVertex = currentSampleBSDFPath.vertices.at(vertexIndex - 1);
+                        HitBundle nextVertex = currentSampleBSDFPath.vertices.at(vertexIndex + 1);
 
-                        Float squaredDistance = glm::length2(thisVertex.hitInfo.intersectionPoint - prevVertex.hitInfo.intersectionPoint);
-                        Vector3 directionPrevToThis = glm::normalize(thisVertex.hitInfo.intersectionPoint - prevVertex.hitInfo.intersectionPoint);
-                        Float geometryTerm = std::max(0.0, glm::dot(directionPrevToThis, prevVertex.hitInfo.normal)) //cos(Theta)_(i-1)
-                                * std::max(0.0, glm::dot(-directionPrevToThis, thisVertex.hitInfo.normal)) //cos(Phi)_i
+                        Float squaredDistance = glm::length2(nextVertex.hitInfo.intersectionPoint - thisVertex.hitInfo.intersectionPoint);
+                        Vector3 directionThisToNext = glm::normalize(nextVertex.hitInfo.intersectionPoint - thisVertex.hitInfo.intersectionPoint);
+                        Float geometryTerm = std::max(0.0, glm::dot(directionThisToNext, thisVertex.hitInfo.normal)) //cos(Theta)_(i-1)
+                                * std::max(0.0, glm::dot(-directionThisToNext, nextVertex.hitInfo.normal)) //cos(Phi)_i
                                 / squaredDistance;
 
-                        Float pdfWAConversionFactor_XiPlus1GivenXi = std::max(0.0, glm::dot(-directionPrevToThis, thisVertex.hitInfo.normal)) //cos(Phi)_i
+                        Float pdfWAConversionFactor_XiPlus1GivenXi = std::max(0.0, glm::dot(-directionThisToNext, nextVertex.hitInfo.normal)) //cos(Phi)_i
                                                                / squaredDistance;
 
                         Float pdfA_XiPlus1GivenXi = currentSampleBSDFPath.pdfBSDFWs.at(vertexIndex) * pdfWAConversionFactor_XiPlus1GivenXi;
 
                         //Store geometry terms and area domain BSDFs
-                        currentSampleBSDFPath.G_xi_ximinus1s.at(vertexIndex) = geometryTerm;
+                        currentSampleBSDFPath.G_xi_xiplus1s.at(vertexIndex) = geometryTerm;
                         currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex) = pdfA_XiPlus1GivenXi;
 
                     }
@@ -114,7 +114,7 @@ public:
                         //Calculate light transported along this given path to the camera
                         for(int vertexIndex = pathLength - 1; vertexIndex >= 0; vertexIndex--) {
                             //Visibility term implicitly 1 along this path
-                            Float geometryTerm = currentSampleBSDFPath.G_xi_ximinus1s.at(vertexIndex);
+                            Float geometryTerm = currentSampleBSDFPath.G_xi_xiplus1s.at(vertexIndex);
                             Float pdfBSDFA = currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex);
                             Spectrum bsdf = currentSampleBSDFPath.bsdfs.at(vertexIndex);
 

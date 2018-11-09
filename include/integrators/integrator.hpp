@@ -20,7 +20,7 @@ struct Path {
     std::vector<Spectrum> bsdfs;
     std::vector<Float> pdfBSDFWs;
     std::vector<Float> pdfBSDFAs;
-    std::vector<Float> G_xi_ximinus1s;
+    std::vector<Float> G_xi_xiplus1s;
     bool isTerminateAtEmitter = false;
 };
 
