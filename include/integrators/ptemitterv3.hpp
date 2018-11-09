@@ -101,9 +101,9 @@ public:
                         Float pdfWAConversionFactor_XiPlus1GivenXi = std::max(0.0, glm::dot(-directionThisToNext, nextVertex.hitPointAndMaterial.hitInfo.normal)) //cos(Phi)_i
                                                                / squaredDistance;
 
-                        //Store geometry terms and area domain BSDFs
-                        thisVertex.G_xi_xiplus1 = geometryTerm;
-                        thisVertex.pdfBSDFA = thisVertex.pdfBSDFW * pdfWAConversionFactor_XiPlus1GivenXi;
+                        //Store geometry terms and area domain BSDFs *into* the actual vector element, not its copy nextVertex
+                        currentSampleBSDFPath.vertices.at(vertexIndex).G_xi_xiplus1 = geometryTerm;
+                        currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA = thisVertex.pdfBSDFW * pdfWAConversionFactor_XiPlus1GivenXi;
 
                     }
                 }
