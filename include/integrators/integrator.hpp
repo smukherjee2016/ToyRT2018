@@ -10,9 +10,16 @@ class Integrator {
     virtual void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces) const = 0;
 };
 
+enum typeOfVertex {
+    SURFACE,
+    EMITTER,
+    SENSOR
+};
+
 struct HitBundle {
     HitInfo hitInfo;
     std::shared_ptr<Object> closestObject;
+    typeOfVertex vertexType = SURFACE;
 };
 
 struct Path {
@@ -21,7 +28,6 @@ struct Path {
     std::vector<Float> pdfBSDFWs;
     std::vector<Float> pdfBSDFAs;
     std::vector<Float> G_xi_xiplus1s;
-    bool isTerminateAtEmitter = false;
 };
 
 std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& scene) {

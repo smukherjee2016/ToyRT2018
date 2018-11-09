@@ -29,7 +29,7 @@ public:
 
                         //If hit an emitter, store only the hitBundle object and terminate the path
                         if(currentHitBundle.closestObject->isEmitter()) {
-                            currentSampleBSDFPath.isTerminateAtEmitter = true;
+                            currentHitBundle.vertexType = EMITTER;
 
                             currentSampleBSDFPath.vertices.emplace_back(currentHitBundle);
                             currentSampleBSDFPath.bsdfs.emplace_back(Vector3(1.0));
@@ -98,7 +98,7 @@ public:
                 }
 
                 //If final vertex is on an emitter, add contribution : BSDF sampling
-                if(pathLength >= 1 && currentSampleBSDFPath.isTerminateAtEmitter) {
+                if(pathLength >= 1 && currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
                     if(pathLength == 1) { //Direct hit emitter
                         L = currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->Le(cameraRay);
                     }
