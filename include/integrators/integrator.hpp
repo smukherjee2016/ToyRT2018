@@ -19,15 +19,20 @@ enum typeOfVertex {
 struct HitBundle {
     HitInfo hitInfo;
     std::shared_ptr<Object> closestObject;
+
+};
+
+struct Vertex {
+    HitBundle hitPointAndMaterial;
+    Spectrum bsdf_xi_xiplus1;
+    Float pdfBSDFW;
+    Float pdfBSDFA;
+    Float G_xi_xiplus1;
     typeOfVertex vertexType = SURFACE;
 };
 
 struct Path {
-    std::vector<HitBundle> vertices;
-    std::vector<Spectrum> bsdfs;
-    std::vector<Float> pdfBSDFWs;
-    std::vector<Float> pdfBSDFAs;
-    std::vector<Float> G_xi_xiplus1s;
+    std::vector<Vertex> vertices;
 };
 
 std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& scene) {

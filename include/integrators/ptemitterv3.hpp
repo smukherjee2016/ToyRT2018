@@ -23,9 +23,8 @@ public:
 
                 //Add the camera vertex
                 HitBundle cameraPointBundle{};
-                cameraPointBundle.vertexType = SENSOR;
                 cameraPointBundle.hitInfo.intersectionPoint = cameraRay.o;
-                cameraPointBundle.closestObject->mat = std::make_shared<TransparentMaterial>();
+                //cameraPointBundle.closestObject->mat = std::make_shared<TransparentMaterial>();
 
                 //Accumulate path
                 for(int k = 1; k <= numBounces; k++) {
@@ -35,15 +34,18 @@ public:
 
                         //If hit an emitter, store only the hitBundle object and terminate the path
                         if(currentHitBundle.closestObject->isEmitter()) {
-                            currentHitBundle.vertexType = EMITTER;
-
-                            currentSampleBSDFPath.vertices.emplace_back(currentHitBundle);
-                            currentSampleBSDFPath.bsdfs.emplace_back(Vector3(1.0));
-                            currentSampleBSDFPath.pdfBSDFWs.emplace_back(1.0);
+                            Vertex currentVertex;
+                            currentVertex.hitPointAndMaterial = currentHitBundle;
+                            currentVertex.vertexType = EMITTER;
+                            currentVertex.bsdf_xi_xiplus1 = Spectrum(1.0);
+                            currentVertex.pdfBSDFW = 1.0;
 
                             //Keep geometry term and area pdf to 1 if hit emitter
-                            currentSampleBSDFPath.pdfBSDFAs.emplace_back(1.0);
-                            currentSampleBSDFPath.G_xi_xiplus1s.emplace_back(1.0);
+                            currentVertex.G_xi_xiplus1 = 1.0;
+                            currentVertex.pdfBSDFA = 1.0;
+
+                            currentSampleBSDFPath.vertices.emplace_back(currentVertex);
+
                             break;
                         }
 
@@ -59,14 +61,19 @@ public:
                         if(pdfW == 0.0)
                             break;
 
+                        Vertex currentVertex;
+
                         //Store the hitBundles etc. in the path
-                        currentSampleBSDFPath.vertices.emplace_back(currentHitBundle);
-                        currentSampleBSDFPath.bsdfs.emplace_back(bsdf);
-                        currentSampleBSDFPath.pdfBSDFWs.emplace_back(pdfW);
+                        currentVertex.hitPointAndMaterial = currentHitBundle;
+                        currentVertex.bsdf_xi_xiplus1 = bsdf;
+                        currentVertex.pdfBSDFW = pdfW;
 
                         //Keep geometry term, throughput, and area-domain pdf to 1. Will be filled after whole path is constructed
-                        currentSampleBSDFPath.pdfBSDFAs.emplace_back(1.0);
-                        currentSampleBSDFPath.G_xi_xiplus1s.emplace_back(1.0);
+                        currentVertex.pdfBSDFA = 1.0;
+                        currentVertex.G_xi_xiplus1 = 1.0;
+
+                        //Push the vertex into the path
+                        currentSampleBSDFPath.vertices.emplace_back(currentVertex);
 
                         //Generate next ray and make it current
                         Ray nextRay(hitPoint, sampledNextBSDFDirection);
@@ -82,23 +89,21 @@ public:
                 for(auto vertexIndex = 0; vertexIndex < pathLength - 1; vertexIndex++) {
                     if(pathLength > 1) { //Skip the last vertex of the path, TODO it might need special processing for NEE?
                         //Extract current and previous vertices for calculation
-                        HitBundle thisVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
-                        HitBundle nextVertex = currentSampleBSDFPath.vertices.at(vertexIndex + 1);
+                        Vertex thisVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
+                        Vertex nextVertex = currentSampleBSDFPath.vertices.at(vertexIndex + 1);
 
-                        Float squaredDistance = glm::length2(nextVertex.hitInfo.intersectionPoint - thisVertex.hitInfo.intersectionPoint);
-                        Vector3 directionThisToNext = glm::normalize(nextVertex.hitInfo.intersectionPoint - thisVertex.hitInfo.intersectionPoint);
-                        Float geometryTerm = std::max(0.0, glm::dot(directionThisToNext, thisVertex.hitInfo.normal)) //cos(Theta)_(i-1)
-                                * std::max(0.0, glm::dot(-directionThisToNext, nextVertex.hitInfo.normal)) //cos(Phi)_i
+                        Float squaredDistance = glm::length2(nextVertex.hitPointAndMaterial.hitInfo.intersectionPoint - thisVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
+                        Vector3 directionThisToNext = glm::normalize(nextVertex.hitPointAndMaterial.hitInfo.intersectionPoint - thisVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
+                        Float geometryTerm = std::max(0.0, glm::dot(directionThisToNext, thisVertex.hitPointAndMaterial.hitInfo.normal)) //cos(Theta)_(i-1)
+                                * std::max(0.0, glm::dot(-directionThisToNext, nextVertex.hitPointAndMaterial.hitInfo.normal)) //cos(Phi)_i
                                 / squaredDistance;
 
-                        Float pdfWAConversionFactor_XiPlus1GivenXi = std::max(0.0, glm::dot(-directionThisToNext, nextVertex.hitInfo.normal)) //cos(Phi)_i
+                        Float pdfWAConversionFactor_XiPlus1GivenXi = std::max(0.0, glm::dot(-directionThisToNext, nextVertex.hitPointAndMaterial.hitInfo.normal)) //cos(Phi)_i
                                                                / squaredDistance;
 
-                        Float pdfA_XiPlus1GivenXi = currentSampleBSDFPath.pdfBSDFWs.at(vertexIndex) * pdfWAConversionFactor_XiPlus1GivenXi;
-
                         //Store geometry terms and area domain BSDFs
-                        currentSampleBSDFPath.G_xi_xiplus1s.at(vertexIndex) = geometryTerm;
-                        currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex) = pdfA_XiPlus1GivenXi;
+                        thisVertex.G_xi_xiplus1 = geometryTerm;
+                        thisVertex.pdfBSDFA = thisVertex.pdfBSDFW * pdfWAConversionFactor_XiPlus1GivenXi;
 
                     }
                 }
@@ -106,23 +111,26 @@ public:
                 //If final vertex is on an emitter, add contribution : BSDF sampling
                 if(pathLength >= 1 && currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
                     if(pathLength == 1) { //Direct hit emitter
-                        L = currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->Le(cameraRay);
+                        L = currentSampleBSDFPath.vertices.at(pathLength - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
                     }
                     else {
+                        Vertex finalVertex = currentSampleBSDFPath.vertices.at(pathLength - 1);
+                        Vertex penultimateVertex = currentSampleBSDFPath.vertices.at(pathLength - 2);
                         //Reconstruct final shot ray before hitting the emitter
                         Ray finalBounceRay{};
-                        finalBounceRay.o = currentSampleBSDFPath.vertices.at(pathLength - 2).hitInfo.intersectionPoint;
-                        finalBounceRay.d = glm:: normalize(currentSampleBSDFPath.vertices.at(pathLength - 1).hitInfo.intersectionPoint
-                                                           - currentSampleBSDFPath.vertices.at(pathLength - 2).hitInfo.intersectionPoint);
+                        finalBounceRay.o = penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint;
+                        finalBounceRay.d = glm:: normalize(finalVertex.hitPointAndMaterial.hitInfo.intersectionPoint
+                                                           - penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
 
                         //Find Le in the given direction of final shot ray
-                        L = currentSampleBSDFPath.vertices.at(pathLength - 1).closestObject->Le(finalBounceRay);
+                        L = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
                         //Calculate light transported along this given path to the camera
                         for(int vertexIndex = pathLength - 1; vertexIndex >= 0; vertexIndex--) {
+                            Vertex currentVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
                             //Visibility term implicitly 1 along this path
-                            Float geometryTerm = currentSampleBSDFPath.G_xi_xiplus1s.at(vertexIndex);
-                            Float pdfBSDFA = currentSampleBSDFPath.pdfBSDFAs.at(vertexIndex);
-                            Spectrum bsdf = currentSampleBSDFPath.bsdfs.at(vertexIndex);
+                            Float geometryTerm = currentVertex.G_xi_xiplus1;
+                            Float pdfBSDFA = currentVertex.pdfBSDFA;
+                            Spectrum bsdf = currentVertex.bsdf_xi_xiplus1;
 
                             Spectrum attenuation = bsdf * geometryTerm / pdfBSDFA;
                             L *= attenuation;

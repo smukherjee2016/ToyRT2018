@@ -12,7 +12,7 @@
 #include <chrono>
 
 const int sampleCount = 16;
-const int numBounces = 2;
+const int numBounces = 5;
 
 int main(void) {
 
