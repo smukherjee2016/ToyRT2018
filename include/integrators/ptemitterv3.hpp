@@ -136,8 +136,8 @@ public:
                 }
 
                 //If final vertex is on an emitter, add contribution : BSDF sampling
-                if(pathLength >= 1 && currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
-                    if(pathLength == 1) { //Direct hit emitter
+                if(pathLength >= 2 && currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
+                    if(pathLength == 2) { //Direct hit emitter
                         L = currentSampleBSDFPath.vertices.at(pathLength - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
                     }
                     else {
