@@ -114,7 +114,7 @@ public:
                 int pathLength = currentSampleBSDFPath.vertices.size();
                 //Process the path and fill in geometry term, throughput and area-domain pdf
                 for(auto vertexIndex = 0; vertexIndex < pathLength - 1; vertexIndex++) {
-                    if(pathLength > 1) { //Skip the last vertex of the path, TODO it might need special processing for NEE?
+                    if(pathLength > 1) {
                         //Extract current and previous vertices for calculation
                         Vertex thisVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
                         Vertex nextVertex = currentSampleBSDFPath.vertices.at(vertexIndex + 1);
@@ -152,7 +152,9 @@ public:
                         //Find Le in the given direction of final shot ray
                         L = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
                         //Calculate light transported along this given path to the camera
-                        for(int vertexIndex = pathLength - 1; vertexIndex >= 0; vertexIndex--) {
+                        //Since each vertex contains transport to next vertex, don't need to consider the emitter vertex anymore
+                        //This change is also needed to support Emitter Sampling at every point on the path
+                        for(int vertexIndex = pathLength - 2; vertexIndex >= 0; vertexIndex--) {
                             Vertex currentVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
                             //Visibility term implicitly 1 along this path
                             Float geometryTerm = currentVertex.G_xi_xiplus1;
