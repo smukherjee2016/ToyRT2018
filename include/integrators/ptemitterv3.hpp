@@ -135,14 +135,21 @@ public:
                     }
                 }
 
+                if(pathLength == 1) { //Ray did not hit anything in the scene, so return Le from environment map using camera ray
+                    L = scene.envMap->Le(cameraRay);
+                    pixelValue += L;
+                    continue;
+                }
+
                 if(pathLength == 2) { //Direct hit emitter
                     L = currentSampleBSDFPath.vertices.at(pathLength - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
                     pixelValue += L;
                     continue;
                 }
 
+
                 //If final vertex is on an emitter, add contribution : BSDF sampling
-                if(pathLength >= 2 && currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
+                if(currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
 
                     Vertex finalVertex = currentSampleBSDFPath.vertices.at(pathLength - 1);
                     Vertex penultimateVertex = currentSampleBSDFPath.vertices.at(pathLength - 2);
