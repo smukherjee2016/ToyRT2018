@@ -63,7 +63,7 @@ public:
 
     }
 
-    Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+    Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const override {
         if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
             return Spectrum(0.0); //Return black value for things below the horizon
         }
@@ -76,7 +76,7 @@ public:
         return kS * glossiness;
     }
 
-    Float pdfW(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) const {
+    Float pdfW(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) const override {
 
 #if 0
         if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
