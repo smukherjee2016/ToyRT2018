@@ -2,7 +2,7 @@
 
 #include "integrator.hpp"
 
-class PathTracingBSDFv3 : public Integrator {
+class PathTracingEmitterv4 : public Integrator {
 public:
     void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces = 2) const override {
 #pragma omp parallel for schedule(dynamic, 1)
@@ -102,6 +102,65 @@ public:
                     }
                 }
 
+                //Next Event Estimation aka Emitter Sampling
+                //Traverse the path from the first hit (not the sensor vertex) till the penultimate vertex and try to connect to an emitter
+                Spectrum attenuationEmitterSampling(1.0);
+                for(int vertexIndex = 1; vertexIndex <= (numVertices - 2); vertexIndex++) {
+                    //Get the vertex in question. Keep in mind it's only for reading, directly writing to it won't work
+                    Vertex currentVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
+                    Vertex previousVertex = currentSampleBSDFPath.vertices.at(vertexIndex - 1);
+
+                    Point3 surfacePoint = currentVertex.hitPointAndMaterial.hitInfo.intersectionPoint;
+                    Vector3 normalSurfacePoint = currentVertex.hitPointAndMaterial.hitInfo.normal;
+                    Vector3 incomingDirectionToSurfacePoint = glm::normalize(currentVertex.hitPointAndMaterial.hitInfo.intersectionPoint
+                                                                             - previousVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
+
+                    auto doesSceneHaveEmitters = scene.selectRandomEmitter();
+                    if(doesSceneHaveEmitters) {
+                        //Select an emitter
+                        auto emitter = doesSceneHaveEmitters.value();
+                        Float pdfSelectEmitterA = scene.pdfSelectEmitter(emitter);
+
+                        //Sample a point on the emitter
+                        Point3 pointOnEmitter = emitter->samplePointOnEmitter();
+                        Vector3 normalEmitterPoint = emitter->getNormalForEmitter(pointOnEmitter);
+                        Float pdfSelectPointOnEmitterA = emitter->pdfEmitterA(pointOnEmitter);
+                        Vector3 directionToEmitter = glm::normalize(pointOnEmitter - surfacePoint);
+
+                        //Construct shadow ray
+                        Float distance = glm::length(pointOnEmitter - surfacePoint);
+                        Float tMax = distance - epsilon;
+                        Ray shadowRay(surfacePoint, directionToEmitter, epsilon, tMax);
+
+                        //Shoot shadow ray to check for visibility. If shadow ray does not hit anything, Visibility Term = 1
+                        auto didShadowRayHitSomething = traceRayReturnClosestHit(shadowRay, scene);
+                        if(!didShadowRayHitSomething) {
+                            //Add contribution from emitter
+                            Spectrum bsdfToEmitterPoint = currentVertex.hitPointAndMaterial.closestObject->mat->brdf(directionToEmitter,
+                                                                                                                     -incomingDirectionToSurfacePoint, normalSurfacePoint);
+
+                            Float emitterSamplingPdfA = pdfSelectEmitterA * pdfSelectPointOnEmitterA;
+
+                            Float squaredDistance = distance * distance;
+
+                            Float geometryTerm = std::max(0.0, glm::dot(directionToEmitter, normalSurfacePoint)) //cos(Theta), surface point
+                                                 * std::max(0.0, glm::dot(-directionToEmitter, normalEmitterPoint)) //cos(Phi), emitter point
+                                                 / squaredDistance;
+
+                            Spectrum Le = emitter->Le(shadowRay);
+
+                            L += Le *  attenuationEmitterSampling * bsdfToEmitterPoint * geometryTerm / emitterSamplingPdfA;
+                        }
+                    }
+
+                    //Update attenuation while going to next vertex due to surface interactions
+                    Float geometryTerm = currentVertex.G_xi_xiplus1;
+                    Float pdfBSDFA = currentVertex.pdfBSDFA;
+                    Spectrum bsdf = currentVertex.bsdf_xi_xiplus1;
+
+                    attenuationEmitterSampling *= (bsdf * geometryTerm / pdfBSDFA);
+
+                }
 
                 pixelValue += L; //Add sample contribution
             }
