@@ -65,11 +65,11 @@ public:
                             currentVertex.hitPointAndMaterial = currentHitBundle;
                             currentVertex.vertexType = EMITTER;
                             currentVertex.bsdf_xi_xiplus1 = Spectrum(1.0);
-                            currentVertex.pdfBSDFW = 1.0;
+                            currentVertex.pdfBSDFW = 0.0; //Set pdfs to 0 since no way to sample from an emitter
 
-                            //Keep geometry term and area pdf to 1 if hit emitter
+                            //Keep geometry term to 1 if hit emitter
                             currentVertex.G_xi_xiplus1 = 1.0;
-                            currentVertex.pdfBSDFA = 1.0;
+                            currentVertex.pdfBSDFA = 0.0;
 
                             currentSampleBSDFPath.vertices.emplace_back(currentVertex);
 
