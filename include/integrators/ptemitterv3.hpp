@@ -20,6 +20,8 @@ public:
                 Ray currentRay = cameraRay;
                 Path currentSampleBSDFPath{};
                 Spectrum L_emitter(0.0);
+                Spectrum L_bsdf(0.0);
+                Spectrum L(0.0);
 
                 //Add the camera vertex, a tiny tiny transparent sphere
                 HitBundle cameraPointBundle{};
@@ -118,7 +120,7 @@ public:
 
                 int numVertices = currentSampleBSDFPath.vertices.size();
                 //Process the path and fill in geometry term, throughput and area-domain pdf till the penultimate vertex
-                for(auto vertexIndex = 0; vertexIndex < numVertices - 1; vertexIndex++) {
+                for(auto vertexIndex = 0; vertexIndex <= numVertices - 2; vertexIndex++) {
                     if(numVertices > 1) {
                         //Extract current and previous vertices for calculation
                         Vertex thisVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
@@ -141,16 +143,16 @@ public:
                 }
 
                 if(numVertices == 2) { //Direct hit emitter
-                    L_emitter = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
-                    pixelValue += L_emitter;
+                    L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
+                    pixelValue += L;
                     continue;
                 }
 
                 //Next Event Estimation aka Emitter Sampling
                 //Traverse the path from the first hit (not the sensor vertex) till the penultimate vertex and try to connect to an emitter
                 Spectrum attenuationEmitterSampling(1.0);
-                for(int vertexIndex = 1; vertexIndex < (numVertices - 1); vertexIndex++) {
-                    //Get the vertex in question, keep in mind it's only for reading, directly writing to it won't work
+                for(int vertexIndex = 1; vertexIndex <= (numVertices - 2); vertexIndex++) {
+                    //Get the vertex in question. Keep in mind it's only for reading, directly writing to it won't work
                     Vertex currentVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
                     Vertex previousVertex = currentSampleBSDFPath.vertices.at(vertexIndex - 1);
 
@@ -206,12 +208,10 @@ public:
 
                 }
 
+                //L += L_emitter;
+
                 //If final vertex is on an emitter, add contribution : BSDF sampling
                 if(currentSampleBSDFPath.vertices.at(numVertices - 1).vertexType == EMITTER) {
-
-                    pixelValue += L_emitter; //Add sample contribution
-                    continue; //Disable BSDF sampling to avoid double-counting emitter sampling
-
                     Vertex finalVertex = currentSampleBSDFPath.vertices.at(numVertices - 1);
                     Vertex penultimateVertex = currentSampleBSDFPath.vertices.at(numVertices - 2);
                     //Reconstruct final shot ray before hitting the emitter
@@ -221,7 +221,7 @@ public:
                                                        - penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
 
                     //Find Le in the given direction of final shot ray
-                    L_emitter = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
+                    L_bsdf = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
                     //Calculate light transported along this given path to the camera
                     //Since each vertex contains transport to next vertex, don't need to consider the emitter vertex anymore
                     //This change is also needed to support Emitter Sampling at every point on the path
@@ -233,13 +233,14 @@ public:
                         Spectrum bsdf = currentVertex.bsdf_xi_xiplus1;
 
                         Spectrum attenuation = bsdf * geometryTerm / pdfBSDFA;
-                        L_emitter *= attenuation;
+                        L_bsdf *= attenuation;
 
                     }
 
 
                 }
-                pixelValue += L_emitter; //Add sample contribution
+                L += L_emitter; //Add sample contribution
+                pixelValue += L;
             }
             pixelValue /= sampleCount; //Average MC estimation
             film.pixels.at(positionInFilm) = pixelValue; //Write to film

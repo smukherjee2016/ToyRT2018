@@ -27,7 +27,7 @@ public:
         objects.emplace_back(std::make_unique<Sphere>(Point3(-1e5+1,40.8,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(.75,.25,.25)))); //Left wall (after modification)
         objects.emplace_back(std::make_unique<Sphere>(Point3(50,40.8,-1e5)      , 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)))); //Front wall (after modification)
         objects.emplace_back(std::make_unique<Sphere>(Point3(50,1e5+81.6,81.6)      , 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)))); //Ceiling (after modification)
-        objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(0.01, 0.5, 0.999)))); //Floor (after modification)
+        objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<Phong>(Spectrum(0.01, 0.5, 0.999), 100))); //Floor (after modification)
         //objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(0.75)))); //Floor (after modification)
         objects.emplace_back(std::make_unique<Sphere>(Point3(27,16.5,47)       , 1.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(8.24))); //Emitters should always have zero transmission
         objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(12.34)));
