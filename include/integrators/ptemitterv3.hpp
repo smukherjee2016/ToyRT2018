@@ -19,7 +19,7 @@ public:
                 Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
                 Ray currentRay = cameraRay;
                 Path currentSampleBSDFPath{};
-                Spectrum L(0.0);
+                Spectrum L_emitter(0.0);
 
                 //Add the camera vertex, a tiny tiny transparent sphere
                 HitBundle cameraPointBundle{};
@@ -136,8 +136,8 @@ public:
                 }
 
                 if(pathLength == 2) { //Direct hit emitter
-                    L = currentSampleBSDFPath.vertices.at(pathLength - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
-                    pixelValue += L;
+                    L_emitter = currentSampleBSDFPath.vertices.at(pathLength - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
+                    pixelValue += L_emitter;
                     continue;
                 }
 
@@ -188,7 +188,7 @@ public:
 
                             Spectrum Le = emitter->Le(shadowRay);
 
-                            L += Le *  attenuationEmitterSampling * bsdfToEmitterPoint * geometryTerm / emitterSamplingPdfA;
+                            L_emitter += Le *  attenuationEmitterSampling * bsdfToEmitterPoint * geometryTerm / emitterSamplingPdfA;
                         }
                     }
 
@@ -204,7 +204,7 @@ public:
                 //If final vertex is on an emitter, add contribution : BSDF sampling
                 if(currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
 
-                    pixelValue += L; //Add sample contribution
+                    pixelValue += L_emitter; //Add sample contribution
                     continue; //Disable BSDF sampling to avoid double-counting emitter sampling
 
                     Vertex finalVertex = currentSampleBSDFPath.vertices.at(pathLength - 1);
@@ -216,7 +216,7 @@ public:
                                                        - penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
 
                     //Find Le in the given direction of final shot ray
-                    L = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
+                    L_emitter = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
                     //Calculate light transported along this given path to the camera
                     //Since each vertex contains transport to next vertex, don't need to consider the emitter vertex anymore
                     //This change is also needed to support Emitter Sampling at every point on the path
@@ -228,13 +228,13 @@ public:
                         Spectrum bsdf = currentVertex.bsdf_xi_xiplus1;
 
                         Spectrum attenuation = bsdf * geometryTerm / pdfBSDFA;
-                        L *= attenuation;
+                        L_emitter *= attenuation;
 
                     }
 
 
                 }
-                pixelValue += L; //Add sample contribution
+                pixelValue += L_emitter; //Add sample contribution
             }
             pixelValue /= sampleCount; //Average MC estimation
             film.pixels.at(positionInFilm) = pixelValue; //Write to film
