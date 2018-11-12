@@ -140,6 +140,50 @@ public:
                     continue;
                 }
 
+                //Emitter sampling
+                Spectrum attenuation(1.0);
+                for(int vertexIndex = 1; vertexIndex <= (numVertices - 2); vertexIndex++) {
+                    auto doesSceneHaveEmitters = scene.selectRandomEmitter();
+                    if(doesSceneHaveEmitters) {
+                        auto emitter = doesSceneHaveEmitters.value();
+                        Float pdfSelectEmitter = scene.pdfSelectEmitter(emitter);
+                        Vector3 incomingDirectionToVertex = glm::normalize(currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.hitInfo.intersectionPoint
+                                - currentSampleBSDFPath.vertices.at(vertexIndex - 1).hitPointAndMaterial.hitInfo.intersectionPoint);
+
+                        //Sample point on emitter
+                        Point3 pointOnEmitter = emitter->samplePointOnEmitter();
+                        Vector3 emitterPointNormal = emitter->getNormalForEmitter(pointOnEmitter);
+                        Point3 currentVertexPos = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.hitInfo.intersectionPoint;
+                        Vector3 directionToEmitter = glm::normalize(pointOnEmitter - currentVertexPos);
+                        Float distanceToEmitter = glm::distance(pointOnEmitter, currentVertexPos);
+                        Float tMax = distanceToEmitter - epsilon;
+
+                        Ray shadowRay(currentVertexPos, directionToEmitter, epsilon, tMax);
+                        auto didShadowRayHitSomething = traceRayReturnClosestHit(shadowRay, scene);
+                        if(!didShadowRayHitSomething) {
+                            Vector3 currentVertexNormal = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.hitInfo.normal;
+                            Float squaredDistance = glm::distance2(pointOnEmitter, currentVertexPos);
+                            Float geometryTerm = std::max(0.0, glm::dot(currentVertexNormal, directionToEmitter)) //cos(Theta)
+                                    * std::max(0.0, glm::dot(emitterPointNormal, -directionToEmitter)) //cos(Phi)
+                                    / squaredDistance;
+
+                            Spectrum bsdfEmitter = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->brdf(
+                                    -incomingDirectionToVertex, directionToEmitter, currentVertexNormal);
+                            Float pdfEmitterSampling = pdfSelectEmitter * emitter->pdfEmitterA(pointOnEmitter);
+                            Spectrum Le = emitter->Le(shadowRay);
+
+                            L += attenuation * Le * bsdfEmitter * geometryTerm / pdfEmitterSampling;
+
+                        }
+
+                        Spectrum bsdfCurrentVertex = currentSampleBSDFPath.vertices.at(vertexIndex).bsdf_xi_xiplus1;
+                        Float geometryTerm = currentSampleBSDFPath.vertices.at(vertexIndex).G_xi_xiplus1;
+                        Float pdfA = currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA;
+
+                        attenuation *= ((bsdfCurrentVertex * geometryTerm) / pdfA);
+
+                    }
+                }
 
 
                 pixelValue += L; //Add sample contribution

@@ -110,7 +110,7 @@ public:
     }
 
     Vector3 getNormalForEmitter(const Point3& point) const override {
-        return glm::normalize((point - center) / radius);
+        return glm::normalize((point - center));
     }
 
     Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr, Spectrum _Le = Vector3(0.0)) :
