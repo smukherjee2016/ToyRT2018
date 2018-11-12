@@ -41,6 +41,11 @@ public:
 
                 currentSampleBSDFPath.vertices.emplace_back(cameraVertex);
 
+                /*
+                 * Design decision: n bounces = n + 1 vertices including the camera vertex.
+                 * For emitter sampling, Only connect to emitter till the penultimate vertex for n bounces emitter sampling.
+                 * For BSDF sampling, connect the last vertex if and only if it's an emitter.
+                */
                 //Accumulate path
                 for(int k = 1; k <= numBounces; k++) {
                     std::optional<HitBundle> didCurrentRayHitObject = traceRayReturnClosestHit(currentRay, scene);
@@ -112,7 +117,7 @@ public:
                 }
 
                 int pathLength = currentSampleBSDFPath.vertices.size();
-                //Process the path and fill in geometry term, throughput and area-domain pdf
+                //Process the path and fill in geometry term, throughput and area-domain pdf till the penultimate vertex
                 for(auto vertexIndex = 0; vertexIndex < pathLength - 1; vertexIndex++) {
                     if(pathLength > 1) {
                         //Extract current and previous vertices for calculation
