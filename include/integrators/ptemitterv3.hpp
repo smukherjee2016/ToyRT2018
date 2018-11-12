@@ -204,6 +204,7 @@ public:
                 //If final vertex is on an emitter, add contribution : BSDF sampling
                 if(currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
 
+                    pixelValue += L; //Add sample contribution
                     continue; //Disable BSDF sampling to avoid double-counting emitter sampling
 
                     Vertex finalVertex = currentSampleBSDFPath.vertices.at(pathLength - 1);
