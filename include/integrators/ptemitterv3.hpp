@@ -114,7 +114,7 @@ public:
                 int pathLength = currentSampleBSDFPath.vertices.size();
                 //Process the path and fill in geometry term, throughput and area-domain pdf
                 for(auto vertexIndex = 0; vertexIndex < pathLength - 1; vertexIndex++) {
-                    if(pathLength > 1) { //Skip the last vertex of the path, TODO it might need special processing for NEE?
+                    if(pathLength > 1) {
                         //Extract current and previous vertices for calculation
                         Vertex thisVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
                         Vertex nextVertex = currentSampleBSDFPath.vertices.at(vertexIndex + 1);
@@ -135,35 +135,103 @@ public:
                     }
                 }
 
-                //If final vertex is on an emitter, add contribution : BSDF sampling
-                if(pathLength >= 1 && currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
-                    if(pathLength == 1) { //Direct hit emitter
-                        L = currentSampleBSDFPath.vertices.at(pathLength - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
-                    }
-                    else {
-                        Vertex finalVertex = currentSampleBSDFPath.vertices.at(pathLength - 1);
-                        Vertex penultimateVertex = currentSampleBSDFPath.vertices.at(pathLength - 2);
-                        //Reconstruct final shot ray before hitting the emitter
-                        Ray finalBounceRay{};
-                        finalBounceRay.o = penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint;
-                        finalBounceRay.d = glm:: normalize(finalVertex.hitPointAndMaterial.hitInfo.intersectionPoint
-                                                           - penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
+                if(pathLength == 2) { //Direct hit emitter
+                    L = currentSampleBSDFPath.vertices.at(pathLength - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
+                    pixelValue += L;
+                    continue;
+                }
 
-                        //Find Le in the given direction of final shot ray
-                        L = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
-                        //Calculate light transported along this given path to the camera
-                        for(int vertexIndex = pathLength - 1; vertexIndex >= 0; vertexIndex--) {
-                            Vertex currentVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
-                            //Visibility term implicitly 1 along this path
-                            Float geometryTerm = currentVertex.G_xi_xiplus1;
-                            Float pdfBSDFA = currentVertex.pdfBSDFA;
-                            Spectrum bsdf = currentVertex.bsdf_xi_xiplus1;
+                //Next Event Estimation aka Emitter Sampling
+                //Traverse the path from the first hit (not the sensor vertex) till the penultimate vertex and try to connect to an emitter
+                Spectrum attenuationEmitterSampling(1.0);
+                for(int vertexIndex = 1; vertexIndex < (pathLength - 1); vertexIndex++) {
+                    //Get the vertex in question, keep in mind it's only for reading, directly writing to it won't work
+                    Vertex currentVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
+                    Vertex previousVertex = currentSampleBSDFPath.vertices.at(vertexIndex - 1);
 
-                            Spectrum attenuation = bsdf * geometryTerm / pdfBSDFA;
-                            L *= attenuation;
+                    Point3 surfacePoint = currentVertex.hitPointAndMaterial.hitInfo.intersectionPoint;
+                    Vector3 normalSurfacePoint = currentVertex.hitPointAndMaterial.hitInfo.normal;
+                    Vector3 incomingDirectionToSurfacePoint = glm::normalize(currentVertex.hitPointAndMaterial.hitInfo.intersectionPoint
+                            - previousVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
 
+                    auto doesSceneHaveEmitters = scene.selectRandomEmitter();
+                    if(doesSceneHaveEmitters) {
+                        //Select an emitter
+                        auto emitter = doesSceneHaveEmitters.value();
+                        Float pdfSelectEmitterA = scene.pdfSelectEmitter(emitter);
+
+                        //Sample a point on the emitter
+                        Point3 pointOnEmitter = emitter->samplePointOnEmitter();
+                        Vector3 normalEmitterPoint = emitter->getNormalForEmitter(pointOnEmitter);
+                        Float pdfSelectPointOnEmitterA = emitter->pdfEmitterA(pointOnEmitter);
+                        Vector3 directionToEmitter = glm::normalize(pointOnEmitter - surfacePoint);
+
+                        //Construct shadow ray
+                        Float distance = glm::length(pointOnEmitter - surfacePoint);
+                        Float tMax = distance - epsilon;
+                        Ray shadowRay(surfacePoint, directionToEmitter, epsilon, tMax);
+
+                        //Shoot shadow ray to check for visibility. If shadow ray does not hit anything, Visibility Term = 1
+                        auto didShadowRayHitSomething = traceRayReturnClosestHit(shadowRay, scene);
+                        if(!didShadowRayHitSomething) {
+                            //Add contribution from emitter
+                            Spectrum bsdfToEmitterPoint = currentVertex.hitPointAndMaterial.closestObject->mat->brdf(directionToEmitter,
+                                    -incomingDirectionToSurfacePoint, normalSurfacePoint);
+
+                            Float emitterSamplingPdfA = pdfSelectEmitterA * pdfSelectPointOnEmitterA;
+
+                            Float squaredDistance = distance * distance;
+
+                            Float geometryTerm = std::max(0.0, glm::dot(directionToEmitter, normalSurfacePoint)) //cos(Theta), surface point
+                                    * std::max(0.0, glm::dot(-directionToEmitter, normalEmitterPoint)) //cos(Phi), emitter point
+                                    / squaredDistance;
+
+                            Spectrum Le = emitter->Le(shadowRay);
+
+                            L += Le *  attenuationEmitterSampling * bsdfToEmitterPoint * geometryTerm / emitterSamplingPdfA;
                         }
                     }
+
+                    //Update attenuation while going to next vertex due to surface interactions
+                    Float geometryTerm = currentVertex.G_xi_xiplus1;
+                    Float pdfBSDFA = currentVertex.pdfBSDFA;
+                    Spectrum bsdf = currentVertex.bsdf_xi_xiplus1;
+
+                    attenuationEmitterSampling *= (bsdf * geometryTerm / pdfBSDFA);
+
+                }
+
+                //If final vertex is on an emitter, add contribution : BSDF sampling
+                if(currentSampleBSDFPath.vertices.at(pathLength - 1).vertexType == EMITTER) {
+
+                    pixelValue += L; //Add sample contribution
+                    continue; //Disable BSDF sampling to avoid double-counting emitter sampling
+
+                    Vertex finalVertex = currentSampleBSDFPath.vertices.at(pathLength - 1);
+                    Vertex penultimateVertex = currentSampleBSDFPath.vertices.at(pathLength - 2);
+                    //Reconstruct final shot ray before hitting the emitter
+                    Ray finalBounceRay{};
+                    finalBounceRay.o = penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint;
+                    finalBounceRay.d = glm:: normalize(finalVertex.hitPointAndMaterial.hitInfo.intersectionPoint
+                                                       - penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
+
+                    //Find Le in the given direction of final shot ray
+                    L = finalVertex.hitPointAndMaterial.closestObject->Le(finalBounceRay);
+                    //Calculate light transported along this given path to the camera
+                    //Since each vertex contains transport to next vertex, don't need to consider the emitter vertex anymore
+                    //This change is also needed to support Emitter Sampling at every point on the path
+                    for(int vertexIndex = pathLength - 2; vertexIndex >= 0; vertexIndex--) {
+                        Vertex currentVertex = currentSampleBSDFPath.vertices.at(vertexIndex);
+                        //Visibility term implicitly 1 along this path
+                        Float geometryTerm = currentVertex.G_xi_xiplus1;
+                        Float pdfBSDFA = currentVertex.pdfBSDFA;
+                        Spectrum bsdf = currentVertex.bsdf_xi_xiplus1;
+
+                        Spectrum attenuation = bsdf * geometryTerm / pdfBSDFA;
+                        L *= attenuation;
+
+                    }
+
 
                 }
                 pixelValue += L; //Add sample contribution

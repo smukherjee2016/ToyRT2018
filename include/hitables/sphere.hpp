@@ -80,7 +80,6 @@ public:
     }
 
     Point3 samplePointOnEmitter() const override {
-        Float x,y,z;
         Point2 thetaPhi;
         Point3 pointInCartesian;
 
