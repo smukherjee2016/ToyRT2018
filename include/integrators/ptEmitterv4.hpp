@@ -134,37 +134,14 @@ public:
 
                 }
 
-                //If final vertex is on an emitter, add contribution : BSDF sampling
-                if(numVertices >= 1 && currentSampleBSDFPath.vertices.at(numVertices - 1).vertexType == EMITTER) {
-                    if (numVertices == 1) { //Direct hit emitter
-                        L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(
-                                cameraRay);
-                    } else {
-                        //Reconstruct final shot ray before hitting the emitter
-                        Ray finalBounceRay{};
-                        finalBounceRay.o = currentSampleBSDFPath.vertices.at(
-                                numVertices - 2).hitPointAndMaterial.hitInfo.intersectionPoint;
-                        finalBounceRay.d = glm::normalize(currentSampleBSDFPath.vertices.at(
-                                numVertices - 1).hitPointAndMaterial.hitInfo.intersectionPoint
-                                                          - currentSampleBSDFPath.vertices.at(
-                                numVertices - 2).hitPointAndMaterial.hitInfo.intersectionPoint);
-
-                        //Find Le in the given direction of final shot ray
-                        L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(
-                                finalBounceRay);
-                        //Calculate light transported along this given path to the camera
-                        for (int vertexIndex = numVertices - 1; vertexIndex >= 1; vertexIndex--) {
-                            //Visibility term implicitly 1 along this path
-                            Float geometryTerm = currentSampleBSDFPath.vertices.at(vertexIndex).G_xi_xiplus1;
-                            Float pdfBSDFA = currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA;
-                            Spectrum bsdf = currentSampleBSDFPath.vertices.at(vertexIndex).bsdf_xi_xiplus1;
-
-                            Spectrum attenuation = bsdf * geometryTerm / pdfBSDFA;
-                            L *= attenuation;
-
-                        }
-                    }
+                if(numVertices == 2) { //Direct hit emitter
+                    L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
+                    pixelValue += L;
+                    continue;
                 }
+
+
+
                 pixelValue += L; //Add sample contribution
             }
             pixelValue /= sampleCount; //Average MC estimation
