@@ -76,10 +76,10 @@ public:
                         break; //Don't do any (more) bounces if didn't hit anything
                 }
 
-                int pathLength = currentSampleBSDFPath.vertices.size();
+                int numVertices = currentSampleBSDFPath.vertices.size();
                 //Process the path and fill in geometry term, throughput and area-domain pdf
-                for(auto vertexIndex = 0; vertexIndex < pathLength - 1; vertexIndex++) {
-                    if(pathLength > 1) { //Skip the last vertex of the path, TODO it might need special processing for NEE?
+                for(auto vertexIndex = 0; vertexIndex < numVertices - 1; vertexIndex++) {
+                    if(numVertices > 1) { //Skip the last vertex of the path, TODO it might need special processing for NEE?
                         //Extract current and previous vertices for calculation
                         HitBundle thisVertex = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial;
                         HitBundle nextVertex = currentSampleBSDFPath.vertices.at(vertexIndex + 1).hitPointAndMaterial;
