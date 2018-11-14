@@ -178,7 +178,7 @@ public:
 
                             //MIS Calculations
                             Float pdfBSDFA_EmitterSampling = currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA; //Same as pdfA below
-                            Float misWeight = PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+                            Float misWeight = PowerHeuristic(pdfEmitterA_EmitterSampling, pdfBSDFA_EmitterSampling);
 
                             L_emitter += attenuation * Le * bsdfEmitter * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
 
@@ -216,7 +216,7 @@ public:
                     Float pdfSelectFinalVertexOnEmitterA = emitter->pdfEmitterA(pointOnEmitter);
                     Float pdfEmitterA_BSDFSampling = pdfSelectEmitterA * pdfSelectFinalVertexOnEmitterA;
                     Float pdfBSDFA_BSDFSampling = penultimateVertex.pdfBSDFA; //Since the pdf of hitting the next vertex is stored in the previous vertex now
-                    Float misWeight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitterA_BSDFSampling);
+                    Float misWeight = PowerHeuristic(pdfBSDFA_BSDFSampling, pdfEmitterA_BSDFSampling);
 
                     //Attenuate L by the weight
                     L_BSDF *= misWeight;

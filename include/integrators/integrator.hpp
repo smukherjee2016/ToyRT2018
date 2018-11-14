@@ -65,8 +65,6 @@ std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& s
 
 }
 
-inline Float PowerHeuristic(int nF, Float pdfF, int nG, Float pdfG) {
-    Float f = nF * pdfF;
-    Float g = nG * pdfG;
-    return (f * f) / (f * f + g * g);
+inline Float PowerHeuristic(Float pA, Float pB) {
+    return (pA * pA) / (pA * pA + pB * pB);
 }

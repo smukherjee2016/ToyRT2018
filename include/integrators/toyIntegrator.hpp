@@ -58,7 +58,7 @@ public:
 
                                     Float compositeEmitterPdfA_EmitterSampling = pdfEmitterA_EmitterSampling * scene.pdfSelectEmitter(emitter);
 
-                                    Float misWeight = PowerHeuristic(1, compositeEmitterPdfA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+                                    Float misWeight = PowerHeuristic(compositeEmitterPdfA_EmitterSampling, pdfBSDFA_EmitterSampling);
                                     pixelValue += emitter->Le(nextRay) * brdf * geometryTerm * misWeight / compositeEmitterPdfA_EmitterSampling;
                                     //pixelValue /= emitterBundle.pdfSelectEmitter;
 
@@ -94,7 +94,7 @@ public:
                                     Float squaredDistance = glm::length2(nextBundle.hitInfo.intersectionPoint - cameraRayHitBundle.hitInfo.intersectionPoint);
                                     //Vector3 emitterNormal = nextBundle.closestObject->getNormalForEmitter(nextBundle.hitInfo.intersectionPoint);
                                     Float pdfBSDFA_BSDFSampling = pdfBSDF_BSDFSampling * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) / squaredDistance;
-                                    Float misweight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitter_BSDFSampling);
+                                    Float misweight = PowerHeuristic(pdfBSDFA_BSDFSampling, pdfEmitter_BSDFSampling);
 
                                     pixelValue += nextBundle.closestObject->Le(nextRay) * brdf * glm::dot(outgoingDirection, cameraRayHitBundle.hitInfo.normal) * misweight / pdfBSDF_BSDFSampling;
                                 }
