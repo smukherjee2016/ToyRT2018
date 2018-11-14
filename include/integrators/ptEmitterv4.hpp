@@ -184,7 +184,8 @@ public:
 
                     }
                 }
-
+                if(L.x < 0.0 || L.y < 0.0 || L.z < 0.0)
+                    throw std::runtime_error("Encountered negative value!");
 
                 pixelValue += L; //Add sample contribution
             }
