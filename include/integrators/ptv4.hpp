@@ -177,7 +177,9 @@ public:
                             Spectrum Le = emitter->Le(shadowRay);
 
                             //MIS Calculations
-                            Float pdfBSDFA_EmitterSampling = currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA; //Same as pdfA below
+                            Float pdfBSDFW_EmitterSampling = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->pdfW(
+                                    -incomingDirectionToVertex, directionToEmitter, currentVertexNormal);
+                            Float pdfBSDFA_EmitterSampling = pdfBSDFW_EmitterSampling * std::max(0.0, glm::dot(emitterPointNormal, -directionToEmitter)) / squaredDistance;
                             Float misWeight = PowerHeuristic(pdfEmitterA_EmitterSampling, pdfBSDFA_EmitterSampling);
 
                             L_emitter += attenuation * Le * bsdfEmitter * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
@@ -222,7 +224,7 @@ public:
                     L_BSDF *= misWeight;
 
                     //Calculate light transported along this given path to the camera
-                    for (int vertexIndex = numVertices - 1; vertexIndex >= 0; vertexIndex--) {
+                    for (int vertexIndex = numVertices - 2; vertexIndex >= 0; vertexIndex--) {
                         //Visibility term implicitly 1 along this path
                         Float geometryTerm = currentSampleBSDFPath.vertices.at(vertexIndex).G_xi_xiplus1;
                         Float pdfBSDFA = currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA;
