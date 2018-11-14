@@ -173,10 +173,14 @@ public:
 
                             Spectrum bsdfEmitter = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->brdf(
                                     -incomingDirectionToVertex, directionToEmitter, currentVertexNormal);
-                            Float pdfEmitterSampling = pdfSelectEmitter * emitter->pdfEmitterA(pointOnEmitter);
+                            Float pdfEmitterA_EmitterSampling = pdfSelectEmitter * emitter->pdfEmitterA(pointOnEmitter);
                             Spectrum Le = emitter->Le(shadowRay);
 
-                            L_emitter += attenuation * Le * bsdfEmitter * geometryTerm / pdfEmitterSampling;
+                            //MIS Calculations
+                            Float pdfBSDFA_EmitterSampling = currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA; //Same as pdfA below
+                            Float misWeight = PowerHeuristic(1, pdfEmitterA_EmitterSampling, 1, pdfBSDFA_EmitterSampling);
+
+                            L_emitter += attenuation * Le * bsdfEmitter * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
 
                         }
 
@@ -192,19 +196,33 @@ public:
                 //If final vertex is on an emitter, add contribution : BSDF sampling
                 if(currentSampleBSDFPath.vertices.at(numVertices - 1).vertexType == EMITTER) {
                     //Reconstruct final shot ray before hitting the emitter
+                    Vertex finalVertexOnEmitter = currentSampleBSDFPath.vertices.at(numVertices - 1);
+                    Vertex penultimateVertex = currentSampleBSDFPath.vertices.at(numVertices - 2);
+
                     Ray finalBounceRay{};
-                    finalBounceRay.o = currentSampleBSDFPath.vertices.at(
-                            numVertices - 2).hitPointAndMaterial.hitInfo.intersectionPoint;
-                    finalBounceRay.d = glm::normalize(currentSampleBSDFPath.vertices.at(
-                            numVertices - 1).hitPointAndMaterial.hitInfo.intersectionPoint
-                                                      - currentSampleBSDFPath.vertices.at(
-                            numVertices - 2).hitPointAndMaterial.hitInfo.intersectionPoint);
+                    finalBounceRay.o = penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint;
+                    finalBounceRay.d = glm::normalize(finalVertexOnEmitter.hitPointAndMaterial.hitInfo.intersectionPoint
+                                                      - penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
 
                     //Find Le in the given direction of final shot ray
-                    L_BSDF = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(
+                    L_BSDF = finalVertexOnEmitter.hitPointAndMaterial.closestObject->Le(
                             finalBounceRay);
+
+                    //MIS Calculation for BSDF sampling. Weight only between the final and penultimate vertex, where final vertex is an emitter
+                    //For all other bounces, no emitter to sample from, so BSDF sampling will implicitly have a weight of 1.0
+                    Point3 pointOnEmitter = finalVertexOnEmitter.hitPointAndMaterial.hitInfo.intersectionPoint;
+                    auto emitter = finalVertexOnEmitter.hitPointAndMaterial.closestObject;
+                    Float pdfSelectEmitterA = scene.pdfSelectEmitter(emitter);
+                    Float pdfSelectFinalVertexOnEmitterA = emitter->pdfEmitterA(pointOnEmitter);
+                    Float pdfEmitterA_BSDFSampling = pdfSelectEmitterA * pdfSelectFinalVertexOnEmitterA;
+                    Float pdfBSDFA_BSDFSampling = penultimateVertex.pdfBSDFA; //Since the pdf of hitting the next vertex is stored in the previous vertex now
+                    Float misWeight = PowerHeuristic(1, pdfBSDFA_BSDFSampling, 1, pdfEmitterA_BSDFSampling);
+
+                    //Attenuate L by the weight
+                    L_BSDF *= misWeight;
+
                     //Calculate light transported along this given path to the camera
-                    for (int vertexIndex = numVertices - 1; vertexIndex >= 1; vertexIndex--) {
+                    for (int vertexIndex = numVertices - 1; vertexIndex >= 0; vertexIndex--) {
                         //Visibility term implicitly 1 along this path
                         Float geometryTerm = currentSampleBSDFPath.vertices.at(vertexIndex).G_xi_xiplus1;
                         Float pdfBSDFA = currentSampleBSDFPath.vertices.at(vertexIndex).pdfBSDFA;
@@ -216,8 +234,8 @@ public:
                     }
                 }
 
-                L = L_emitter;
-                //L += L_emitter + L_BSDF;
+                //L = L_BSDF;
+                L += L_emitter + L_BSDF;
 
                 pixelValue += L; //Add sample contribution
             }
