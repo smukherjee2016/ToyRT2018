@@ -172,13 +172,13 @@ public:
                                                  / squaredDistance;
 
                             Spectrum bsdfEmitter = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->brdf(
-                                    -incomingDirectionToVertex, directionToEmitter, currentVertexNormal);
+                                    directionToEmitter, -incomingDirectionToVertex, currentVertexNormal);
                             Float pdfEmitterA_EmitterSampling = pdfSelectEmitter * emitter->pdfEmitterA(pointOnEmitter);
                             Spectrum Le = emitter->Le(shadowRay);
 
                             //MIS Calculations
                             Float pdfBSDFW_EmitterSampling = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->pdfW(
-                                    -incomingDirectionToVertex, directionToEmitter, currentVertexNormal);
+                                    directionToEmitter, -incomingDirectionToVertex, currentVertexNormal);
                             Float pdfBSDFA_EmitterSampling = pdfBSDFW_EmitterSampling * std::max(0.0, glm::dot(emitterPointNormal, -directionToEmitter)) / squaredDistance;
                             Float misWeight = PowerHeuristic(pdfEmitterA_EmitterSampling, pdfBSDFA_EmitterSampling);
 
