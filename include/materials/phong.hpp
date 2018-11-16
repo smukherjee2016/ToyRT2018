@@ -60,7 +60,7 @@ public:
 
         Vector3 sampledDirection = glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
 
-        if(glm::dot(wo, normal) < 0.0 || glm::dot(sampledDirection, normal) < 0.0)
+        if(!areDirectionsSanitized(sampledDirection, wo, normal))
             return Vector3(0.0); //Return black value for things below the horizon
         else
             return sampledDirection;
@@ -69,7 +69,7 @@ public:
     }
 
     Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const override {
-        if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
+        if(!areDirectionsSanitized(wi, wo, normal)) {
             return Spectrum(0.0); //Return black value for things below the horizon
         }
 
@@ -91,7 +91,7 @@ public:
         return M_INVPI * glm::dot(wi, normal); // cos(Phi) / PI = dot(sampledDirection, normal) / PI
 #else
 
-        if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
+        if(!areDirectionsSanitized(wi, wo, normal)) {
             return 0.0; //Return black value for things below the horizon
         }
 

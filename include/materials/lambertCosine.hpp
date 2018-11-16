@@ -33,12 +33,17 @@ public:
         Basis basis;
         basis.makeOrthonormalBasis(normal);
 
-        return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+        Vector3 sampledDirection = glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+
+        if(!areDirectionsSanitized(sampledDirection, wo, normal))
+            return Vector3(0.0); //Return black value for things below the horizon
+        else
+            return sampledDirection;
 
     }
 
     Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
-        if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0) {
+        if(!areDirectionsSanitized(wi, wo, normal)) {
             return Spectrum(0.0); //Return black value for things below the horizon
         }
 
@@ -46,7 +51,7 @@ public:
     }
 
     Float pdfW(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) const {
-        if(glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) < 0.0) {
+        if(!areDirectionsSanitized(wi, wo, normal)) {
             return 0.0; //Return black value for things below the horizon
         }
 

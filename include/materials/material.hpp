@@ -8,3 +8,10 @@ public:
     virtual Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const = 0;
     virtual Float pdfW(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) const = 0;
 };
+
+inline bool areDirectionsSanitized(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) {
+    if(glm::dot(wo, normal) < 0.0 || glm::dot(wi, normal) < 0.0 || glm::dot(wo, normal) > 1.0 || glm::dot(wi, normal) > 1.0)
+        return false;
+
+    return true;
+}
