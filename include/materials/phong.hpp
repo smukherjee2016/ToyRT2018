@@ -60,9 +60,6 @@ public:
 
         Vector3 sampledDirection = glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
 
-        if(((1.0 - glm::length(sampledDirection)) > epsilon) || ((1.0 - glm::length(wo)) > epsilon) || ((1.0 - glm::length(normal)) > epsilon))
-            throw std::runtime_error("Not normalized!");
-
         if(!areDirectionsSanitized(sampledDirection, wo, normal))
             return Vector3(0.0); //Return black value for things below the horizon
         else
@@ -75,9 +72,6 @@ public:
         if(!areDirectionsSanitized(wi, wo, normal)) {
             return Spectrum(0.0); //Return black value for things below the horizon
         }
-
-        if(((1.0 - glm::length(wi)) > epsilon) || ((1.0 - glm::length(wo)) > epsilon) || ((1.0 - glm::length(normal)) > epsilon))
-            throw std::runtime_error("Not normalized!");
 
         Vector3 reflectedVector = glm::reflect(-wi, normal);
         Float normalizationFactor = (static_cast<Float>(phongExponent) + 2.0) * 0.5 * M_INVPI;
@@ -96,9 +90,6 @@ public:
 
         return M_INVPI * glm::dot(wi, normal); // cos(Phi) / PI = dot(sampledDirection, normal) / PI
 #else
-
-        if(((1.0 - glm::length(wi)) > epsilon) || ((1.0 - glm::length(wo)) > epsilon) || ((1.0 - glm::length(normal)) > epsilon))
-            throw std::runtime_error("Not normalized!");
 
         if(!areDirectionsSanitized(wi, wo, normal)) {
             return 0.0; //Return black value for things below the horizon
