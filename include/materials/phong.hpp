@@ -37,9 +37,6 @@ public:
 
         return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
 #else
-        if(glm::dot(wo, normal) < 0.0)
-            return Vector3(0.0); //Return black value for things below the horizon
-
         Vector3 reflectedVector = glm::reflect(-wo, normal);
         Point3 pointInCartesian;
         //std::vector<Vector3> arrays;
@@ -61,7 +58,12 @@ public:
         Basis basis;
         basis.makeOrthonormalBasis(reflectedVector); //Sample cone and transform
 
-        return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+        Vector3 sampledDirection = glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
+
+        if(glm::dot(wo, normal) < 0.0 || glm::dot(sampledDirection, normal) < 0.0)
+            return Vector3(0.0); //Return black value for things below the horizon
+        else
+            return sampledDirection;
 #endif
 
     }
