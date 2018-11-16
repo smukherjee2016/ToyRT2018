@@ -37,6 +37,9 @@ public:
 
         return glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
 #else
+        if(glm::dot(wo, normal) < 0.0)
+            return Vector3(0.0); //Return black value for things below the horizon
+
         Vector3 reflectedVector = glm::reflect(-wo, normal);
         Point3 pointInCartesian;
         //std::vector<Vector3> arrays;
