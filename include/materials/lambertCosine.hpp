@@ -35,6 +35,9 @@ public:
 
         Vector3 sampledDirection = glm::normalize(pointInCartesian.x * basis.Cx + pointInCartesian.y * basis.Cy + pointInCartesian.z * basis.Cz);
 
+        if(((1.0 - glm::length(sampledDirection)) > epsilon) || ((1.0 - glm::length(wo)) > epsilon) || ((1.0 - glm::length(normal)) > epsilon))
+            throw std::runtime_error("Not normalized!");
+
         if(!areDirectionsSanitized(sampledDirection, wo, normal))
             return Vector3(0.0); //Return black value for things below the horizon
         else
@@ -42,7 +45,10 @@ public:
 
     }
 
-    Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {
+    Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const {\
+        if(((1.0 - glm::length(wi)) > epsilon) || ((1.0 - glm::length(wo)) > epsilon) || ((1.0 - glm::length(normal)) > epsilon))
+            throw std::runtime_error("Not normalized!");
+
         if(!areDirectionsSanitized(wi, wo, normal)) {
             return Spectrum(0.0); //Return black value for things below the horizon
         }
@@ -51,6 +57,9 @@ public:
     }
 
     Float pdfW(const Vector3 &wi, const Vector3 &wo, const Vector3 &normal) const {
+        if(((1.0 - glm::length(wi)) > epsilon) || ((1.0 - glm::length(wo)) > epsilon) || ((1.0 - glm::length(normal)) > epsilon))
+            throw std::runtime_error("Not normalized!");
+
         if(!areDirectionsSanitized(wi, wo, normal)) {
             return 0.0; //Return black value for things below the horizon
         }
