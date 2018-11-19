@@ -87,6 +87,7 @@ public:
                         Vector3 hitPoint = currentHitBundle.hitInfo.intersectionPoint;
 
                         //Sample next direction alongwith the pdfs
+                        //TODO Handle zero samples properly return Sample object with info instead of Vector
                         Vector3 sampledNextBSDFDirection = currentHitBundle.closestObject->mat->sampleDirection(-currentRay.d, hitPointNormal);
                         Spectrum bsdf = currentHitBundle.closestObject->mat->brdf(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
                         Float pdfW = currentHitBundle.closestObject->mat->pdfW(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
@@ -151,13 +152,16 @@ public:
                     if(doesSceneHaveEmitters) {
                         auto emitter = doesSceneHaveEmitters.value();
                         Float pdfSelectEmitter = scene.pdfSelectEmitter(emitter);
-                        Vector3 incomingDirectionToVertex = glm::normalize(currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.hitInfo.intersectionPoint
-                                                                           - currentSampleBSDFPath.vertices.at(vertexIndex - 1).hitPointAndMaterial.hitInfo.intersectionPoint);
+                        auto currentHitPoint = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial;
+                        auto previousHitPoint = currentSampleBSDFPath.vertices.at(vertexIndex - 1).hitPointAndMaterial;
+
+                        Vector3 incomingDirectionToVertex = glm::normalize(currentHitPoint.hitInfo.intersectionPoint
+                                                                           - previousHitPoint.hitInfo.intersectionPoint);
 
                         //Sample point on emitter
                         Point3 pointOnEmitter = emitter->samplePointOnEmitter();
                         Vector3 emitterPointNormal = emitter->getNormalForEmitter(pointOnEmitter);
-                        Point3 currentVertexPos = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.hitInfo.intersectionPoint;
+                        Point3 currentVertexPos = currentHitPoint.hitInfo.intersectionPoint;
                         Vector3 directionToEmitter = glm::normalize(pointOnEmitter - currentVertexPos);
                         Float distanceToEmitter = glm::distance(pointOnEmitter, currentVertexPos);
                         Float tMax = distanceToEmitter - epsilon;
@@ -165,24 +169,27 @@ public:
                         Ray shadowRay(currentVertexPos, directionToEmitter, epsilon, tMax);
                         auto didShadowRayHitSomething = traceRayReturnClosestHit(shadowRay, scene);
                         if(!didShadowRayHitSomething) {
-                            Vector3 currentVertexNormal = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.hitInfo.normal;
+                            Vector3 currentVertexNormal = glm::normalize(currentHitPoint.hitInfo.normal);
                             Float squaredDistance = glm::distance2(pointOnEmitter, currentVertexPos);
                             Float geometryTerm = std::max(0.0, glm::dot(currentVertexNormal, directionToEmitter)) //cos(Theta)
                                                  * std::max(0.0, glm::dot(emitterPointNormal, -directionToEmitter)) //cos(Phi)
                                                  / squaredDistance;
 
-                            Spectrum bsdfEmitter = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->brdf(
+                            Spectrum bsdfEmitter = currentHitPoint.closestObject->mat->brdf(
                                     directionToEmitter, -incomingDirectionToVertex, currentVertexNormal);
                             Float pdfEmitterA_EmitterSampling = pdfSelectEmitter * emitter->pdfEmitterA(pointOnEmitter);
                             Spectrum Le = emitter->Le(shadowRay);
 
                             //MIS Calculations
-                            Float pdfBSDFW_EmitterSampling = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->pdfW(
+                            Float pdfBSDFW_EmitterSampling = currentHitPoint.closestObject->mat->pdfW(
                                     directionToEmitter, -incomingDirectionToVertex, currentVertexNormal);
                             Float pdfBSDFA_EmitterSampling = pdfBSDFW_EmitterSampling * std::max(0.0, glm::dot(emitterPointNormal, -directionToEmitter)) / squaredDistance;
                             Float misWeight = PowerHeuristic(pdfEmitterA_EmitterSampling, pdfBSDFA_EmitterSampling);
 
-                            L_emitter += attenuation * Le * bsdfEmitter * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
+                            Spectrum bob = attenuation * Le * bsdfEmitter * geometryTerm * misWeight / pdfEmitterA_EmitterSampling;
+                            if(glm::any(glm::lessThan(bob, Vector3(0.0))))
+                                std::cout << "lel";
+                            L_emitter += bob;
 
                         }
 
