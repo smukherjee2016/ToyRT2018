@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <omp.h>
 #include "integrator.hpp"
 
 class PathTracingIntegratorv4 : public Integrator {
@@ -251,6 +252,10 @@ public:
             }
             pixelValue /= sampleCount; //Average MC estimation
             film.pixels.at(positionInFilm) = pixelValue; //Write to film
+
+        auto tid = omp_get_thread_num();
+        if(tid == 0 && x % film.screenWidth == 0)
+            std::cout << "Completed " << (static_cast<Float>(positionInFilm) / (film.screenWidth * film.screenHeight)) * 100 << " percent.\n";
         }
 
     }
