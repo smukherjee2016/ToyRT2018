@@ -80,9 +80,10 @@ public:
         }
 
         //Theta = [0, 2*PI], phi = [0, PI/2] for hemisphere, [0,PI] for sphere
-        Cz = glm::normalize(glm::cross(normal, in));
-        Cx = glm::normalize(glm::cross(normal, Cz));
         Cy = glm::normalize(normal);
+        Cz = glm::normalize(glm::cross(Cy, in));
+        Cx = glm::normalize(glm::cross(Cy, Cz));
+
 
 
     }
