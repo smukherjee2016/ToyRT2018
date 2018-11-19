@@ -92,8 +92,6 @@ public:
                         Spectrum bsdf = currentHitBundle.closestObject->mat->brdf(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
                         Float pdfW = currentHitBundle.closestObject->mat->pdfW(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
 
-                        if(pdfW == 0.0)
-                            break;
 
                         Vertex currentVertex{};
                         //Store the hitBundles etc. in the path
@@ -110,6 +108,9 @@ public:
                         Ray nextRay(hitPoint, sampledNextBSDFDirection);
                         currentRay = nextRay;
 
+                        //There is no next sample and direction, so stop making the path here
+                        if(pdfW == 0.0)
+                            break;
                     }
                     else
                         break; //Don't do any (more) bounces if didn't hit anything
