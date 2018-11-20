@@ -70,7 +70,7 @@ if(WIN32)
 endif(WIN32)
 find_package(embree 3 REQUIRED)
 include_directories(${EMBREE_INCLUDE_DIRS})
-option(EMBREE_ISPC_SUPPORT "Build Embree with support for ISPC applications." OFF FORCE)
+option(EMBREE_ISPC_SUPPORT "Build Embree with support for ISPC applications." OFF)
 
 add_library(ToyRT2018_lib INTERFACE)
 target_sources( ToyRT2018_lib
