@@ -48,11 +48,27 @@ endif()
 set(GLM_TEST_ENABLE OFF CACHE BOOL "")
 
 add_subdirectory("extern/glm")
+
+#PCG
 add_subdirectory("extern/pcg-cpp")
+
+#TinyObjLoader
+add_subdirectory("extern/tinyobjloader")
 
 #OpenMP
 find_package(OpenMP REQUIRED)
 
+#Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
+if(WIN32)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
+        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x64")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
+        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x86")
+    endif()
+endif(WIN32)
+find_package(embree 3 REQUIRED)
+include_directories(${EMBREE_INCLUDE_DIRS})
+set(EMBREE_ISPC_SUPPORT "Build Embree with support for ISPC applications." OFF FORCE)
 
 add_library(ToyRT2018_lib INTERFACE)
 target_sources( ToyRT2018_lib
@@ -69,6 +85,7 @@ add_executable(ToyRT2018 src/main.cpp)
 if(OpenMP_CXX_FOUND)
     target_link_libraries(ToyRT2018 PUBLIC OpenMP::OpenMP_CXX)
 endif()
+target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
 target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU" )
