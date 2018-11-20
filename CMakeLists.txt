@@ -53,12 +53,6 @@ add_subdirectory("extern/pcg-cpp")
 #OpenMP
 find_package(OpenMP REQUIRED)
 
-#Need to set embree Directory according to documentation
-if(WIN32)
-    set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x64")
-endif(WIN32)
-
-find_package(embree 3 REQUIRED)
 
 add_library(ToyRT2018_lib INTERFACE)
 target_sources( ToyRT2018_lib
