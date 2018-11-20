@@ -72,19 +72,16 @@ public:
     Vector3 Cz;
 
 
-    //TODO- Replace by Pixar paper later sometime
+    //Ref. Building an Orthonormal Basis, Revisited [Duff et al. 2017]
     void makeOrthonormalBasis(const Vector3& normal) {
-        Vector3 in(0.0, 1.0, 0.0); //Arbitrary, set by ourselves
-        if(std::abs(glm::dot(in, normal)) > 0.99) { //If the vectors are too close
-            in = Vector3(0.0, 0.0, 1.0); //Select another vector
-        }
 
-        //Theta = [0, 2*PI], phi = [0, PI/2] for hemisphere, [0,PI] for sphere
+        Float sign = std::copysign(1.0, normal.z);
+        const Float a = -1.0 / (sign  + normal.z);
+        const Float b = normal.x * normal.y * a;
+
         Cy = glm::normalize(normal);
-        Cz = glm::normalize(glm::cross(Cy, in));
-        Cx = glm::normalize(glm::cross(Cy, Cz));
-
-
+        Cz = Vector3(1.0 + sign * Cy.x * Cy.x * a, sign * b, -sign * Cy.x);
+        Cx = Vector3(b, sign + Cy.y * Cy.y * a, -Cy.y);
 
     }
 };
