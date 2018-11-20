@@ -40,7 +40,9 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/glm/CMakeLists.txt")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/glm/CMakeLists.txt"
+        OR NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/tinyobjloader/CMakeLists.txt"
+        OR NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/pcg-cpp/CMakeLists.txt")
         message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
@@ -68,7 +70,7 @@ if(WIN32)
 endif(WIN32)
 find_package(embree 3 REQUIRED)
 include_directories(${EMBREE_INCLUDE_DIRS})
-set(EMBREE_ISPC_SUPPORT "Build Embree with support for ISPC applications." OFF FORCE)
+option(EMBREE_ISPC_SUPPORT "Build Embree with support for ISPC applications." OFF FORCE)
 
 add_library(ToyRT2018_lib INTERFACE)
 target_sources( ToyRT2018_lib
