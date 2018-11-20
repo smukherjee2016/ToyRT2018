@@ -92,9 +92,6 @@ public:
                         Spectrum bsdf = currentHitBundle.closestObject->mat->brdf(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
                         Float pdfW = currentHitBundle.closestObject->mat->pdfW(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
 
-                        if(pdfW == 0.0)
-                            break;
-
                         Vertex currentVertex;
 
                         //Store the hitBundles etc. in the path
@@ -112,6 +109,9 @@ public:
                         //Generate next ray and make it current
                         Ray nextRay(hitPoint, sampledNextBSDFDirection);
                         currentRay = nextRay;
+
+                        if(pdfW == 0.0)
+                            break;
 
                     }
                     else
