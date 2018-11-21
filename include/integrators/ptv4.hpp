@@ -10,7 +10,7 @@ public:
     void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
                 const int numBounces = 2) const override {
         unsigned int numThreads = std::thread::hardware_concurrency() - 1;
-//#pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
+#pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
 //#pragma omp parallel for schedule(dynamic, 1)
 
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {

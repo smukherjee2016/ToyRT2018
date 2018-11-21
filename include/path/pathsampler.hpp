@@ -12,7 +12,8 @@ std::optional<HitBundle> traceRayReturnClosestHit(const Ray &ray);
 class PathSampler {
 
 public:
-    Path& generatePath(Scene& scene, const Ray& cameraRay, const int numBounces) {
+    //TODO The path object can be large and memory copies can be expensive... Look at how to prevent copies if they happen
+    Path generatePath(Scene& scene, const Ray& cameraRay, const int numBounces) {
         Path path{};
         Ray currentRay = cameraRay;
 
