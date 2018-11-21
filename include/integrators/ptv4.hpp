@@ -7,9 +7,10 @@
 
 class PathTracingIntegratorv4 : public Integrator {
 public:
-    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces = 2) const override {
+    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+                const int numBounces = 2) const override {
         unsigned int numThreads = std::thread::hardware_concurrency() - 1;
-#pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
+//#pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
 //#pragma omp parallel for schedule(dynamic, 1)
 
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
@@ -27,7 +28,7 @@ public:
                 Spectrum L_emitter(0.0);
                 Spectrum L_BSDF(0.0);
 
-                PathSampler pathSampler;
+                PathSampler pathSampler{};
                 Path currentSampleBSDFPath = pathSampler.generatePath(scene, cameraRay, numBounces);
 
                 int numVertices = currentSampleBSDFPath.vertices.size();
@@ -60,7 +61,7 @@ public:
                         Float tMax = distanceToEmitter - epsilon;
 
                         Ray shadowRay(currentVertexPos, directionToEmitter, epsilon, tMax);
-                        auto didShadowRayHitSomething = traceRayReturnClosestHit(shadowRay, scene);
+                        auto didShadowRayHitSomething = scene.traceRayReturnClosestHit(shadowRay);
                         if(!didShadowRayHitSomething) {
                             Vector3 currentVertexNormal = glm::normalize(currentHitPoint.hitInfo.normal);
                             Float squaredDistance = glm::distance2(pointOnEmitter, currentVertexPos);

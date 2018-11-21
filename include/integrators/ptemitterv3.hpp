@@ -50,7 +50,7 @@ public:
                 */
                 //Accumulate path
                 for(int k = 1; k <= numBounces; k++) {
-                    std::optional<HitBundle> didCurrentRayHitObject = traceRayReturnClosestHit(currentRay, scene);
+                    std::optional<HitBundle> didCurrentRayHitObject = scene.traceRayReturnClosestHit(currentRay, scene);
                     if(didCurrentRayHitObject) {
                         HitBundle currentHitBundle = didCurrentRayHitObject.value();
 
@@ -179,7 +179,7 @@ public:
                         Ray shadowRay(surfacePoint, directionToEmitter, epsilon, tMax);
 
                         //Shoot shadow ray to check for visibility. If shadow ray does not hit anything, Visibility Term = 1
-                        auto didShadowRayHitSomething = traceRayReturnClosestHit(shadowRay, scene);
+                        auto didShadowRayHitSomething = scene.traceRayReturnClosestHit(shadowRay, scene);
                         if(!didShadowRayHitSomething) {
                             //Add contribution from emitter
                             Spectrum bsdfToEmitterPoint = currentVertex.hitPointAndMaterial.closestObject->mat->brdf(directionToEmitter,

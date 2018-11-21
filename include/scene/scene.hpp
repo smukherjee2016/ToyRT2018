@@ -10,6 +10,7 @@
 #include "materials/blinnphong.hpp"
 #include "materials/phong.hpp"
 #include "materials/transparentMaterial.hpp"
+#include "path/path.hpp" //TODO Check inclusion of defn. of HitBundle in path.hpp
 
 class Scene
 {
@@ -42,25 +43,56 @@ public:
 
         //Create the emitter list
         for(auto& object : objects) {
-                if(object->isEmitter())
-                    emitters.emplace_back(object);
+            if(object->isEmitter())
+                emitters.emplace_back(object);
         }
     }
 
     std::optional<std::shared_ptr<Object>> selectRandomEmitter() const {
 
-            if(emitters.size() == 0)
-                    return std::nullopt;
+        if(emitters.size() == 0)
+            return std::nullopt;
 
-            //Select random light source uniformly
-            int randomEmitterIndex = rng.generateRandomInt(emitters.size() - 1);
+        //Select random light source uniformly
+        int randomEmitterIndex = rng.generateRandomInt(emitters.size() - 1);
 
-            std::shared_ptr<Object> ret = emitters.at(randomEmitterIndex);
-            return ret;
+        std::shared_ptr<Object> ret = emitters.at(randomEmitterIndex);
+        return ret;
     }
 
     Float pdfSelectEmitter(std::shared_ptr<Object> emitter) const {
-            return 1.0 / emitters.size();
+        return 1.0 / emitters.size();
     }
+
+    std::optional<HitBundle> traceRayReturnClosestHit(const Ray &ray) {
+        HitBundle closestHitBundle{};
+        closestHitBundle.hitInfo.tIntersection = Infinity;
+
+        HitBundle currentHitBundle{};
+        bool hitSomething = false;
+
+        for(auto & object: objects) {
+
+            std::optional<HitInfo> hitInfoOptional = object->checkIntersectionAndClosestHit(ray);
+
+            if (hitInfoOptional) {
+                currentHitBundle.hitInfo = hitInfoOptional.value();
+                hitSomething = true;
+                currentHitBundle.closestObject = object;
+
+                if (currentHitBundle.hitInfo.tIntersection < closestHitBundle.hitInfo.tIntersection) {
+                    closestHitBundle = currentHitBundle;
+                }
+            }
+
+        }
+
+        if(hitSomething)
+            return { closestHitBundle };
+
+        return std::nullopt;
+
+    }
+
 
 };

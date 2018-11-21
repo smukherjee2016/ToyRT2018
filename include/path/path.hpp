@@ -23,6 +23,7 @@ struct Vertex {
     typeOfVertex vertexType = SURFACE;
 };
 
-struct Path {
+class Path {
+public:
     std::vector<Vertex> vertices;
 };

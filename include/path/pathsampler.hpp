@@ -4,7 +4,7 @@
 #include "path.hpp"
 
 //Forward declaration of traceRayReturnClosestHit from integrator.hpp
-std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& scene);
+std::optional<HitBundle> traceRayReturnClosestHit(const Ray &ray);
 
 #include "integrators/integrator.hpp"
 
@@ -12,8 +12,8 @@ std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& s
 class PathSampler {
 
 public:
-    Path& generatePath(const Scene& scene, const Ray& cameraRay, const int numBounces) {
-        Path path;
+    Path& generatePath(Scene& scene, const Ray& cameraRay, const int numBounces) {
+        Path path{};
         Ray currentRay = cameraRay;
 
         //Add the camera vertex, a tiny tiny transparent sphere
@@ -39,7 +39,7 @@ public:
 
         //Accumulate path, assume first vertex on the path is the first hitpoint, not the camera
         for(int k = 1; k <= numBounces; k++) {
-            std::optional<HitBundle> didCurrentRayHitObject = traceRayReturnClosestHit(currentRay, scene);
+            std::optional<HitBundle> didCurrentRayHitObject = scene.traceRayReturnClosestHit(currentRay);
             if(didCurrentRayHitObject) {
                 HitBundle currentHitBundle = didCurrentRayHitObject.value();
 

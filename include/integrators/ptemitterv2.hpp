@@ -9,7 +9,8 @@ typedef std::shared_ptr<Object> ObjectPtr;
 class PathTracingEmitterv2 : public Integrator {
 
 public:
-    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces) const {
+    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+                const int numBounces) const {
 #pragma omp parallel for schedule(dynamic, 1)
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 
@@ -24,7 +25,7 @@ public:
                 Spectrum throughput(1.0);
 
                 Ray thisRay = pinholeCamera.generateCameraRay(x, y, film);
-                HitBundleOptional hitInformationBundleOptional = traceRayReturnClosestHit(thisRay, scene);
+                HitBundleOptional hitInformationBundleOptional = scene.traceRayReturnClosestHit(thisRay);
 
                 if(hitInformationBundleOptional) {
                     HitBundle hitInfoBundle_Bounce1 = hitInformationBundleOptional.value();
@@ -46,7 +47,7 @@ public:
                     throughput *= (bsdf / pdfBSDFW_1);
 
                     Ray ray_2(hitInfoBundle_Bounce1.hitInfo.intersectionPoint, sampledNextDirection);
-                    HitBundleOptional hitInformationBundleOptional2 = traceRayReturnClosestHit(ray_2, scene);
+                    HitBundleOptional hitInformationBundleOptional2 = scene.traceRayReturnClosestHit(ray_2);
 
                     //Bounce 2
                     if(hitInformationBundleOptional2) {
@@ -69,7 +70,7 @@ public:
 
                             Float tMax = glm::length(sampledPointOnEmitter - hitInfoBundle_Bounce2.hitInfo.intersectionPoint) - epsilon;
                             Ray shadowRay(hitInfoBundle_Bounce2.hitInfo.intersectionPoint, outgoingDirection_Emitter, epsilon, tMax);
-                            HitBundleOptional shadowRayHitSomething = traceRayReturnClosestHit(shadowRay, scene);
+                            HitBundleOptional shadowRayHitSomething = scene.traceRayReturnClosestHit(shadowRay);
                             if(!shadowRayHitSomething) {
                                 Vector3 emitterNormal = emitter->getNormalForEmitter(sampledPointOnEmitter);
                                 Float squaredDistance = glm::length2(sampledPointOnEmitter - hitInfoBundle_Bounce2.hitInfo.intersectionPoint);

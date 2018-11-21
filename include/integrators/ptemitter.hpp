@@ -4,7 +4,8 @@
 
 class PathTracingIntegratorEmitterSampling : public Integrator {
 public:
-    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces) const override {
+    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+                const int numBounces) const override {
 #pragma omp parallel for schedule(dynamic, 1)
         for(int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 
@@ -27,7 +28,7 @@ public:
                 HitInfo prevBounceHitInfo{};
                 Vector3 prevBounceSampledDirection(0.0);
                 for(int k = 1; k <= numBounces; k++) {
-                    std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(prevRay, scene);
+                    std::optional<HitBundle> hitBundle = scene.traceRayReturnClosestHit(prevRay);
                     if (hitBundle) {
 
                         HitBundle currentHitBundle = hitBundle.value();
@@ -79,7 +80,7 @@ public:
                                 Ray nextRay(currentHitBundle.hitInfo.intersectionPoint, outgoingDirection,epsilon,tMax);
                                 //Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
 
-                                std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                                std::optional<HitBundle> nextRayHitBundle = scene.traceRayReturnClosestHit(nextRay);
                                 if (!nextRayHitBundle) {
                                     //Unoccluded so we can reach light source
                                     Vector3 emitterNormal = emitter->getNormalForEmitter(pointOnEmitter);

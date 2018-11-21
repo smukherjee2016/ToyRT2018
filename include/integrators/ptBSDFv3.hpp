@@ -5,7 +5,8 @@
 
 class PathTracingBSDFv3 : public Integrator {
 public:
-    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces = 2) const override {
+    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+                const int numBounces = 2) const override {
         unsigned int numThreads = std::thread::hardware_concurrency() - 1;
 #pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
@@ -45,7 +46,7 @@ public:
 
                 //Accumulate path, assume first vertex on the path is the first hitpoint, not the camera
                 for(int k = 1; k <= numBounces; k++) {
-                    std::optional<HitBundle> didCurrentRayHitObject = traceRayReturnClosestHit(currentRay, scene);
+                    std::optional<HitBundle> didCurrentRayHitObject = traceRayReturnClosestHit(currentRay);
                     if(didCurrentRayHitObject) {
                         HitBundle currentHitBundle = didCurrentRayHitObject.value();
 

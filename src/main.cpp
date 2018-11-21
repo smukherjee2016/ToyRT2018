@@ -13,7 +13,7 @@
 #include "util/rng.hpp"
 #include <chrono>
 
-const int sampleCount = 16;
+const int sampleCount = 512;
 const int numBounces = 3;
 
 int main(void) {

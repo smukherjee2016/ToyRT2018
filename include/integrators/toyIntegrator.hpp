@@ -2,7 +2,8 @@
 
 class ToyIntegrator : public Integrator {
 public:
-    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces = 1) const override {
+    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+                const int numBounces = 1) const override {
 #pragma omp parallel for schedule(dynamic, 1)
         for(int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 
@@ -17,7 +18,7 @@ public:
                 for(int k = 1; k <= numBounces; k++) {
                     Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
 
-                    std::optional<HitBundle> hitBundle = traceRayReturnClosestHit(cameraRay, scene);
+                    std::optional<HitBundle> hitBundle = scene.traceRayReturnClosestHit(cameraRay);
 
                     if (hitBundle) {
                         HitBundle cameraRayHitBundle = hitBundle.value();
@@ -45,7 +46,7 @@ public:
                                 Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection,epsilon,tMax);
                                 //Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
 
-                                std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                                std::optional<HitBundle> nextRayHitBundle = scene.traceRayReturnClosestHit(nextRay);
                                 if (!nextRayHitBundle) {
                                     //Unoccluded so we can reach light source
                                     Vector3 emitterNormal = emitter->getNormalForEmitter(pointOnLightSource);
@@ -81,7 +82,7 @@ public:
                                                                                                  -cameraRay.d,
                                                                                                  cameraRayHitBundle.hitInfo.normal);
                             Ray nextRay(cameraRayHitBundle.hitInfo.intersectionPoint, outgoingDirection);
-                            std::optional<HitBundle> nextRayHitBundle = traceRayReturnClosestHit(nextRay, scene);
+                            std::optional<HitBundle> nextRayHitBundle = scene.traceRayReturnClosestHit(nextRay);
                             if (nextRayHitBundle) {
                                 HitBundle nextBundle = nextRayHitBundle.value();
 
