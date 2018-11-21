@@ -4,35 +4,11 @@
 #include "camera/pinholecamera.hpp"
 #include "scene/scene.hpp"
 #include "util/rng.hpp"
+#include "path/pathsampler.hpp"
 #include <optional>
 
 class Integrator {
     virtual void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces) const = 0;
-};
-
-enum typeOfVertex {
-    SURFACE,
-    EMITTER,
-    SENSOR
-};
-
-struct HitBundle {
-    HitInfo hitInfo;
-    std::shared_ptr<Object> closestObject;
-
-};
-
-struct Vertex {
-    HitBundle hitPointAndMaterial;
-    Spectrum bsdf_xi_xiplus1;
-    Float pdfBSDFW;
-    Float pdfBSDFA;
-    Float G_xi_xiplus1;
-    typeOfVertex vertexType = SURFACE;
-};
-
-struct Path {
-    std::vector<Vertex> vertices;
 };
 
 std::optional<HitBundle> traceRayReturnClosestHit(const Ray& ray, const Scene& scene) {
