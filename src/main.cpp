@@ -13,7 +13,7 @@
 #include "util/sampler.hpp"
 #include <chrono>
 
-const int sampleCount = 512;
+const int sampleCount = 1024;
 const int numBounces = 3;
 
 int main(void) {
@@ -36,7 +36,7 @@ int main(void) {
     PathTracingIntegratorv4 ptIntegrator;
     //PathTracingBSDFv3 ptIntegrator;
     auto start = std::chrono::steady_clock::now();
-    ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
+    ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces, Sampler());
     auto end = std::chrono::steady_clock::now();
 
     film.writePixels("Assignment4_normals.pfm");

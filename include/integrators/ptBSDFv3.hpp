@@ -6,7 +6,8 @@
 class PathTracingBSDFv3 : public Integrator {
 public:
     void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
-                const int numBounces = 2) const override {
+                const int numBounces,
+                Sampler sampler) const override {
         unsigned int numThreads = std::thread::hardware_concurrency() - 1;
 #pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
@@ -84,7 +85,9 @@ public:
                         Vector3 hitPoint = currentHitBundle.hitInfo.intersectionPoint;
 
                         //Sample next direction alongwith the pdfs
-                        Vector3 sampledNextBSDFDirection = currentHitBundle.closestObject->mat->sampleDirection(-currentRay.d, hitPointNormal);
+                        Point2 sampleInPSS = Point2(sampler.generate1DUniform(), sampler.generate1DUniform());
+                        Vector3 sampledNextBSDFDirection = currentHitBundle.closestObject->mat->sampleDirection(
+                                -currentRay.d, hitPointNormal, sampleInPSS);
                         Spectrum bsdf = currentHitBundle.closestObject->mat->brdf(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
                         Float pdfW = currentHitBundle.closestObject->mat->pdfW(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
 

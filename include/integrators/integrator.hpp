@@ -9,7 +9,8 @@
 
 class Integrator {
     virtual void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
-                        const int numBounces) const = 0;
+                        const int numBounces,
+                        Sampler sampler) const = 0;
 };
 
 inline Float PowerHeuristic(Float pA, Float pB) {

@@ -4,7 +4,7 @@
 
 class PathTracingEmitterv3 : public Integrator {
 public:
-    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces = 2) const override {
+    void render(const PinholeCamera& pinholeCamera, Film& film, const Scene& scene, const int sampleCount, const int numBounces, const Sampler sampler) const override {
 #pragma omp parallel for schedule(dynamic, 1)
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 

@@ -13,7 +13,7 @@ public:
         phongExponent = _g;
     }
 
-    Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const override {
+    Vector3 sampleDirection(const Vector3 &wo, const Vector3 &normal, const Point2 pointInPSS) const override {
 #if 0
         Point3 pointInCartesian;
         //std::vector<Vector3> arrays;
