@@ -2,7 +2,7 @@
 
 #include "common/common.hpp"
 #include "film/film.hpp"
-#include "util/rng.hpp"
+#include "util/sampler.hpp"
 
 class PinholeCamera {
 

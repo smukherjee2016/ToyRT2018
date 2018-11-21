@@ -10,7 +10,7 @@
 #include "integrators/ptBSDFv3.hpp"
 #include "film/film.hpp"
 #include "scene/scene.hpp"
-#include "util/rng.hpp"
+#include "util/sampler.hpp"
 #include <chrono>
 
 const int sampleCount = 512;

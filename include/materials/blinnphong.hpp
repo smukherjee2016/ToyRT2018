@@ -1,7 +1,7 @@
 #pragma once
 
 #include "material.hpp"
-#include "util/rng.hpp"
+#include "util/sampler.hpp"
 
 class BlinnPhong : public Material {
 public:

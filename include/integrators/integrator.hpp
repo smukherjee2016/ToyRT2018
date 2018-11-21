@@ -3,7 +3,7 @@
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
 #include "scene/scene.hpp"
-#include "util/rng.hpp"
+#include "util/sampler.hpp"
 #include "path/pathsampler.hpp"
 #include <optional>
 

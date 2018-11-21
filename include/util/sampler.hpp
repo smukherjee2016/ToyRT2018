@@ -4,9 +4,9 @@
 #include "pcg_random.hpp"
 #include "common/common.hpp"
 
-class RNG {
+class Sampler {
 public:
-    RNG() {
+    Sampler() {
         pcg_extras::seed_seq_from<std::random_device> seed_source;
         rng.seed(seed_source);
     }
@@ -26,4 +26,4 @@ private:
 
 };
 
-static thread_local RNG rng;
+static thread_local Sampler rng;
