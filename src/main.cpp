@@ -1,7 +1,7 @@
 #include <iostream>
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
-//#include "integrators/toyIntegrator.hpp"
+#include "integrators/toyIntegrator.hpp"
 //#include "integrators/pt.hpp"
 //#include "integrators/ptemitter.hpp"
 //#include "integrators/ptemitterv2.hpp"
@@ -13,7 +13,7 @@
 #include "util/sampler.hpp"
 #include <chrono>
 
-const int sampleCount = 16;
+const int sampleCount = 1024;
 const int numBounces = 3;
 
 int main(void) {
