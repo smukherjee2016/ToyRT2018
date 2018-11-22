@@ -53,8 +53,8 @@ public:
                                                                            - previousHitPoint.hitInfo.intersectionPoint);
 
                         //Sample point on emitter
-                        Point3 pointOnEmitter = emitter->samplePointOnEmitter();
-                        Vector3 emitterPointNormal = emitter->getNormalForEmitter(pointOnEmitter);
+                        Point3 pointOnEmitter = emitter->samplePointOnObject(Sampler());
+                        Vector3 emitterPointNormal = emitter->getNormalAtPoint(pointOnEmitter);
                         Point3 currentVertexPos = currentHitPoint.hitInfo.intersectionPoint;
                         Vector3 directionToEmitter = glm::normalize(pointOnEmitter - currentVertexPos);
                         Float distanceToEmitter = glm::distance(pointOnEmitter, currentVertexPos);
@@ -71,7 +71,8 @@ public:
 
                             Spectrum bsdfEmitter = currentHitPoint.closestObject->mat->brdf(
                                     directionToEmitter, -incomingDirectionToVertex, currentVertexNormal);
-                            Float pdfEmitterA_EmitterSampling = pdfSelectEmitter * emitter->pdfEmitterA(pointOnEmitter);
+                            Float pdfEmitterA_EmitterSampling = pdfSelectEmitter *
+                                    emitter->pdfSelectPointOnObjectA(pointOnEmitter);
                             Spectrum Le = emitter->Le(shadowRay);
 
                             //MIS Calculations
@@ -116,7 +117,7 @@ public:
                     Point3 pointOnEmitter = finalVertexOnEmitter.hitPointAndMaterial.hitInfo.intersectionPoint;
                     auto emitter = finalVertexOnEmitter.hitPointAndMaterial.closestObject;
                     Float pdfSelectEmitterA = scene.pdfSelectEmitter(emitter);
-                    Float pdfSelectFinalVertexOnEmitterA = emitter->pdfEmitterA(pointOnEmitter);
+                    Float pdfSelectFinalVertexOnEmitterA = emitter->pdfSelectPointOnObjectA(pointOnEmitter);
                     Float pdfEmitterA_BSDFSampling = pdfSelectEmitterA * pdfSelectFinalVertexOnEmitterA;
                     Float pdfBSDFA_BSDFSampling = penultimateVertex.pdfBSDFA; //Since the pdf of hitting the next vertex is stored in the previous vertex now
                     Float misWeight = PowerHeuristic(pdfBSDFA_BSDFSampling, pdfEmitterA_BSDFSampling);

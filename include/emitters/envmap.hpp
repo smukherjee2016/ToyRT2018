@@ -24,6 +24,10 @@ public:
         return true;
     }
 
+    Float surfaceArea() const override {
+        return 0;
+    }
+
     //Object
     std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override {
         return std::nullopt;
@@ -39,15 +43,15 @@ public:
         }
     }
 
-    Point3 samplePointOnEmitter() const override {
+    Point3 samplePointOnObject(Sampler sampler) const override {
         return Point3(0.0);
     }
 
-    Float pdfEmitterA(const Point3 &point) const override {
+    Float pdfSelectPointOnObjectA(const Point3 &point) const override {
         return 0.0;
     }
 
-    Vector3 getNormalForEmitter(const Point3& point) const override {
+    Vector3 getNormalAtPoint(const Point3 &point) const override {
         return Vector3(0.0);
     }
 };

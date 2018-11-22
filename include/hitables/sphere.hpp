@@ -66,6 +66,10 @@ public:
 
     }
 
+    Float surfaceArea() const override {
+        return  (4.0 * PI * radius * radius);
+    }
+
     //Emitter
     Spectrum Le(const Ray& incomingRay) const override {
         return LeIntensity;
@@ -79,7 +83,7 @@ public:
             return true;
     }
 
-    Point3 samplePointOnEmitter() const override {
+    Point3 samplePointOnObject(Sampler sampler) const override {
         Point2 thetaPhi;
         Point3 pointInCartesian;
 
@@ -104,12 +108,12 @@ public:
 
     }
 
-    Float pdfEmitterA(const Point3 &point) const override {
+    Float pdfSelectPointOnObjectA(const Point3 &point) const override {
         Float pdfAreaDomain = 1.0 / (4.0 * PI * radius * radius); // 1/4PI
         return pdfAreaDomain;
     }
 
-    Vector3 getNormalForEmitter(const Point3& point) const override {
+    Vector3 getNormalAtPoint(const Point3 &point) const override {
         return glm::normalize((point - center));
     }
 

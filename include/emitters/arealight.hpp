@@ -7,7 +7,7 @@ public:
     Spectrum LeIntensity;
 
     Point3 samplePointOnEmitter(Sampler sampler) const override {
-        return associatedObject->samplePointOnObject(sampler);
+        return associatedObject->samplePointOnObject(Sampler());
     }
 
     Float pdfSelectPointOnEmitterA(const Point3 &point) const override {

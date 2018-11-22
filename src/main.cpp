@@ -1,19 +1,19 @@
 #include <iostream>
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
-#include "integrators/toyIntegrator.hpp"
-#include "integrators/pt.hpp"
-#include "integrators/ptemitter.hpp"
-#include "integrators/ptemitterv2.hpp"
-#include "integrators/ptemitterv4.hpp"
+//#include "integrators/toyIntegrator.hpp"
+//#include "integrators/pt.hpp"
+//#include "integrators/ptemitter.hpp"
+//#include "integrators/ptemitterv2.hpp"
+//#include "integrators/ptemitterv4.hpp"
 #include "integrators/ptv4.hpp"
-#include "integrators/ptBSDFv3.hpp"
+//#include "integrators/ptBSDFv3.hpp"
 #include "film/film.hpp"
 #include "scene/scene.hpp"
 #include "util/sampler.hpp"
 #include <chrono>
 
-const int sampleCount = 512;
+const int sampleCount = 16;
 const int numBounces = 3;
 
 int main(void) {
