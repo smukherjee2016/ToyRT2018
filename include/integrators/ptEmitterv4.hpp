@@ -136,6 +136,7 @@ public:
                 }
 
                 if(numVertices == 2) { //Direct hit emitter Vertex lastVertex = currentSampleBSDFPath.vertices.at(numVertices - 1);
+                    Vertex lastVertex = currentSampleBSDFPath.vertices.at(numVertices - 1);
                     if(lastVertex.vertexType == EMITTER)
                         L = lastVertex.hitPointAndMaterial.closestObject->emitter->Le(cameraRay);
                     pixelValue += L;
@@ -153,7 +154,7 @@ public:
                                 - currentSampleBSDFPath.vertices.at(vertexIndex - 1).hitPointAndMaterial.hitInfo.intersectionPoint);
 
                         //Sample point on emitter
-                        Point3 pointOnEmitter = emitter->samplePointOnEmitter();
+                        Point3 pointOnEmitter = emitter->samplePointOnEmitter(Sampler());
                         Vector3 emitterPointNormal = emitter->getNormalForEmitter(pointOnEmitter);
                         Point3 currentVertexPos = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.hitInfo.intersectionPoint;
                         Vector3 directionToEmitter = glm::normalize(pointOnEmitter - currentVertexPos);
@@ -171,7 +172,7 @@ public:
 
                             Spectrum bsdfEmitter = currentSampleBSDFPath.vertices.at(vertexIndex).hitPointAndMaterial.closestObject->mat->brdf(
                                     -incomingDirectionToVertex, directionToEmitter, currentVertexNormal);
-                            Float pdfEmitterSampling = pdfSelectEmitter * emitter->pdfEmitterA(pointOnEmitter);
+                            Float pdfEmitterSampling = pdfSelectEmitter * emitter->pdfSelectPointOnEmitterA(pointOnEmitter);
                             Spectrum Le = emitter->Le(shadowRay);
 
                             L += attenuation * Le * bsdfEmitter * geometryTerm / pdfEmitterSampling;

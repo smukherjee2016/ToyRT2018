@@ -138,7 +138,7 @@ public:
                 //If final vertex is on an emitter, add contribution : BSDF sampling
                 if(numVertices >= 1 && currentSampleBSDFPath.vertices.at(numVertices - 1).vertexType == EMITTER) {
                     if (numVertices == 1) { //Direct hit emitter
-                        L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(
+                        L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->emitter->Le(
                                 cameraRay);
                     } else {
                         //Reconstruct final shot ray before hitting the emitter
@@ -151,7 +151,7 @@ public:
                                 numVertices - 2).hitPointAndMaterial.hitInfo.intersectionPoint);
 
                         //Find Le in the given direction of final shot ray
-                        L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(
+                        L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->emitter->Le(
                                 finalBounceRay);
                         //Calculate light transported along this given path to the camera
                         for (int vertexIndex = numVertices - 1; vertexIndex >= 1; vertexIndex--) {

@@ -3,8 +3,6 @@
 #include "integrators/integrator.hpp"
 
 typedef std::optional<HitBundle> HitBundleOptional;
-typedef std::optional<std::shared_ptr<Object>> ObjectPtrOptional;
-typedef std::shared_ptr<Object> ObjectPtr;
 
 class PathTracingEmitterv2 : public Integrator {
 
@@ -60,11 +58,11 @@ public:
                         }
 
                         //Emitter sampling
-                        ObjectPtrOptional emitterOptional = scene.selectRandomEmitter();
+                        std::optional<std::shared_ptr<Emitter>> emitterOptional = scene.selectRandomEmitter();
                         if(emitterOptional) { //Found an emitter
-                            ObjectPtr emitter = emitterOptional.value();
+                            std::shared_ptr<Emitter> emitter = emitterOptional.value();
 
-                            Point3 sampledPointOnEmitter = emitter->samplePointOnEmitter();
+                            Point3 sampledPointOnEmitter = emitter->samplePointOnEmitter(Sampler());
                             Vector3 outgoingDirection_Emitter = glm::normalize(sampledPointOnEmitter - hitInfoBundle_Bounce2.hitInfo.intersectionPoint);
                             Spectrum bsdf_2 = hitInfoBundle_Bounce2.closestObject->mat->brdf(outgoingDirection_Emitter, -ray_2.d, hitInfoBundle_Bounce2.hitInfo.normal);
 
@@ -78,7 +76,7 @@ public:
                                         * std::max(0.0, glm::dot(outgoingDirection_Emitter, hitInfoBundle_Bounce2.hitInfo.normal)) //cos(theta)
                                         / squaredDistance;
 
-                                Float pdfEmitterA_2 = emitter->pdfEmitterA(sampledPointOnEmitter);
+                                Float pdfEmitterA_2 = emitter->pdfSelectPointOnEmitterA(sampledPointOnEmitter);
                                 Float compositePdfEmitterA_2 = pdfEmitterA_2 * scene.pdfSelectEmitter(emitter);
                                 Spectrum Le = emitter->Le(shadowRay);
                                 Spectrum contribution = Le * throughput * bsdf_2 * geometryTerm / compositePdfEmitterA_2;

@@ -56,7 +56,7 @@ public:
                         //If hit the emitter, return its Le multiplied by throughput
                         if(currentHitBundle.closestObject->isEmitter()){
                             if(k == 1) {
-                                L += currentHitBundle.closestObject->Le(prevRay); //Direct hit emitter
+                                L += currentHitBundle.closestObject->emitter->Le(prevRay); //Direct hit emitter
                             }
                             else {
                                 L += Vector3(0.0); //Must not double-count any emitter hit at the end of the path
@@ -66,13 +66,13 @@ public:
                         else {
 
                             //Emitter Sampling
-                            std::optional<std::shared_ptr<Object>> emitterOptionalBundle = scene.selectRandomEmitter();
+                            std::optional<std::shared_ptr<Emitter>> emitterOptionalBundle = scene.selectRandomEmitter();
                             if(emitterOptionalBundle) {
-                                std::shared_ptr<Object> emitter = emitterOptionalBundle.value();
-                                Point3 pointOnEmitter = emitter->samplePointOnEmitter();
+                                std::shared_ptr<Emitter> emitter = emitterOptionalBundle.value();
+                                Point3 pointOnEmitter = emitter->samplePointOnEmitter(Sampler());
                                 Vector3 outgoingDirection = glm::normalize(
                                         pointOnEmitter - currentHitBundle.hitInfo.intersectionPoint);
-                                Float pdfEmitterA_EmitterSampling = emitter->pdfEmitterA(pointOnEmitter);
+                                Float pdfEmitterA_EmitterSampling = emitter->pdfSelectPointOnEmitterA(pointOnEmitter);
 
                                 Spectrum brdf = currentHitBundle.closestObject->mat->brdf(outgoingDirection,
                                                                                             -prevRay.d, currentHitBundle.hitInfo.normal);

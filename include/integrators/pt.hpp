@@ -36,7 +36,7 @@ public:
                         //If hit the emitter, return its Le multiplied by throughput
                         if(currentHitBundle.closestObject->isEmitter()){
                             if(k >= 2) {
-                                Vector3 emitterNormal = currentHitBundle.closestObject->getNormalForEmitter(currentHitBundle.hitInfo.intersectionPoint);
+                                Vector3 emitterNormal = currentHitBundle.closestObject->emitter->getNormalForEmitter(currentHitBundle.hitInfo.intersectionPoint);
                                 //Geometry term from previous bounce
                                 Float squaredDistance = glm::length2(prevBounceHitInfo.intersectionPoint - currentHitBundle.hitInfo.intersectionPoint);
                                 Float geometryTerm =  std::max(0.0, glm::dot(prevBounceSampledDirection, prevBounceHitInfo.normal))  //Previous bounce dot product
@@ -48,7 +48,7 @@ public:
                                 accumulatedBSDFWAConversionFactor *=  std::max(0.0, glm::dot(emitterNormal, -prevBounceSampledDirection)) / squaredDistance;
 
                             }
-                            L = currentHitBundle.closestObject->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
+                            L = currentHitBundle.closestObject->emitter->Le(prevRay) * Throughput * accumulatedGeometryTerms / (accumulatedBSDFpdfW * accumulatedBSDFWAConversionFactor);
                             break;
                         }
                         else {
