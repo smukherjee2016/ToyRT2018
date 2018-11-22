@@ -18,7 +18,7 @@ class Scene
 public:
     std::vector<std::shared_ptr<Object>> objects;
     std::shared_ptr<EnvironmentMap> envMap;
-    std::vector<std::shared_ptr<Object>> emitters;
+    std::vector<std::shared_ptr<Emitter>> emitters;
 
     void makeScene() {
 
@@ -33,12 +33,20 @@ public:
         objects.emplace_back(std::make_unique<Sphere>(Point3(60,52,81.6), 6 , std::make_shared<LambertCosine>(Spectrum(.75))));
         //objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(0.75)))); //Floor (after modification)
 
-        std::shared_ptr<Sphere> smolEmitterSphere = std::make_shared<Sphere>(Point3(27,16.5,47)       , 1.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(8.24));
-        std::shared_ptr<Sphere> bigEmitterSphere =  std::make_shared<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(12.34));
+        std::shared_ptr<AreaLight> smolEmitter = std::make_shared<AreaLight>(Spectrum(8.24));
+        std::shared_ptr<AreaLight> bigEmitter = std::make_shared<AreaLight>(Spectrum(12.34));
+
+
+        std::shared_ptr<Sphere> smolEmitterSphere = std::make_shared<Sphere>(Point3(27,16.5,47)       , 1.5, std::make_shared<LambertCosine>(Spectrum(0)), smolEmitter);
+        std::shared_ptr<Sphere> bigEmitterSphere =  std::make_shared<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), bigEmitter);
         objects.emplace_back(smolEmitterSphere); //Emitters should always have zero transmission
         objects.emplace_back(bigEmitterSphere);
 
 
+        smolEmitter->setAssociatedObject(smolEmitterSphere); //TODO Do something about this fragile call...
+        bigEmitter->setAssociatedObject(bigEmitterSphere);
+        emitters.emplace_back(smolEmitter);
+        emitters.emplace_back(bigEmitter);
 
         //Scene with only emitters
 //        objects.emplace_back(std::make_unique<Sphere>(Point3(27,16.5,47)       , 1.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(8.24)));
@@ -46,14 +54,9 @@ public:
 //        objects.emplace_back(std::make_unique<Sphere>(Point3(73,73.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(12.34)));
 
 
-        //Create the emitter list
-        for(auto& object : objects) {
-            if(object->isEmitter())
-                emitters.emplace_back(object);
-        }
     }
 
-    std::optional<std::shared_ptr<Object>> selectRandomEmitter() const {
+    std::optional<std::shared_ptr<Emitter>> selectRandomEmitter() const {
 
         if(emitters.size() == 0)
             return std::nullopt;
@@ -61,11 +64,11 @@ public:
         //Select random light source uniformly
         int randomEmitterIndex = rng.generateRandomInt(emitters.size() - 1);
 
-        std::shared_ptr<Object> ret = emitters.at(randomEmitterIndex);
+        std::shared_ptr<Emitter> ret = emitters.at(randomEmitterIndex);
         return ret;
     }
 
-    Float pdfSelectEmitter(std::shared_ptr<Object> emitter) const {
+    Float pdfSelectEmitter(std::shared_ptr<Emitter> emitter) const {
         return 1.0 / emitters.size();
     }
 

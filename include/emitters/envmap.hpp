@@ -3,7 +3,7 @@
 #include "objects/object.hpp"
 #include "util/pfmutils.hpp"
 
-class EnvironmentMap : public Object {
+class EnvironmentMap : public Emitter {
 
     bool isConstColorEnvMap;
     PFMInfo envMap;
@@ -17,20 +17,26 @@ public:
         else {
             isConstColorEnvMap = true;
         }
+        emitterType = ENVMAP;
     }
 
-    //IsEmitter
-    bool isEmitter() const override {
-        return true;
+    Vector3 getNormalForEmitter(const Point3 &point) const override {
+        return Vector3();
     }
 
-    Float surfaceArea() const override {
+    Spectrum heuristicEmitterSelection() const override {
+        return Spectrum();
+    }
+
+    void setAssociatedObject(std::shared_ptr<Object> _associatedObject) override {
+    }
+
+    Float pdfSelectPointOnEmitterA(const Point3 &point) const override {
         return 0;
     }
 
-    //Object
-    std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override {
-        return std::nullopt;
+    Point3 samplePointOnEmitter(Sampler sampler) const override {
+        return Point3(0.0);
     }
 
     Spectrum Le(const Ray& incomingRay) const override {
@@ -43,15 +49,5 @@ public:
         }
     }
 
-    Point3 samplePointOnObject(Sampler sampler) const override {
-        return Point3(0.0);
-    }
 
-    Float pdfSelectPointOnObjectA(const Point3 &point) const override {
-        return 0.0;
-    }
-
-    Vector3 getNormalAtPoint(const Point3 &point) const override {
-        return Vector3(0.0);
-    }
 };

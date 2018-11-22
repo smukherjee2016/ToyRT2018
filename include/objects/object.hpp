@@ -17,7 +17,6 @@ public:
     std::shared_ptr<Emitter> emitter;
 
     //Emitter
-    virtual Spectrum Le(const Ray& incomingRay) const = 0;
     virtual Point3 samplePointOnObject(Sampler sampler) const = 0;
     virtual Float pdfSelectPointOnObjectA(const Point3 &point) const = 0;
     virtual Vector3 getNormalAtPoint(const Point3 &point) const = 0;

@@ -34,7 +34,9 @@ public:
                 int numVertices = currentSampleBSDFPath.vertices.size();
 
                 if(numVertices == 2) { //Direct hit emitter
-                    L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
+                    Vertex lastVertex = currentSampleBSDFPath.vertices.at(numVertices - 1);
+                    if(lastVertex.vertexType == EMITTER)
+                        L = lastVertex.hitPointAndMaterial.closestObject->emitter->Le(cameraRay);
                     pixelValue += L;
                     continue;
                 }
@@ -53,8 +55,8 @@ public:
                                                                            - previousHitPoint.hitInfo.intersectionPoint);
 
                         //Sample point on emitter
-                        Point3 pointOnEmitter = emitter->samplePointOnObject(Sampler());
-                        Vector3 emitterPointNormal = emitter->getNormalAtPoint(pointOnEmitter);
+                        Point3 pointOnEmitter = emitter->samplePointOnEmitter(Sampler());
+                        Vector3 emitterPointNormal = emitter->getNormalForEmitter(pointOnEmitter);
                         Point3 currentVertexPos = currentHitPoint.hitInfo.intersectionPoint;
                         Vector3 directionToEmitter = glm::normalize(pointOnEmitter - currentVertexPos);
                         Float distanceToEmitter = glm::distance(pointOnEmitter, currentVertexPos);
@@ -72,7 +74,7 @@ public:
                             Spectrum bsdfEmitter = currentHitPoint.closestObject->mat->brdf(
                                     directionToEmitter, -incomingDirectionToVertex, currentVertexNormal);
                             Float pdfEmitterA_EmitterSampling = pdfSelectEmitter *
-                                    emitter->pdfSelectPointOnObjectA(pointOnEmitter);
+                                    emitter->pdfSelectPointOnEmitterA(pointOnEmitter);
                             Spectrum Le = emitter->Le(shadowRay);
 
                             //MIS Calculations
@@ -109,15 +111,15 @@ public:
                                                       - penultimateVertex.hitPointAndMaterial.hitInfo.intersectionPoint);
 
                     //Find Le in the given direction of final shot ray
-                    L_BSDF = finalVertexOnEmitter.hitPointAndMaterial.closestObject->Le(
+                    L_BSDF = finalVertexOnEmitter.hitPointAndMaterial.closestObject->emitter->Le(
                             finalBounceRay);
 
                     //MIS Calculation for BSDF sampling. Weight only between the final and penultimate vertex, where final vertex is an emitter
                     //For all other bounces, no emitter to sample from, so BSDF sampling will implicitly have a weight of 1.0
                     Point3 pointOnEmitter = finalVertexOnEmitter.hitPointAndMaterial.hitInfo.intersectionPoint;
-                    auto emitter = finalVertexOnEmitter.hitPointAndMaterial.closestObject;
-                    Float pdfSelectEmitterA = scene.pdfSelectEmitter(emitter);
-                    Float pdfSelectFinalVertexOnEmitterA = emitter->pdfSelectPointOnObjectA(pointOnEmitter);
+                    auto closestObject = finalVertexOnEmitter.hitPointAndMaterial.closestObject;
+                    Float pdfSelectEmitterA = scene.pdfSelectEmitter(closestObject->emitter);
+                    Float pdfSelectFinalVertexOnEmitterA = closestObject->emitter->pdfSelectPointOnEmitterA(pointOnEmitter);
                     Float pdfEmitterA_BSDFSampling = pdfSelectEmitterA * pdfSelectFinalVertexOnEmitterA;
                     Float pdfBSDFA_BSDFSampling = penultimateVertex.pdfBSDFA; //Since the pdf of hitting the next vertex is stored in the previous vertex now
                     Float misWeight = PowerHeuristic(pdfBSDFA_BSDFSampling, pdfEmitterA_BSDFSampling);

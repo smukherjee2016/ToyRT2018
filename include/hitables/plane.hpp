@@ -37,11 +37,6 @@ public:
         return {hitInfo};
     }
 
-    //Emitter
-    virtual Spectrum Le(const Ray& incomingRay) const override {
-        return Vector3(0.0);
-    }
-
     //IsEmitter
     bool isEmitter() const override {
         return false;

@@ -70,17 +70,9 @@ public:
         return  (4.0 * PI * radius * radius);
     }
 
-    //Emitter
-    Spectrum Le(const Ray& incomingRay) const override {
-        return LeIntensity;
-    }
-
     //IsEmitter
     bool isEmitter() const override {
-        if(LeIntensity == Vector3(0.0))
-            return false;
-        else
-            return true;
+        return !(emitter == nullptr);
     }
 
     Point3 samplePointOnObject(Sampler sampler) const override {
@@ -117,15 +109,14 @@ public:
         return glm::normalize((point - center));
     }
 
-    Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr, Spectrum _Le = Vector3(0.0)) :
+    Sphere(Point3 _center, Float _radius, std::shared_ptr<Material> _mat = nullptr, std::shared_ptr<Emitter> _emitter = nullptr) :
     center(_center), radius(_radius) {
             mat = _mat; //Base class members apparently doesn't work otherwise...
             //LeIntensity = _Le / (4 * PI * _radius * _radius);
-            LeIntensity = _Le;
+            emitter = _emitter;
     }
 
     glm::dvec3 center = {0, 0, 0};
     double radius = 1.0;
-    Spectrum LeIntensity;
 
 };
