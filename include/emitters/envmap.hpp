@@ -3,20 +3,30 @@
 #include "objects/object.hpp"
 #include "util/pfmutils.hpp"
 
-class EnvironmentMap : public Emitter {
+class EnvironmentMap : public Object {
 
     bool isConstColorEnvMap;
     PFMInfo envMap;
 public:
 
     EnvironmentMap(const std::string file = "") {
-        if (file != "") {
-            envMap = readPFM(file);
-            isConstColorEnvMap = false;
-        } else {
+        if(file != "") {
+           envMap = readPFM(file);
+           isConstColorEnvMap = false;
+        }
+        else {
             isConstColorEnvMap = true;
         }
-        emitterType = ENVMAP;
+    }
+
+    //IsEmitter
+    bool isEmitter() const override {
+        return true;
+    }
+
+    //Object
+    std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const override {
+        return std::nullopt;
     }
 
     Spectrum Le(const Ray& incomingRay) const override {
@@ -29,23 +39,15 @@ public:
         }
     }
 
-    Point3 samplePointOnEmitter(Sampler sampler) const override {
+    Point3 samplePointOnEmitter() const override {
         return Point3(0.0);
     }
 
-    Float pdfSelectPointOnEmitterA(const Point3 &point) const override {
+    Float pdfEmitterA(const Point3 &point) const override {
         return 0.0;
     }
 
     Vector3 getNormalForEmitter(const Point3& point) const override {
         return Vector3(0.0);
-    }
-
-    Spectrum heuristicEmitterSelection() const override {
-        return Spectrum(1.0);
-    }
-
-    void setAssociatedObject(std::shared_ptr<Object> _associatedObject) {
-        associatedObject = _associatedObject;
     }
 };
