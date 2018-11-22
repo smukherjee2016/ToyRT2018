@@ -8,8 +8,7 @@
 class PathTracingIntegratorv4 : public Integrator {
 public:
     void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
-                const int numBounces,
-                Sampler sampler) const override {
+                const int numBounces = 2) const override {
         unsigned int numThreads = std::thread::hardware_concurrency() - 1;
 #pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
 //#pragma omp parallel for schedule(dynamic, 1)
@@ -30,7 +29,7 @@ public:
                 Spectrum L_BSDF(0.0);
 
                 PathSampler pathSampler{};
-                Path currentSampleBSDFPath = pathSampler.generatePath(scene, cameraRay, numBounces, sampler);
+                Path currentSampleBSDFPath = pathSampler.generatePath(scene, cameraRay, numBounces);
 
                 int numVertices = currentSampleBSDFPath.vertices.size();
 

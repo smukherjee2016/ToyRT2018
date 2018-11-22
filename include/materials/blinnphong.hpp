@@ -13,7 +13,7 @@ public:
         g = _g;
     }
 
-    Vector3 sampleDirection(const Vector3 &wo, const Vector3 &normal, const Point2 pointInPSS) const {
+    Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const {
 
         Point3 pointInCartesian;
         //std::vector<Vector3> arrays;

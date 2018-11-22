@@ -4,7 +4,7 @@
 
 class TransparentMaterial : public Material {
 
-    Vector3 sampleDirection(const Vector3 &wo, const Vector3 &normal, const Point2 pointInPSS) const override {
+    Vector3 sampleDirection(const Vector3& wo, const Vector3& normal) const override {
         return wo; //Return the same direction. Light passes through unmodified
     }
     Spectrum brdf(const Vector3& wi, const Vector3& wo, const Vector3& normal) const override {

@@ -5,8 +5,7 @@
 class PathTracingIntegrator : public Integrator {
 public:
     void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
-                const int numBounces,
-                Sampler sampler) const override {
+                const int numBounces) const override {
 #pragma omp parallel for schedule(dynamic, 1)
         for(int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 
@@ -54,10 +53,8 @@ public:
                         }
                         else {
                             //BSDF Sampling
-                            Point2 sampleInPSS = Point2(sampler.generate1DUniform(), sampler.generate1DUniform());
                             Vector3 outgoingDirection = currentHitBundle.closestObject->mat->sampleDirection(-prevRay.d,
-                                                                                                             currentHitBundle.hitInfo.normal,
-                                                                                                             sampleInPSS);
+                                                                                                               currentHitBundle.hitInfo.normal);
                             Spectrum brdf = currentHitBundle.closestObject->mat->brdf(outgoingDirection, -prevRay.d,
                                                                                         currentHitBundle.hitInfo.normal);
                             Float pdfBSDF_BSDFSampling = currentHitBundle.closestObject->mat->pdfW(outgoingDirection,

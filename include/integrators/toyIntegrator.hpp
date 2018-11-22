@@ -3,8 +3,7 @@
 class ToyIntegrator : public Integrator {
 public:
     void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
-                const int numBounces,
-                Sampler sampler) const override {
+                const int numBounces = 1) const override {
 #pragma omp parallel for schedule(dynamic, 1)
         for(int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 
@@ -75,10 +74,8 @@ public:
                             }
 
                             //BSDF sampling
-                            Point2 sampleInPSS = Point2(sampler.generate1DUniform(), sampler.generate1DUniform());
-                            Vector3 outgoingDirection = cameraRayHitBundle.closestObject->mat->sampleDirection(
-                                    -cameraRay.d,
-                                    cameraRayHitBundle.hitInfo.normal, sampleInPSS);
+                            Vector3 outgoingDirection = cameraRayHitBundle.closestObject->mat->sampleDirection(-cameraRay.d,
+                                                                                                           cameraRayHitBundle.hitInfo.normal);
                             Spectrum brdf = cameraRayHitBundle.closestObject->mat->brdf(outgoingDirection, -cameraRay.d,
                                                                                     cameraRayHitBundle.hitInfo.normal);
                             Float pdfBSDF_BSDFSampling = cameraRayHitBundle.closestObject->mat->pdfW(outgoingDirection,

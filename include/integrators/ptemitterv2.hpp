@@ -10,8 +10,7 @@ class PathTracingEmitterv2 : public Integrator {
 
 public:
     void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
-                const int numBounces,
-                Sampler sampler) const {
+                const int numBounces) const {
 #pragma omp parallel for schedule(dynamic, 1)
         for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
 
@@ -38,10 +37,7 @@ public:
                         continue;
                     }
 
-                    Point2 sampleInPSS = Point2(sampler.generate1DUniform(), sampler.generate1DUniform());
-                    Vector3 sampledNextDirection = hitInfoBundle_Bounce1.closestObject->mat->sampleDirection(-thisRay.d,
-                                                                                                             hitInfoBundle_Bounce1.hitInfo.normal,
-                                                                                                             sampleInPSS);
+                    Vector3 sampledNextDirection = hitInfoBundle_Bounce1.closestObject->mat->sampleDirection(-thisRay.d, hitInfoBundle_Bounce1.hitInfo.normal);
                     Spectrum bsdf = hitInfoBundle_Bounce1.closestObject->mat->brdf(sampledNextDirection, -thisRay.d, hitInfoBundle_Bounce1.hitInfo.normal);
                     Float pdfBSDFW_1 = hitInfoBundle_Bounce1.closestObject->mat->pdfW(sampledNextDirection, -thisRay.d, hitInfoBundle_Bounce1.hitInfo.normal);
 

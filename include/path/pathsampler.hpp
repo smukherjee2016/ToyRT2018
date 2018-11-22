@@ -13,7 +13,7 @@ class PathSampler {
 
 public:
     //TODO The path object can be large and memory copies can be expensive... Look at how to prevent copies if they happen
-    Path generatePath(Scene &scene, const Ray &cameraRay, const int numBounces, Sampler sampler) {
+    Path generatePath(Scene& scene, const Ray& cameraRay, const int numBounces) {
         Path path{};
         Ray currentRay = cameraRay;
 
@@ -79,10 +79,7 @@ public:
 
                 //Sample next direction alongwith the pdfs
                 //TODO Handle zero samples properly return Sample object with info instead of Vector
-                Point2 sampleInPSS = Point2(sampler.generate1DUniform(), sampler.generate1DUniform());
-                Vector3 sampledNextBSDFDirection = currentHitBundle.closestObject->mat->sampleDirection(-currentRay.d,
-                                                                                                        hitPointNormal,
-                                                                                                        sampleInPSS);
+                Vector3 sampledNextBSDFDirection = currentHitBundle.closestObject->mat->sampleDirection(-currentRay.d, hitPointNormal);
                 Spectrum bsdf = currentHitBundle.closestObject->mat->brdf(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
                 Float pdfW = currentHitBundle.closestObject->mat->pdfW(sampledNextBSDFDirection, -currentRay.d, hitPointNormal);
 
