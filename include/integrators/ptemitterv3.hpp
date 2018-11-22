@@ -143,7 +143,9 @@ public:
                 }
 
                 if(numVertices == 2) { //Direct hit emitter
-                    L = currentSampleBSDFPath.vertices.at(numVertices - 1).hitPointAndMaterial.closestObject->Le(cameraRay);
+                    Vertex lastVertex = currentSampleBSDFPath.vertices.at(numVertices - 1);
+                    if(lastVertex.vertexType == EMITTER)
+                        L = lastVertex.hitPointAndMaterial.closestObject->emitter->Le(cameraRay);
                     pixelValue += L;
                     continue;
                 }
