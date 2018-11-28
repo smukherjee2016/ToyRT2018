@@ -2,9 +2,6 @@
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
 #include "integrators/toyIntegrator.hpp"
-#include "integrators/pt.hpp"
-#include "integrators/ptemitter.hpp"
-#include "integrators/ptemitterv2.hpp"
 #include "integrators/ptemitterv4.hpp"
 #include "integrators/ptv4.hpp"
 #include "integrators/ptBSDFv3.hpp"
@@ -13,7 +10,7 @@
 #include "util/sampler.hpp"
 #include <chrono>
 
-const int sampleCount = 1024;
+const int sampleCount = 16;
 const int numBounces = 3;
 
 int main(void) {
@@ -29,9 +26,6 @@ int main(void) {
     scene.makeScene();
     //ToyIntegrator toyIntegrator;
     //toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
-    //PathTracingIntegrator ptIntegrator;
-    //ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
-    //PathTracingEmitterv2 ptIntegrator;
     //PathTracingEmitterv4 ptIntegrator;
     PathTracingIntegratorv4 ptIntegrator;
     //PathTracingBSDFv3 ptIntegrator;
