@@ -23,9 +23,9 @@ public:
         return LeIntensity;
     }
 
-    Spectrum heuristicEmitterSelection() const override {
+    Float heuristicEmitterSelection() const override {
         Float surfaceArea = associatedObject->surfaceArea();
-        return (LeIntensity * surfaceArea);
+        return ( glm::length(LeIntensity) * surfaceArea);
     }
 
 

@@ -19,6 +19,9 @@ public:
     std::vector<std::shared_ptr<Object>> objects;
     std::shared_ptr<EnvironmentMap> envMap;
     std::vector<std::shared_ptr<Emitter>> emitters;
+    std::vector<Float> cdfEmitters;
+    std::vector<Float> pdfsEmitters;
+
 
     void makeScene() {
 
@@ -53,6 +56,23 @@ public:
 //        objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(12.34)));
 //        objects.emplace_back(std::make_unique<Sphere>(Point3(73,73.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(12.34)));
 
+        //Construct emitter CDF Table
+        std::vector<Float> heuristicsEmitters;
+        Float totalHeuristicValue = 0.0;
+        for(auto & emitter : emitters) {
+            heuristicsEmitters.emplace_back(emitter->heuristicEmitterSelection());
+            totalHeuristicValue += emitter->heuristicEmitterSelection();
+        }
+        for(int i = 0; i < emitters.size(); i++) {
+            pdfsEmitters.emplace_back(heuristicsEmitters.at(i) / totalHeuristicValue);
+        }
+
+        Float currentPdfSum = 0.0;
+        for(int i = 0; i < emitters.size(); i++) {
+            currentPdfSum += pdfsEmitters.at(i);
+            cdfEmitters.emplace_back(currentPdfSum);
+        }
+
 
     }
 
@@ -61,15 +81,34 @@ public:
         if(emitters.size() == 0)
             return std::nullopt;
 
-        //Select random light source uniformly
-        int randomEmitterIndex = rng.generateRandomInt(emitters.size() - 1);
+        Float randomFloat = rng.generate1DUniform();
+        int randomEmitterIndex = 0;
 
+        for(int i = 0; i < emitters.size(); i++) {
+
+            Float prevcdf = (i == 0) ? 0.0 : cdfEmitters.at(i - 1);
+            Float thiscdf = cdfEmitters.at(i);
+            if(randomFloat >= prevcdf && randomFloat <= thiscdf) {
+                randomEmitterIndex = i;
+                break;
+            }
+        }
         std::shared_ptr<Emitter> ret = emitters.at(randomEmitterIndex);
         return ret;
+
+        //Select random light source uniformly
+//        int randomEmitterIndex = rng.generateRandomInt(emitters.size() - 1);
+//
+//        std::shared_ptr<Emitter> ret = emitters.at(randomEmitterIndex);
+//        return ret;
     }
 
     Float pdfSelectEmitter(std::shared_ptr<Emitter> emitter) const {
-        return 1.0 / emitters.size();
+        for(int i = 0 ; i < emitters.size(); i ++) {
+            auto candidateEmitter = emitters.at(i);
+            if(emitter == candidateEmitter)
+                return pdfsEmitters.at(i);
+        }
     }
 
     std::optional<HitBundle> traceRayReturnClosestHit(const Ray &ray) {

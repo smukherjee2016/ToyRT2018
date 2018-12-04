@@ -19,7 +19,7 @@ public:
     virtual Point3 samplePointOnEmitter(Sampler sampler) const = 0;
     virtual Float pdfSelectPointOnEmitterA(const Point3 &point) const = 0;
     virtual Vector3 getNormalForEmitter(const Point3& point) const = 0;
-    virtual Spectrum heuristicEmitterSelection() const  = 0;
+    virtual Float heuristicEmitterSelection() const  = 0;
     virtual void setAssociatedObject(std::shared_ptr<Object> _associatedObject) = 0;
 
 

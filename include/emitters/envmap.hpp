@@ -24,8 +24,8 @@ public:
         return Vector3();
     }
 
-    Spectrum heuristicEmitterSelection() const override {
-        return Spectrum();
+    Float heuristicEmitterSelection() const override {
+        return 0.0;
     }
 
     void setAssociatedObject(std::shared_ptr<Object> _associatedObject) override {
