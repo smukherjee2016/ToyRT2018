@@ -12,6 +12,8 @@
 #include "materials/transparentMaterial.hpp"
 #include "path/path.hpp" //TODO Check inclusion of defn. of HitBundle in path.hpp
 #include "emitters/arealight.hpp"
+#include "accel/embreewrapper.hpp"
+#include "hitables/trianglemesh.hpp"
 
 class Scene
 {
