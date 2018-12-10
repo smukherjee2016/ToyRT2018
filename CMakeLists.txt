@@ -86,6 +86,7 @@ if(OpenMP_CXX_FOUND)
 endif()
 target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
 target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
+target_link_libraries(ToyRT2018 PUBLIC tinyobjloader)
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU" )
     target_compile_options( ToyRT2018 PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)

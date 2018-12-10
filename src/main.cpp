@@ -1,3 +1,4 @@
+#define TINYOBJLOADER_IMPLEMENTATION
 #include <iostream>
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
@@ -9,6 +10,7 @@
 #include "scene/scene.hpp"
 #include "util/sampler.hpp"
 #include <chrono>
+
 
 const int sampleCount = 16;
 const int numBounces = 3;
