@@ -75,6 +75,9 @@ public:
             cdfEmitters.emplace_back(currentPdfSum);
         }
 
+        //Handle triangle meshes loading and starting up Embree
+
+
 
     }
 
