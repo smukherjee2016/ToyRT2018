@@ -14,6 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+option(TOYRT2018_USE_EXTERNAL_JSON "Use an external JSON library" OFF)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -69,6 +70,15 @@ find_package(embree 3 REQUIRED)
 include_directories(${EMBREE_INCLUDE_DIRS})
 option(EMBREE_ISPC_SUPPORT "Build Embree with support for ISPC applications." OFF)
 
+#nlohmann_json
+if(TOYRT2018_USE_EXTERNAL_JSON)
+    find_package(nlohmann_json 3.2.0 REQUIRED)
+else()
+    set(JSON_BuildTests OFF CACHE INTERNAL "")
+    add_subdirectory(extern/nlohmann_json)
+endif()
+
+
 add_library(ToyRT2018_lib INTERFACE)
 target_sources( ToyRT2018_lib
         INTERFACE
@@ -87,6 +97,7 @@ endif()
 target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
 target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
 target_link_libraries(ToyRT2018 PUBLIC tinyobjloader)
+target_link_libraries(ToyRT2018 PUBLIC nlohmann_json::nlohmann_json)
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU" )
     target_compile_options( ToyRT2018 PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)

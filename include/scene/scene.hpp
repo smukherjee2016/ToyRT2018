@@ -14,6 +14,7 @@
 #include "emitters/arealight.hpp"
 #include "accel/embreewrapper.hpp"
 #include "hitables/triangle.hpp"
+#include <nlohmann/json.hpp>
 
 class Scene
 {
