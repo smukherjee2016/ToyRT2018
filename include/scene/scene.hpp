@@ -13,7 +13,7 @@
 #include "path/path.hpp" //TODO Check inclusion of defn. of HitBundle in path.hpp
 #include "emitters/arealight.hpp"
 #include "accel/embreewrapper.hpp"
-#include "hitables/trianglemesh.hpp"
+#include "hitables/triangle.hpp"
 
 class Scene
 {
