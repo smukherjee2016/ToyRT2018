@@ -15,6 +15,7 @@
 #include "accel/embreewrapper.hpp"
 #include "hitables/triangle.hpp"
 #include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class Scene
 {
@@ -25,39 +26,22 @@ public:
     std::vector<Float> cdfEmitters;
     std::vector<Float> pdfsEmitters;
 
+    bool parseScene(const std::string sceneFile) {
+
+        std::ifstream inJsonStream(sceneFile);
+        json sceneJson = json::parse(inJsonStream);
+
+
+        return true;
+    }
+
 
     void makeScene(const std::string sceneFile) {
 
         envMap = std::make_shared<EnvironmentMap>();
 
-        //Cbox-ish, source: smallpt, modified to make flipping normals unnecessary
-        objects.emplace_back(std::make_unique<Sphere>(Point3(1e5+99,40.8,81.6)  , 1e5 , std::make_shared<LambertCosine>(Spectrum(.25,.25,.75)))); // Right wall (after modification
-        objects.emplace_back(std::make_unique<Sphere>(Point3(-1e5+1,40.8,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(.75,.25,.25)))); //Left wall (after modification)
-        objects.emplace_back(std::make_unique<Sphere>(Point3(50,40.8,-1e5)      , 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)))); //Front wall (after modification)
-        objects.emplace_back(std::make_unique<Sphere>(Point3(50,1e5+81.6,81.6)      , 1e5 , std::make_shared<LambertCosine>(Spectrum(.75)))); //Ceiling (after modification)
-        objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<Phong>(Spectrum(0.01, 0.5, 0.999), 100))); //Floor (after modification)
-        objects.emplace_back(std::make_unique<Sphere>(Point3(60,52,81.6), 6 , std::make_shared<LambertCosine>(Spectrum(.75))));
-        //objects.emplace_back(std::make_unique<Sphere>(Point3(50,-1e5,81.6), 1e5 , std::make_shared<LambertCosine>(Spectrum(0.75)))); //Floor (after modification)
-
-        std::shared_ptr<AreaLight> smolEmitter = std::make_shared<AreaLight>(Spectrum(8.24));
-        std::shared_ptr<AreaLight> bigEmitter = std::make_shared<AreaLight>(Spectrum(12.34));
-
-
-        std::shared_ptr<Sphere> smolEmitterSphere = std::make_shared<Sphere>(Point3(27,16.5,47)       , 1.5, std::make_shared<LambertCosine>(Spectrum(0)), smolEmitter);
-        std::shared_ptr<Sphere> bigEmitterSphere =  std::make_shared<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), bigEmitter);
-        objects.emplace_back(smolEmitterSphere); //Emitters should always have zero transmission
-        objects.emplace_back(bigEmitterSphere);
-
-
-        smolEmitter->setAssociatedObject(smolEmitterSphere); //TODO Do something about this fragile call...
-        bigEmitter->setAssociatedObject(bigEmitterSphere);
-        emitters.emplace_back(smolEmitter);
-        emitters.emplace_back(bigEmitter);
-
-        //Scene with only emitters
-//        objects.emplace_back(std::make_unique<Sphere>(Point3(27,16.5,47)       , 1.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(8.24)));
-//        objects.emplace_back(std::make_unique<Sphere>(Point3(73,16.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(12.34)));
-//        objects.emplace_back(std::make_unique<Sphere>(Point3(73,73.5,78)       , 16.5, std::make_shared<LambertCosine>(Spectrum(0)), Spectrum(12.34)));
+        //Load and parse scene file
+        parseScene(sceneFile);
 
         //Construct emitter CDF Table
         std::vector<Float> heuristicsEmitters;
@@ -115,6 +99,7 @@ public:
             if(emitter == candidateEmitter)
                 return pdfsEmitters.at(i);
         }
+        return 0.0;
     }
 
     std::optional<HitBundle> traceRayReturnClosestHit(const Ray &ray) {
