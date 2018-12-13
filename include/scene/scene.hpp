@@ -30,6 +30,7 @@ public:
 
         std::ifstream inJsonStream(sceneFile);
         json sceneJson = json::parse(inJsonStream);
+        inJsonStream.close();
 
 
         return true;
