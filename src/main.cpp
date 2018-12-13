@@ -25,7 +25,7 @@ int main(void) {
     Film film(PI/6.0, 1.0, resX, resY);
     PinholeCamera pinholeCamera(Point3(50,52,295.6), Point3(50, 51.9574, 294.601), Point3(0.0, 0.999093, -0.0425734));
     Scene scene;
-    scene.makeScene();
+    scene.makeScene("");
     //ToyIntegrator toyIntegrator;
     //toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
     //PathTracingEmitterv4 ptIntegrator;

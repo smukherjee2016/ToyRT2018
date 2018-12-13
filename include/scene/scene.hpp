@@ -26,7 +26,7 @@ public:
     std::vector<Float> pdfsEmitters;
 
 
-    void makeScene() {
+    void makeScene(const std::string sceneFile) {
 
         envMap = std::make_shared<EnvironmentMap>();
 
