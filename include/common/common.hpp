@@ -22,6 +22,7 @@ using Vector3 = glm::dvec3;
 using Float = double;
 using Spectrum = glm::dvec3;
 
+//Ref. https://github.com/nlohmann/json#arbitrary-types-conversions
 namespace glm
 {
     void to_json(json& j, const dvec3& p)
@@ -57,6 +58,7 @@ using Vector3 = glm::vec3;
 using Float = float;
 using Spectrum = glm::vec3;
 
+//Ref. https://github.com/nlohmann/json#arbitrary-types-conversions
 namespace glm
 {
     void to_json(json& j, const vec3& p)
