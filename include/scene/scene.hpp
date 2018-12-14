@@ -170,7 +170,6 @@ public:
                 std::shared_ptr<AreaLight> emitter = std::make_shared<AreaLight>(Le);
                 const std::string emitterID = emitterJSON.at("id");
                 emitter->id = emitterID;
-                emitter->associatedObjectID = emitterJSON.at("associatedObject");
 
                 emittersHashTable.insert({emitterID, emitter});
             }
@@ -183,8 +182,7 @@ public:
                 std::shared_ptr<Emitter> emitterPointer = emitterHashElement.second;
 
 
-                if(objectPointer->id.compare(emitterPointer->associatedObjectID) == 0
-                    && emitterPointer->id.compare(objectPointer->associatedEmitterID) == 0) // Found matching object and emitter
+                if(emitterPointer->id.compare(objectPointer->associatedEmitterID) == 0) // Found matching object and emitter
                 {
                     //std::cout << "Found emitter with id: " << emitterPointer->id << " matching with object: " << objectPointer->id << std::endl;
                     //Link the pointers from both sides, object and emitter
