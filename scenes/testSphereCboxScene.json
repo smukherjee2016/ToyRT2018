@@ -96,7 +96,7 @@
 		{
 			"id": "frontWall",
 			"type": "sphere",
-			"center": [ 50, 40.8, 100000 ],
+			"center": [ 50, 40.8, -100000 ],
 			"radius": 100000,
 			"material": "otherWallsMat"
 		},
