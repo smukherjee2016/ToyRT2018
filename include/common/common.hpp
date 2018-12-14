@@ -12,18 +12,78 @@
 #define USE_DOUBLE_PRECISION
 //#define USE_LIGHT_SAMPLING
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #ifdef USE_DOUBLE_PRECISION
 using Point2 = glm::dvec2;
 using Point3 = glm::dvec3;
 using Vector3 = glm::dvec3;
 using Float = double;
 using Spectrum = glm::dvec3;
+
+namespace glm
+{
+    void to_json(json& j, const dvec3& p)
+    {
+        j = json{p.r, p.g, p.b};
+    }
+
+    void from_json(const json& j, dvec3& p)
+    {
+        j.at(0).get_to(p.r);
+        j.at(1).get_to(p.g);
+        j.at(2).get_to(p.b);
+
+    }
+
+    void to_json(json& j, const dvec2& p)
+    {
+        j = json{p.x, p.y};
+    }
+
+    void from_json(const json& j, dvec2& p)
+    {
+        j.at(0).get_to(p.x);
+        j.at(1).get_to(p.y);
+
+    }
+}
+
 #else
 using Point2 = glm::vec2;
 using Point3 = glm::vec3;
 using Vector3 = glm::vec3;
 using Float = float;
 using Spectrum = glm::vec3;
+
+namespace glm
+{
+    void to_json(json& j, const vec3& p)
+    {
+        j = json{p.r, p.g, p.b};
+    }
+
+    void from_json(const json& j, vec3& p)
+    {
+        j.at(0).get_to(p.r);
+        j.at(1).get_to(p.g);
+        j.at(2).get_to(p.b);
+
+    }
+
+    void to_json(json& j, const vec2& p)
+    {
+        j = json{p.x, p.y};
+    }
+
+    void from_json(const json& j, vec2& p)
+    {
+        j.at(0).get_to(p.x);
+        j.at(1).get_to(p.y);
+
+    }
+}
 #endif
 
 const Float Infinity = std::numeric_limits<Float>::max();
