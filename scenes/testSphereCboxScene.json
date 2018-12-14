@@ -1,136 +1,136 @@
 {
-	"film": {
-		"XRes": 512,
-		"YRes": 512,
-		"distanceToFilm": 1.0,
-		"FOV": 30,
-		"isXFOV": false
-	},
-	
-	"camera": {
-		"cameraType": "pinhole",
-		"origin": [ 50, 52, 295.6 ],
-		"lookAt": [ 50, 51.9574, 294.60 ],
-		"up": [ 0.0, 0.999093, -0.0425734 ]
-	},
-	
-	"emitters":[
-	
-		{
-			"id": "smolEmitter",
-			"emitterType": "area",
-			"Le": [ 8.24, 8.24, 8.24]
-		},
-		
-		{
-			"id": "bigEmitter",
-			"emitterType": "area",
-			"Le": [ 12.34, 12.34, 12.34 ]
-		}
-	],
-	
-	"materials":[
-		{
-			"id": "rightWallMat",
-			"type": "LambertCosine",
-			"Kd": [ 0.25, 0.25, 0.75 ]
-		},
-		
-		{
-			"id": "leftWallMat",
-			"type": "LambertCosine",
-			"Kd": [ 0.75, 0.25, 0.25 ]
-		},
-		
-		{
-			"id": "otherWallsMat",
-			"type": "LambertCosine",
-			"Kd": [ 0.75, 0.75, 0.75 ]
-		},
-		
-		{
-			"id": "bottomWallMat",
-			"type": "Phong",
-			"Ks": [ 0.01, 0.5, 0.999 ],
-			"specularExponent": 100
-		},
+  "film": {
+    "XRes": 512,
+    "YRes": 512,
+    "distanceToFilm": 1.0,
+    "FOV": 30,
+    "isXFOV": false
+  },
 
-		{
-			"id": "transparentMat",
-			"type": "LambertCosine",
-			"Kd": [0.0, 0.0, 0.0]
-		}
-	
-	],
-	
-	"objects": [
-		{
-			"id": "topWall",
-			"type": "sphere",
-			"center": [ 50, 100081.6, 81.6 ],
-			"radius": 100000,
-			"material": "otherWallsMat"
-		},
+  "camera": {
+    "cameraType": "pinhole",
+    "origin": [ 50, 52, 295.6 ],
+    "lookAt": [ 50, 51.9574, 294.60 ],
+    "up": [ 0.0, 0.999093, -0.0425734 ]
+  },
 
-		{
-			"id": "bottomWall",
-			"type": "sphere",
-			"center": [ 50, -100000, 81.6 ],
-			"radius": 100000,
-			"material": "bottomWallMat"
-		},
+  "emitters":[
 
-		{
-			"id": "leftWall",
-			"type": "sphere",
-			"center": [-99999, 40.8, 81.6 ],
-			"radius": 100000,
-			"material": "leftWallMat"
-		},
-		
-		{
-			"id": "rightWall",
-			"type": "sphere",
-			"center": [ 100099, 40.8, 81.6 ],
-			"radius": 100000,
-			"material": "rightWallMat"
-		},
-		
-		{
-			"id": "frontWall",
-			"type": "sphere",
-			"center": [ 50, 40.8, -100000 ],
-			"radius": 100000,
-			"material": "otherWallsMat"
-		},
-		
-		{
-			"id": "smallDiffuseSphere",
-			"type": "sphere",
-			"center": [ 60, 52, 81.6],
-			"radius": 6,
-			"material": "otherWallsMat"
-		},
-		
-		{
-			"id": "smolEmitterObject",
-			"type": "sphere",
-			"center": [ 27, 16.5, 47 ],
-			"radius": 1.5,
-			"material": "transparentMat",
-			"associatedEmitter": "smolEmitter"
-		},
-		
-		{
-			"id": "bigEmitterObject",
-			"type": "sphere",
-			"center": [ 73, 16.5, 78 ],
-			"radius": 16.5,
-			"material": "transparentMat",
-			"associatedEmitter": "bigEmitter"
-		}
+    {
+      "id": "smolEmitter",
+      "emitterType": "area",
+      "Le": [ 8.24, 8.24, 8.24]
+    },
 
-	
-	]
-	
+    {
+      "id": "bigEmitter",
+      "emitterType": "area",
+      "Le": [ 12.34, 12.34, 12.34 ]
+    }
+  ],
+
+  "materials":[
+    {
+      "id": "rightWallMat",
+      "type": "LambertCosine",
+      "Kd": [ 0.25, 0.25, 0.75 ]
+    },
+
+    {
+      "id": "leftWallMat",
+      "type": "LambertCosine",
+      "Kd": [ 0.75, 0.25, 0.25 ]
+    },
+
+    {
+      "id": "otherWallsMat",
+      "type": "LambertCosine",
+      "Kd": [ 0.75, 0.75, 0.75 ]
+    },
+
+    {
+      "id": "bottomWallMat",
+      "type": "Phong",
+      "Ks": [ 0.01, 0.5, 0.999 ],
+      "specularExponent": 100
+    },
+
+    {
+      "id": "transparentMat",
+      "type": "LambertCosine",
+      "Kd": [0.0, 0.0, 0.0]
+    }
+
+  ],
+
+  "objects": [
+    {
+      "id": "topWall",
+      "type": "sphere",
+      "center": [ 50, 100081.6, 81.6 ],
+      "radius": 100000,
+      "material": "otherWallsMat"
+    },
+
+    {
+      "id": "bottomWall",
+      "type": "sphere",
+      "center": [ 50, -100000, 81.6 ],
+      "radius": 100000,
+      "material": "bottomWallMat"
+    },
+
+    {
+      "id": "leftWall",
+      "type": "sphere",
+      "center": [-99999, 40.8, 81.6 ],
+      "radius": 100000,
+      "material": "leftWallMat"
+    },
+
+    {
+      "id": "rightWall",
+      "type": "sphere",
+      "center": [ 100099, 40.8, 81.6 ],
+      "radius": 100000,
+      "material": "rightWallMat"
+    },
+
+    {
+      "id": "frontWall",
+      "type": "sphere",
+      "center": [ 50, 40.8, -100000 ],
+      "radius": 100000,
+      "material": "otherWallsMat"
+    },
+
+    {
+      "id": "smallDiffuseSphere",
+      "type": "sphere",
+      "center": [ 60, 52, 81.6],
+      "radius": 6,
+      "material": "otherWallsMat"
+    },
+
+    {
+      "id": "smolEmitterObject",
+      "type": "sphere",
+      "center": [ 27, 16.5, 47 ],
+      "radius": 1.5,
+      "material": "transparentMat",
+      "associatedEmitter": "smolEmitter"
+    },
+
+    {
+      "id": "bigEmitterObject",
+      "type": "sphere",
+      "center": [ 73, 16.5, 78 ],
+      "radius": 16.5,
+      "material": "transparentMat",
+      "associatedEmitter": "bigEmitter"
+    }
+
+
+  ]
+
 }
