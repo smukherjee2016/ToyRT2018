@@ -5,21 +5,21 @@
 
 class PathTracingEmitterv4 : public Integrator {
 public:
-    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+    void render(std::shared_ptr<Camera> camera, std::shared_ptr<Film> film, Scene &scene, const int sampleCount,
                 const int numBounces = 2) const override {
         unsigned int numThreads = std::thread::hardware_concurrency() - 1;
 #pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
-        for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
+        for (int i = 0; i < film->screenHeight * film->screenWidth; i++) {
 
             int positionInFilm = i;
-            int x = positionInFilm % film.screenWidth;
-            int y = positionInFilm / film.screenWidth;
-            //int positionInFilm = y * film.screenWidth + x;
+            int x = positionInFilm % film->screenWidth;
+            int y = positionInFilm / film->screenWidth;
+            //int positionInFilm = y * film->screenWidth + x;
 
             Spectrum pixelValue{};
             for (int j = 0; j < sampleCount; j++) {
 
-                Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
+                Ray cameraRay = camera->generateCameraRay(x, y, film);
                 Ray currentRay = cameraRay;
                 Path currentSampleBSDFPath{};
                 Spectrum L(0.0);
@@ -193,7 +193,7 @@ public:
                 pixelValue += L; //Add sample contribution
             }
             pixelValue /= sampleCount; //Average MC estimation
-            film.pixels.at(positionInFilm) = pixelValue; //Write to film
+            film->pixels.at(positionInFilm) = pixelValue; //Write to film
         }
 
     }

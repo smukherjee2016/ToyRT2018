@@ -15,10 +15,14 @@
 #include "emitters/arealight.hpp"
 #include "accel/embreewrapper.hpp"
 #include "hitables/triangle.hpp"
+#include "film/film.hpp"
+#include "camera/pinholecamera.hpp"
 
 class Scene
 {
 public:
+    std::shared_ptr<Film> film;
+    std::shared_ptr<Camera> camera;
     std::shared_ptr<EnvironmentMap> envMap;
     std::vector<std::shared_ptr<Emitter>> emitters;
     std::vector<Float> cdfEmitters;
@@ -30,13 +34,41 @@ public:
 
     void parseAndSetupScene(const std::string sceneFile) {
 
+        /*
+         * Parses the scene file and sets up everything in it.
+         * Currently does very little to prevent ill-formed inputs and crashes. TODO: Implement stricter checks for validity
+         */
         std::ifstream inJsonStream(sceneFile);
         json sceneJson = json::parse(inJsonStream);
         inJsonStream.close();
 
         //Construct film
+        {
+            auto filmJSON = sceneJson.at("film");
+            int xRes = filmJSON.at("XRes").get<int>();
+            int yRes = filmJSON.at("YRes").get<int>();
+            Float distanceToFilm = filmJSON.at("distanceToFilm").get<Float>();
+            int FOV_degrees = filmJSON.at("FOV").get<int>();
+            bool isXFOV = filmJSON.at("isXFOV").get<bool>();
+
+            Float FOV_radians = static_cast<Float>(FOV_degrees) * PI / 180.0;
+            film = std::make_unique<Film>(FOV_radians, distanceToFilm, xRes, yRes, isXFOV);
+        }
 
         //Construct camera
+        {
+            auto cameraJSON = sceneJson.at("camera");
+            const std::string cameraTypeString = cameraJSON.at("cameraType");
+            if(cameraTypeString.compare("pinhole") == 0) {
+                Point3 origin = cameraJSON.at("origin").get<Point3>();
+                Point3 lookAt = cameraJSON.at("lookAt").get<Point3>();
+                Vector3 up = cameraJSON.at("up").get<Vector3>();
+                camera = std::make_unique<PinholeCamera>(origin, lookAt, up);
+            }
+            else {
+                std::cerr << "Unsupported camera type: " << cameraTypeString << std::endl;
+            }
+        }
 
         //Construct materials
         for(auto & materialJSON : sceneJson.at("materials")) {
@@ -121,6 +153,9 @@ public:
             }
             else if(objectTypeString.compare("plane") == 0) {
                 //TODO Add support for planes
+            }
+            else {
+                std::cerr << "Unsupported object type: " << objectTypeString << std::endl;
             }
 
         }
