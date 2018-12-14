@@ -19,13 +19,13 @@
 		{
 			"id": "smolEmitter",
 			"emitterType": "area",
-			"Le": [ 8.24, 8.24, 8.24],
+			"Le": [ 8.24, 8.24, 8.24]
 		},
 		
 		{
 			"id": "bigEmitter",
 			"emitterType": "area",
-			"Le": [ 12.34, 12.34, 12.34 ],
+			"Le": [ 12.34, 12.34, 12.34 ]
 		}
 	],
 	
