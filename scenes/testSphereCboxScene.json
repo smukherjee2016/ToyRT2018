@@ -20,15 +20,12 @@
 			"id": "smolEmitter",
 			"emitterType": "area",
 			"Le": [ 8.24, 8.24, 8.24],
-			"associatedObject": "smolEmitterObject"
 		},
 		
 		{
 			"id": "bigEmitter",
 			"emitterType": "area",
 			"Le": [ 12.34, 12.34, 12.34 ],
-			"associatedObject": "bigEmitterObject"
-		
 		}
 	],
 	
