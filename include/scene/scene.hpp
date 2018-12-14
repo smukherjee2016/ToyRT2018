@@ -14,8 +14,6 @@
 #include "emitters/arealight.hpp"
 #include "accel/embreewrapper.hpp"
 #include "hitables/triangle.hpp"
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 class Scene
 {
@@ -26,11 +24,39 @@ public:
     std::vector<Float> cdfEmitters;
     std::vector<Float> pdfsEmitters;
 
-    bool parseScene(const std::string sceneFile) {
+    bool parseAndSetupScene(const std::string sceneFile) {
 
         std::ifstream inJsonStream(sceneFile);
         json sceneJson = json::parse(inJsonStream);
         inJsonStream.close();
+
+        //Construct film
+
+        //Construct camera
+
+        //Construct materials
+        for(auto & material : sceneJson.at("materials")) {
+
+
+        }
+
+
+        //Construct objects
+        for(auto & object : sceneJson.at("objects")) {
+           // std::cout << object << std::endl;
+        }
+
+        //Construct emitters
+        for(auto & emitterJSON : sceneJson.at("emitters")) {
+            // map TaskState values to JSON as strings
+
+
+            std::string emitterTypeString = emitterJSON.at("emitterType");
+
+            if(emitterTypeString.compare("area") == 0) {
+                Spectrum Le = emitterJSON.at("Le").get<Spectrum>();
+            }
+        }
 
 
         return true;
@@ -42,7 +68,7 @@ public:
         envMap = std::make_shared<EnvironmentMap>();
 
         //Load and parse scene file
-        parseScene(sceneFile);
+        parseAndSetupScene(sceneFile);
 
         //Construct emitter CDF Table
         std::vector<Float> heuristicsEmitters;
