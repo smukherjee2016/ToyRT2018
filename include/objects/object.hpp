@@ -15,6 +15,10 @@ public:
     virtual std::optional<HitInfo> checkIntersectionAndClosestHit(const Ray& ray) const = 0;
     std::shared_ptr<Material> mat;
     std::shared_ptr<Emitter> emitter;
+    std::string id;
+    std::string associatedMaterialID;
+    std::string associatedEmitterID;
+
 
     //Emitter
     virtual Point3 samplePointOnObject(Sampler sampler) const = 0;

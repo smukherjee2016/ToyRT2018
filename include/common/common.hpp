@@ -8,7 +8,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <fstream>
-//#define USE_X_FOV
 #define USE_DOUBLE_PRECISION
 //#define USE_LIGHT_SAMPLING
 

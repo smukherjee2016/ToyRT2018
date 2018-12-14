@@ -2,21 +2,21 @@
 
 class ToyIntegrator : public Integrator {
 public:
-    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
-                const int numBounces = 1) const override {
+    void render(std::shared_ptr<Camera> camera, std::shared_ptr<Film> film, Scene &scene, const int sampleCount,
+                const int numBounces = 2) const override {
 #pragma omp parallel for schedule(dynamic, 1)
-        for(int i = 0; i < film.screenHeight * film.screenWidth; i++) {
+        for(int i = 0; i < film->screenHeight * film->screenWidth; i++) {
 
             int positionInFilm = i;
-            int x = positionInFilm % film.screenWidth;
-            int y = positionInFilm / film.screenWidth;
-            //int positionInFilm = y * film.screenWidth + x;
+            int x = positionInFilm % film->screenWidth;
+            int y = positionInFilm / film->screenWidth;
+            //int positionInFilm = y * film->screenWidth + x;
 
             Spectrum pixelValue{};
             for (int j = 0; j < sampleCount; j++) {
 
                 for(int k = 1; k <= numBounces; k++) {
-                    Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
+                    Ray cameraRay = camera->generateCameraRay(x, y, film);
 
                     std::optional<HitBundle> hitBundle = scene.traceRayReturnClosestHit(cameraRay);
 
@@ -120,7 +120,7 @@ public:
 
             }
             pixelValue /= (sampleCount);
-            film.pixels.at(positionInFilm) = pixelValue;
+            film->pixels.at(positionInFilm) = pixelValue;
         }
     }
 

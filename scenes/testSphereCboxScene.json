@@ -19,16 +19,13 @@
 		{
 			"id": "smolEmitter",
 			"emitterType": "area",
-			"Le": [ 8.24, 8.24, 8.24],
-			"associatedObject": "smolEmitterObject"
+			"Le": [ 8.24, 8.24, 8.24]
 		},
 		
 		{
 			"id": "bigEmitter",
 			"emitterType": "area",
-			"Le": [ 12.34, 12.34, 12.34 ],
-			"associatedObject": "bigEmitterObject"
-		
+			"Le": [ 12.34, 12.34, 12.34 ]
 		}
 	],
 	
@@ -56,7 +53,13 @@
 			"type": "Phong",
 			"Ks": [ 0.01, 0.5, 0.999 ],
 			"specularExponent": 100
-		}		
+		},
+
+		{
+			"id": "transparentMat",
+			"type": "LambertCosine",
+			"Kd": [0.0, 0.0, 0.0]
+		}
 	
 	],
 	
@@ -96,7 +99,7 @@
 		{
 			"id": "frontWall",
 			"type": "sphere",
-			"center": [ 50, 40.8, 100000 ],
+			"center": [ 50, 40.8, -100000 ],
 			"radius": 100000,
 			"material": "otherWallsMat"
 		},
@@ -114,7 +117,7 @@
 			"type": "sphere",
 			"center": [ 27, 16.5, 47 ],
 			"radius": 1.5,
-			"material": "otherWallsMat",
+			"material": "transparentMat",
 			"associatedEmitter": "smolEmitter"
 		},
 		
@@ -123,10 +126,10 @@
 			"type": "sphere",
 			"center": [ 73, 16.5, 78 ],
 			"radius": 16.5,
-			"material": "otherWallsMat",
+			"material": "transparentMat",
 			"associatedEmitter": "bigEmitter"
 		}
-		
+
 	
 	]
 	

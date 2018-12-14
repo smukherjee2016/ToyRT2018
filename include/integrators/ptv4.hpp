@@ -7,23 +7,23 @@
 
 class PathTracingIntegratorv4 : public Integrator {
 public:
-    void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+    void render(std::shared_ptr<Camera> camera, std::shared_ptr<Film> film, Scene &scene, const int sampleCount,
                 const int numBounces = 2) const override {
         unsigned int numThreads = std::thread::hardware_concurrency() - 1;
 #pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
 //#pragma omp parallel for schedule(dynamic, 1)
 
-        for (int i = 0; i < film.screenHeight * film.screenWidth; i++) {
+        for (int i = 0; i < film->screenHeight * film->screenWidth; i++) {
 
             int positionInFilm = i;
-            int x = positionInFilm % film.screenWidth;
-            int y = positionInFilm / film.screenWidth;
-            //int positionInFilm = y * film.screenWidth + x;
+            int x = positionInFilm % film->screenWidth;
+            int y = positionInFilm / film->screenWidth;
+            //int positionInFilm = y * film->screenWidth + x;
 
             Spectrum pixelValue{};
             for (int j = 0; j < sampleCount; j++) {
 
-                Ray cameraRay = pinholeCamera.generateCameraRay(x, y, film);
+                Ray cameraRay = camera->generateCameraRay(x, y, film);
                 Spectrum L(0.0);
                 Spectrum L_emitter(0.0);
                 Spectrum L_BSDF(0.0);
@@ -146,11 +146,11 @@ public:
                 pixelValue += L; //Add sample contribution
             }
             pixelValue /= sampleCount; //Average MC estimation
-            film.pixels.at(positionInFilm) = pixelValue; //Write to film
+            film->pixels.at(positionInFilm) = pixelValue; //Write to film
 
         auto tid = omp_get_thread_num();
-        if(tid == 0 && x % film.screenWidth == 0)
-            std::cout << "Completed " << (static_cast<Float>(positionInFilm) / (film.screenWidth * film.screenHeight)) * 100 << " percent.\n";
+        if(tid == 0 && x % film->screenWidth == 0)
+            std::cout << "Completed " << (static_cast<Float>(positionInFilm) / (film->screenWidth * film->screenHeight)) * 100 << " percent.\n";
         }
 
     }

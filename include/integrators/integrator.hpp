@@ -8,7 +8,7 @@
 #include <optional>
 
 class Integrator {
-    virtual void render(const PinholeCamera &pinholeCamera, Film &film, Scene &scene, const int sampleCount,
+    virtual void render(std::shared_ptr<Camera> camera, std::shared_ptr<Film> film, Scene &scene, const int sampleCount,
                         const int numBounces) const = 0;
 };
 

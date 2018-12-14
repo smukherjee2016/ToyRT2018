@@ -1,10 +1,8 @@
 #pragma once
 
-#include "common/common.hpp"
-#include "film/film.hpp"
-#include "util/sampler.hpp"
+#include "camera/camera.hpp"
 
-class PinholeCamera {
+class PinholeCamera : public Camera {
 
 public:
     Point3 origin;
@@ -30,20 +28,20 @@ public:
         makeBasisVectors();
     }
 
-    Ray generateCameraRay(const int x, const int y, const Film& film) const { //Pixel coordinates
-        Float u = (static_cast<Float>(x) + rng.generate1DUniform()) / film.screenWidth; //Shoot ray randomly to do AntiAliasing
-        Float v = (static_cast<Float>(y) + rng.generate1DUniform()) / film.screenHeight;
+    Ray generateCameraRay(const int x, const int y, std::shared_ptr<Film> film) const override { //Pixel coordinates
+        Float u = (static_cast<Float>(x) + rng.generate1DUniform()) / film->screenWidth; //Shoot ray randomly to do AntiAliasing
+        Float v = (static_cast<Float>(y) + rng.generate1DUniform()) / film->screenHeight;
 #ifdef USE_X_FOV
-        Float widthImagePlane = 2.0 * film.distanceToFilm * std::tan(film.FOV / 2.0);
-        Float heightImagePlane = widthImagePlane / film.aspectRatio;
+        Float widthImagePlane = 2.0 * film->distanceToFilm * std::tan(film->FOV / 2.0);
+        Float heightImagePlane = widthImagePlane / film->aspectRatio;
 #else
-        Float heightImagePlane = 2.0 * film.distanceToFilm * std::tan(film.FOV / 2.0);
-        Float widthImagePlane = heightImagePlane * film.aspectRatio;
+        Float heightImagePlane = 2.0 * film->distanceToFilm * std::tan(film->FOV / 2.0);
+        Float widthImagePlane = heightImagePlane * film->aspectRatio;
 #endif
         Float xImagePlane = (u - 0.5) * widthImagePlane;
         Float yImagePlane = (v - 0.5) * heightImagePlane;
 
-        Point3 positionOfPixelInWorld = origin + film.distanceToFilm * directionToLookAt
+        Point3 positionOfPixelInWorld = origin + film->distanceToFilm * directionToLookAt
                 + xImagePlane * C_x + yImagePlane * C_y;
 
         Vector3 directionInImageWorld = glm::normalize(positionOfPixelInWorld - origin);

@@ -22,8 +22,6 @@ int main(void) {
 
     //std::cout << rng.generate1DUniform() << std::endl;
 
-    Film film(PI/6.0, 1.0, resX, resY);
-    PinholeCamera pinholeCamera(Point3(50,52,295.6), Point3(50, 51.9574, 294.601), Point3(0.0, 0.999093, -0.0425734));
     Scene scene;
     scene.makeScene("../scenes/testSphereCboxScene.json");
     //ToyIntegrator toyIntegrator;
@@ -32,10 +30,10 @@ int main(void) {
     PathTracingIntegratorv4 ptIntegrator;
     //PathTracingBSDFv3 ptIntegrator;
     auto start = std::chrono::steady_clock::now();
-    ptIntegrator.render(pinholeCamera, film, scene, sampleCount, numBounces);
+    ptIntegrator.render(scene.camera, scene.film, scene, sampleCount, numBounces);
     auto end = std::chrono::steady_clock::now();
 
-    film.writePixels("Assignment4_normals.pfm");
+    scene.film->writePixels("Assignment4_normals.pfm");
 
     std::cout << "Time taken to render a " << resX << " by " << resY << " image using "
         << sampleCount << " samples and " << numBounces << " bounces: "
