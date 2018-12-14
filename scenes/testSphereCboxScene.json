@@ -56,7 +56,13 @@
 			"type": "Phong",
 			"Ks": [ 0.01, 0.5, 0.999 ],
 			"specularExponent": 100
-		}		
+		},
+
+		{
+			"id": "transparentMat",
+			"type": "LambertCosine",
+			"Kd": [0.0, 0.0, 0.0]
+		}
 	
 	],
 	
@@ -114,7 +120,7 @@
 			"type": "sphere",
 			"center": [ 27, 16.5, 47 ],
 			"radius": 1.5,
-			"material": "otherWallsMat",
+			"material": "transparentMat",
 			"associatedEmitter": "smolEmitter"
 		},
 		
@@ -123,10 +129,10 @@
 			"type": "sphere",
 			"center": [ 73, 16.5, 78 ],
 			"radius": 16.5,
-			"material": "otherWallsMat",
+			"material": "transparentMat",
 			"associatedEmitter": "bigEmitter"
 		}
-		
+
 	
 	]
 	
