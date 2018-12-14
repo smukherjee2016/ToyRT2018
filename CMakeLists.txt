@@ -14,7 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-option(TOYRT2018_USE_EXTERNAL_JSON "Use an external JSON library" OFF)
+set(TOYRT2018_USE_EXTERNAL_JSON OFF CACHE BOOL "Use an external JSON library")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -26,7 +26,7 @@ endif()
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     # Update submodules as needed
-    option(GIT_SUBMODULE "Check submodules during build" ON)
+    set(GIT_SUBMODULE ON CACHE BOOL "Check submodules during build")
     if(GIT_SUBMODULE)
         message(STATUS "Submodule update")
         execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
@@ -68,7 +68,7 @@ if(WIN32)
 endif(WIN32)
 find_package(embree 3 REQUIRED)
 include_directories(${EMBREE_INCLUDE_DIRS})
-option(EMBREE_ISPC_SUPPORT "Build Embree with support for ISPC applications." OFF)
+set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL "Build Embree with support for ISPC applications.")
 
 #nlohmann_json
 if(TOYRT2018_USE_EXTERNAL_JSON)
