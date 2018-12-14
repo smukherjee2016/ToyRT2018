@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 #include "common/common.hpp"
 #include "hitables/sphere.hpp"
 #include "hitables/plane.hpp"
@@ -23,6 +24,10 @@ public:
     std::vector<std::shared_ptr<Emitter>> emitters;
     std::vector<Float> cdfEmitters;
     std::vector<Float> pdfsEmitters;
+    std::unordered_map<std::string, std::shared_ptr<Object>> objectsHashTable;
+    std::unordered_map<std::string, std::shared_ptr<Emitter>> emittersHashTable;
+    std::unordered_map<std::string, std::shared_ptr<Material>> materialsHashTable;
+
 
     bool parseAndSetupScene(const std::string sceneFile) {
 
@@ -35,15 +40,92 @@ public:
         //Construct camera
 
         //Construct materials
-        for(auto & material : sceneJson.at("materials")) {
+        for(auto & materialJSON : sceneJson.at("materials")) {
+
+            const std::string materialTypeString = materialJSON.at("type");
+
+
+            if(materialTypeString.compare("LambertCosine") == 0) {
+                Spectrum kD = materialJSON.at("Kd").get<Spectrum>();
+                std::string materialID = materialJSON.at("id");
+                std::shared_ptr<LambertCosine> lambertCosineMaterial = std::make_shared<LambertCosine>(kD);
+                lambertCosineMaterial->id = materialID;
+
+                materialsHashTable.insert({materialID, lambertCosineMaterial});
+            }
+            else if(materialTypeString.compare("LambertUniform") == 0) {
+
+                Spectrum kD = materialJSON.at("Kd").get<Spectrum>();
+                std::string materialID = materialJSON.at("id");
+                std::shared_ptr<LambertUniform> lambertUniformMaterial = std::make_shared<LambertUniform>(kD);
+                lambertUniformMaterial->id = materialID;
+
+                materialsHashTable.insert({materialID, lambertUniformMaterial});
+            }
+            else if(materialTypeString.compare("Phong") == 0) {
+
+                Spectrum kS = materialJSON.at("Ks").get<Spectrum>();
+                std::string materialID = materialJSON.at("id");
+
+                int specularExponent = materialJSON.at("specularExponent").get<int>();
+
+                std::shared_ptr<Phong> phongMaterial = std::make_shared<Phong>(kS, specularExponent);
+                phongMaterial->id = materialID;
+
+                materialsHashTable.insert({materialID, phongMaterial});
+
+            }
+            else if(materialTypeString.compare("BlinnPhong") == 0) {
+
+                Spectrum kS = materialJSON.at("Ks").get<Spectrum>();
+                std::string materialID = materialJSON.at("id");
+
+                int specularExponent = materialJSON.at("specularExponent").get<int>();
+
+                std::shared_ptr<BlinnPhong> blinnPhongMaterial = std::make_shared<BlinnPhong>(kS, specularExponent);
+                blinnPhongMaterial->id = materialID;
+
+                materialsHashTable.insert({materialID, blinnPhongMaterial});
+
+            }
+            else {
+                std::cerr << "Unsupported material: " << materialTypeString << std::endl;
+            }
 
 
         }
 
 
         //Construct objects
-        for(auto & object : sceneJson.at("objects")) {
-           // std::cout << object << std::endl;
+        for(auto & objectJSON : sceneJson.at("objects")) {
+
+            const std::string objectTypeString = objectJSON.at("type");
+
+            if(objectTypeString.compare("sphere") == 0) {
+                Point3 centerOfSphere = objectJSON.at("center").get<Point3>();
+                int radiusOfSphere = objectJSON.at("radius").get<int>();
+                std::string materialKey = objectJSON.at("material").get<std::string>();
+                auto materialPtr = materialsHashTable.find(materialKey)->second;
+
+                std::string objectID = objectJSON.at("id").get<std::string>();
+                std::shared_ptr<Sphere> sphereObject =  std::make_shared<Sphere>(centerOfSphere, radiusOfSphere, materialPtr);
+                sphereObject->id = objectID;
+
+
+                objectsHashTable.insert({objectID, sphereObject});
+            }
+            else if(objectTypeString.compare("plane") == 0) {
+                //TODO Add support for planes
+            }
+
+
+            if(objectJSON.find("associatedEmitter") != objectJSON.end()) { //Emitter
+
+
+            }
+            else { //Non emitter
+
+            }
         }
 
         //Construct emitters
@@ -51,10 +133,16 @@ public:
             // map TaskState values to JSON as strings
 
 
-            std::string emitterTypeString = emitterJSON.at("emitterType");
+            const std::string emitterTypeString = emitterJSON.at("emitterType");
 
             if(emitterTypeString.compare("area") == 0) {
                 Spectrum Le = emitterJSON.at("Le").get<Spectrum>();
+                std::shared_ptr<AreaLight> emitter = std::make_shared<AreaLight>(Le);
+                const std::string emitterID = emitterJSON.at("id");
+                emitter->id = emitterID;
+                emitter->associatedObjectID = emitterJSON.at("associatedObject");
+
+                emittersHashTable.insert({emitterID, emitter});
             }
         }
 

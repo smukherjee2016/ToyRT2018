@@ -13,6 +13,8 @@ public:
     };
     typeOfEmitter emitterType;
     std::shared_ptr<Object> associatedObject;
+    std::string id;
+    std::string associatedObjectID;
 
     //Emitter
     virtual Spectrum Le(const Ray& incomingRay) const = 0;
