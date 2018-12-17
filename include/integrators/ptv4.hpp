@@ -17,7 +17,7 @@ public:
 
             int positionInFilm = i;
             int x = positionInFilm % film->screenWidth;
-            int y = film->screenHeight - positionInFilm / film->screenWidth;
+            int y = positionInFilm / film->screenWidth;
             //int positionInFilm = y * film->screenWidth + x;
 
             Spectrum pixelValue{};
