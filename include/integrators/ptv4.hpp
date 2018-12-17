@@ -13,6 +13,7 @@ public:
 #pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
 //#pragma omp parallel for schedule(dynamic, 1)
 
+        //Bottom-up scanlining
         for (int i = 0; i < film->screenHeight * film->screenWidth; i++) {
 
             int positionInFilm = i;
