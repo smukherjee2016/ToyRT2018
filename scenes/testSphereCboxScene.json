@@ -1,7 +1,7 @@
 {
   "film": {
-    "XRes": 512,
-    "YRes": 512,
+    "XRes": 1024,
+    "YRes": 576,
     "distanceToFilm": 1.0,
     "FOV": 30,
     "isXFOV": false

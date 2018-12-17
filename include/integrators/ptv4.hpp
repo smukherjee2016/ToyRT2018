@@ -9,7 +9,7 @@ class PathTracingIntegratorv4 : public Integrator {
 public:
     void render(std::shared_ptr<Camera> camera, std::shared_ptr<Film> film, Scene &scene, const int sampleCount,
                 const int numBounces = 2) const override {
-        unsigned int numThreads = std::thread::hardware_concurrency() - 1;
+        unsigned int numThreads = std::thread::hardware_concurrency() - 2;
 #pragma omp parallel for schedule(dynamic, 1) num_threads(numThreads)
 //#pragma omp parallel for schedule(dynamic, 1)
 
@@ -17,7 +17,7 @@ public:
 
             int positionInFilm = i;
             int x = positionInFilm % film->screenWidth;
-            int y = positionInFilm / film->screenWidth;
+            int y = film->screenHeight - positionInFilm / film->screenWidth;
             //int positionInFilm = y * film->screenWidth + x;
 
             Spectrum pixelValue{};
