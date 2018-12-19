@@ -78,6 +78,14 @@ else()
     add_subdirectory(extern/nlohmann_json)
 endif()
 
+#AssImp
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE INTERNAL "If the supplementary tools for Assimp are built in addition to the library.")
+set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "If the test suite for Assimp is built in addition to the library.")
+if (POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif (POLICY CMP0048)
+add_subdirectory(extern/assimp)
+
 
 add_library(ToyRT2018_lib INTERFACE)
 target_sources( ToyRT2018_lib
@@ -98,6 +106,7 @@ target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
 target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
 target_link_libraries(ToyRT2018 PUBLIC tinyobjloader)
 target_link_libraries(ToyRT2018 PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(ToyRT2018 PUBLIC assimp::assimp)
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU" )
     target_compile_options( ToyRT2018 PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)
