@@ -154,6 +154,26 @@ public:
             else if(objectTypeString.compare("plane") == 0) {
                 //TODO Add support for planes
             }
+            else if(objectTypeString.compare("mesh") == 0) {
+                //Triangle mesh
+                std::string materialKey = objectJSON.at("material").get<std::string>();
+                auto materialPtr = materialsHashTable.find(materialKey)->second;
+
+                std::string objectID = objectJSON.at("id").get<std::string>();
+
+                //Read in parameters for the triangle mesh
+
+
+                std::shared_ptr<TriangleMesh> meshObject =  std::make_shared<TriangleMesh>();
+                meshObject->id = objectID;
+
+                if(objectJSON.find("associatedEmitter") != objectJSON.end()) { // The object is an emitter then
+                    std::string associatedEmitterKey = objectJSON.at("associatedEmitter").get<std::string>();
+                    meshObject->associatedEmitterID = associatedEmitterKey;
+                }
+
+                objectsHashTable.insert({objectID, meshObject});
+            }
             else {
                 std::cerr << "Unsupported object type: " << objectTypeString << std::endl;
             }
