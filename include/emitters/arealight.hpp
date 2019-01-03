@@ -10,7 +10,7 @@ public:
         return associatedObject->samplePointOnObject(Sampler());
     }
 
-    Float pdfSelectPointOnEmitterA(const Point3 &point) const override {
+    Float pdfSelectPointOnEmitterA(const Point3&) const override {
         Float surfaceArea = associatedObject->surfaceArea();
         return 1.0 / surfaceArea;
     }
@@ -19,7 +19,7 @@ public:
         return associatedObject->getNormalAtPoint(point);
     }
 
-    Spectrum Le(const Ray& incomingRay) const override {
+    Spectrum Le(const Ray&) const override {
         return LeIntensity;
     }
 

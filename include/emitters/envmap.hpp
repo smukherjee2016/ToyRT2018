@@ -20,7 +20,7 @@ public:
         emitterType = ENVMAP;
     }
 
-    Vector3 getNormalForEmitter(const Point3 &point) const override {
+    Vector3 getNormalForEmitter(const Point3&) const override {
         return Vector3();
     }
 

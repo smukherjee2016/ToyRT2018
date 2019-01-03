@@ -100,7 +100,7 @@ public:
 
     }
 
-    Float pdfSelectPointOnObjectA(const Point3 &point) const override {
+    Float pdfSelectPointOnObjectA(const Point3&) const override {
         Float pdfAreaDomain = 1.0 / (4.0 * PI * radius * radius); // 1/4PI
         return pdfAreaDomain;
     }
