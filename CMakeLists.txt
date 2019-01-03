@@ -78,7 +78,6 @@ find_package(embree 3 REQUIRED)
 if(EMBREE_INCLUDE_DIRS)
     message("Found embree at: " ${EMBREE_INCLUDE_DIRS} " and " ${EMBREE_LIBRARY})
 endif()
-include_directories(${EMBREE_INCLUDE_DIRS})
 set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL "Build Embree with support for ISPC applications.")
 
 #nlohmann_json
@@ -97,14 +96,15 @@ if (POLICY CMP0048)
 endif (POLICY CMP0048)
 add_subdirectory(extern/assimp)
 
-
+#Define the library
 add_library(ToyRT2018_lib INTERFACE)
-target_sources( ToyRT2018_lib
-        INTERFACE
-        "${CMAKE_CURRENT_LIST_DIR}/include/"
-        )
-target_include_directories(ToyRT2018_lib INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/glm/")
-target_include_directories(ToyRT2018_lib INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/pcg-cpp/include")
+
+#https://foonathan.net/blog/2018/10/17/cmake-warnings.html Use SYSTEM to suppress warnings
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE ${EMBREE_INCLUDE_DIRS})
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/glm/")
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/pcg-cpp/include")
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/nlohmann_json/single_include")
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/assimp/include")
 #set_target_properties(ToyRT2018_lib PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
