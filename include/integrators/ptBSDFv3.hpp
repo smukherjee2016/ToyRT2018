@@ -24,7 +24,7 @@ public:
                 Spectrum L(0.0);
 
                 PathSampler pathSampler{};
-                Path currentSampleBSDFPath = pathSampler.generatePath(scene, cameraRay, numBounces);
+                Path currentSampleBSDFPath = pathSampler.generatePath(scene, currentRay, numBounces);
 
                 int numVertices = currentSampleBSDFPath.vertices.size();
                 //Process the path and fill in geometry term, throughput and area-domain pdf

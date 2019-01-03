@@ -132,8 +132,6 @@ public:
 
             const std::string objectTypeString = objectJSON.at("type");
 
-            bool isEmitter = false;
-
             if(objectTypeString.compare("sphere") == 0) {
                 Point3 centerOfSphere = objectJSON.at("center").get<Point3>();
                 Float radiusOfSphere = objectJSON.at("radius").get<Float>();
@@ -233,12 +231,12 @@ public:
             heuristicsEmitters.emplace_back(emitter->heuristicEmitterSelection());
             totalHeuristicValue += emitter->heuristicEmitterSelection();
         }
-        for(int i = 0; i < emitters.size(); i++) {
+        for(size_t i = 0; i < emitters.size(); i++) {
             pdfsEmitters.emplace_back(heuristicsEmitters.at(i) / totalHeuristicValue);
         }
 
         Float currentPdfSum = 0.0;
-        for(int i = 0; i < emitters.size(); i++) {
+        for(size_t i = 0; i < emitters.size(); i++) {
             currentPdfSum += pdfsEmitters.at(i);
             cdfEmitters.emplace_back(currentPdfSum);
         }
@@ -257,7 +255,7 @@ public:
         Float randomFloat = rng.generate1DUniform();
         int randomEmitterIndex = 0;
 
-        for(int i = 0; i < emitters.size(); i++) {
+        for(size_t i = 0; i < emitters.size(); i++) {
 
             Float prevcdf = (i == 0) ? 0.0 : cdfEmitters.at(i - 1);
             Float thiscdf = cdfEmitters.at(i);
@@ -277,7 +275,7 @@ public:
     }
 
     Float pdfSelectEmitter(std::shared_ptr<Emitter> emitter) const {
-        for(int i = 0 ; i < emitters.size(); i ++) {
+        for(size_t i = 0 ; i < emitters.size(); i ++) {
             auto candidateEmitter = emitters.at(i);
             if(emitter == candidateEmitter)
                 return pdfsEmitters.at(i);
