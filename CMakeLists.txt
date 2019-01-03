@@ -66,7 +66,18 @@ if(WIN32)
         set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x86")
     endif()
 endif(WIN32)
+if (UNIX)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
+        set(embree_DIR "/usr/lib64/cmake/embree-3.3.0/")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
+        set(embree_DIR "/usr/lib32/cmake/embree-3.3.0/")
+    endif()
+endif(UNIX)
+
 find_package(embree 3 REQUIRED)
+if(EMBREE_INCLUDE_DIRS)
+    message("Found embree at: " ${EMBREE_INCLUDE_DIRS} " and " ${EMBREE_LIBRARY})
+endif()
 include_directories(${EMBREE_INCLUDE_DIRS})
 set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL "Build Embree with support for ISPC applications.")
 
