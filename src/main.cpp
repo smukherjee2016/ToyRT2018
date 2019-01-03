@@ -3,7 +3,7 @@
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
 #include "integrators/toyIntegrator.hpp"
-#include "integrators/ptemitterv4.hpp"
+#include "integrators/ptEmitterv4.hpp"
 #include "integrators/ptv4.hpp"
 #include "integrators/ptBSDFv3.hpp"
 #include "film/film.hpp"
