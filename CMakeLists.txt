@@ -91,6 +91,12 @@ endif()
 #AssImp
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE INTERNAL "If the supplementary tools for Assimp are built in addition to the library.")
 set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "If the test suite for Assimp is built in addition to the library.")
+#Disabling all importers by default, see CMakeLists output for importers supported and enable as needed
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT FALSE CACHE INTERNAL "Disable all importers by default.")
+set(ASSIMP_BUILD_OBJ_IMPORTER TRUE CACHE INTERNAL "Enable OBJ importer.")
+set(ASSIMP_BUILD_PLY_IMPORTER TRUE CACHE INTERNAL "Enable PLY importer.")
+# https://github.com/assimp/assimp/issues/2179
+set(ASSIMP_BUILD_STEP_IMPORTER FALSE CACHE INTERNAL "Disable step builder that causes mingw debug build to fail.")
 if (POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
