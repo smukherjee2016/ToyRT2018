@@ -55,9 +55,6 @@ add_subdirectory("extern/pcg-cpp")
 #TinyObjLoader
 add_subdirectory("extern/tinyobjloader")
 
-#OpenMP
-find_package(OpenMP REQUIRED)
-
 #Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
 if(WIN32)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
@@ -125,9 +122,6 @@ target_include_directories(ToyRT2018_lib INTERFACE include/)
 
 
 add_executable(ToyRT2018 src/main.cpp)
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(ToyRT2018 PUBLIC OpenMP::OpenMP_CXX)
-endif()
 target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
 target_link_libraries(ToyRT2018 PUBLIC tinyobjloader)
 target_link_libraries(ToyRT2018 PUBLIC nlohmann_json::nlohmann_json)
