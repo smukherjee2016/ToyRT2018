@@ -102,6 +102,14 @@ if (POLICY CMP0048)
 endif (POLICY CMP0048)
 add_subdirectory(extern/assimp)
 
+#TBB with CMake: https://github.com/wjakob/tbb
+set(TBB_BUILD_SHARED           OFF CACHE INTERNAL      "Build TBB shared library" )
+set(TBB_BUILD_STATIC           ON CACHE INTERNAL       "Build TBB static library" )
+set(TBB_BUILD_TBBMALLOC        OFF CACHE INTERNAL      "Build TBB malloc library" OFF)
+set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library" OFF)
+set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable testing infrastructure" OFF)
+add_subdirectory(extern/tbbcmake)
+
 #Define the library
 add_library(ToyRT2018_lib INTERFACE)
 
@@ -111,6 +119,7 @@ target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/pcg-cpp/include")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/nlohmann_json/single_include")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/assimp/include")
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/tbbcmake/include")
 #set_target_properties(ToyRT2018_lib PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
@@ -120,10 +129,11 @@ if(OpenMP_CXX_FOUND)
     target_link_libraries(ToyRT2018 PUBLIC OpenMP::OpenMP_CXX)
 endif()
 target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
-target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
 target_link_libraries(ToyRT2018 PUBLIC tinyobjloader)
 target_link_libraries(ToyRT2018 PUBLIC nlohmann_json::nlohmann_json)
 target_link_libraries(ToyRT2018 PUBLIC assimp::assimp)
+target_link_libraries(ToyRT2018 PUBLIC tbb_static)
+target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU" )
     target_compile_options( ToyRT2018 PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)
