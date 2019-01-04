@@ -14,3 +14,6 @@
 [submodule "extern/assimp"]
 	path = extern/assimp
 	url = https://github.com/assimp/assimp
+[submodule "extern/tbbcmake"]
+	path = extern/tbbcmake
+	url = https://github.com/wjakob/tbb
