@@ -5,6 +5,7 @@
 #include "scene/scene.hpp"
 #include "util/sampler.hpp"
 #include "path/pathsampler.hpp"
+#include "tbb/tbb.h"
 #include <optional>
 
 class Integrator {
