@@ -31,7 +31,7 @@ public:
                     PathSampler pathSampler{};
                     Path currentSampleBSDFPath = pathSampler.generatePath(scene, cameraRay, numBounces);
 
-                    int numVertices = currentSampleBSDFPath.vertices.size();
+                    size_t numVertices = currentSampleBSDFPath.vertices.size();
 
                     if(numVertices == 2) { //Direct hit emitter
                         Vertex lastVertex = currentSampleBSDFPath.vertices.at(numVertices - 1);
@@ -43,7 +43,7 @@ public:
 
                     //Emitter sampling
                     Spectrum attenuation(1.0);
-                    for(int vertexIndex = 1; vertexIndex <= (numVertices - 2); vertexIndex++) {
+                    for(size_t vertexIndex = 1; vertexIndex <= (numVertices - 2); vertexIndex++) {
                         auto doesSceneHaveEmitters = scene.selectRandomEmitter();
                         if(doesSceneHaveEmitters) {
                             auto emitter = doesSceneHaveEmitters.value();
