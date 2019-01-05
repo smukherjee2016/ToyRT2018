@@ -17,10 +17,10 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(TOYRT2018_USE_EXTERNAL_JSON OFF CACHE BOOL "Use an external JSON library")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "Setting build type to 'Release' as none was specified.")
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-            "MinSizeRel" "RelWithDebInfo")
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+    "MinSizeRel" "RelWithDebInfo")
 endif()
 
 find_package(Git QUIET)
@@ -59,8 +59,8 @@ add_subdirectory("extern/tinyobjloader")
 set(TBB_BUILD_SHARED           OFF CACHE INTERNAL      "Build TBB shared library" )
 set(TBB_BUILD_STATIC           ON CACHE INTERNAL       "Build TBB static library" )
 set(TBB_BUILD_TBBMALLOC        ON CACHE INTERNAL      "Build TBB malloc library")
-set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library")
-set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable testing infrastructure")
+set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library" FORCE)
+set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable testing infrastructure" FORCE)
 add_subdirectory(extern/tbbcmake)
 
 #Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
@@ -123,13 +123,14 @@ target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${EMBREE_INCLUDE_DIRS
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
 
+SET(TOYRT_LINK_LIBRARY optimized ToyRT2018_lib debug ToyRT2018_lib)
 add_executable(ToyRT2018 src/main.cpp)
 target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
 target_link_libraries(ToyRT2018 PUBLIC tinyobjloader)
 target_link_libraries(ToyRT2018 PUBLIC nlohmann_json::nlohmann_json)
 target_link_libraries(ToyRT2018 PUBLIC assimp::assimp)
 target_link_libraries(ToyRT2018 PUBLIC tbb_static)
-target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
+target_link_libraries(ToyRT2018 PUBLIC ${TOYRT_LINK_LIBRARY})
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU" )
     target_compile_options( ToyRT2018 PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)
