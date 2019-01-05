@@ -65,20 +65,20 @@ set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable te
 add_subdirectory(extern/tbbcmake)
 
 #Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
-#if(WIN32)
-#    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
-#        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x64")
-#    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
-#        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x86")
-#    endif()
-#endif(WIN32)
-#if (UNIX)
-#    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
-#        set(embree_DIR "/usr/lib64/cmake/embree-3.3.0/")
-#    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
-#        set(embree_DIR "/usr/lib32/cmake/embree-3.3.0/")
-#    endif()
-#endif(UNIX)
+if(WIN32)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
+        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x64")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
+        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x86")
+    endif()
+endif(WIN32)
+if (UNIX)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
+        set(embree_DIR "/usr/lib64/cmake/embree-3.3.0/")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
+        set(embree_DIR "/usr/lib32/cmake/embree-3.3.0/")
+    endif()
+endif(UNIX)
 
 set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL "Build Embree with support for ISPC applications.")
 set(EMBREE_TUTORIALS OFF CACHE BOOL "Build Embree tutorials.")
@@ -86,7 +86,7 @@ SET(EMBREE_TBB_ROOT "")
 SET(TBB_INCLUDE_DIR "extern/tbbcmake/include")
 SET(TBB_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbb_static.a")
 SET(TBB_LIBRARY_MALLOC "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbbmalloc_static.a")
-add_subdirectory(extern/embree3)
+FIND_PACKAGE(embree 3.0 REQUIRED)
 
 #nlohmann_json
 if(TOYRT2018_USE_EXTERNAL_JSON)
@@ -119,7 +119,7 @@ target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/nlohmann_json/single_include")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/assimp/include")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/tbbcmake/include")
-target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/embree3/include")
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${EMBREE_INCLUDE_DIRS}")
 #set_target_properties(ToyRT2018_lib PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
