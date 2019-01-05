@@ -38,8 +38,14 @@ public:
          * Parses the scene file and sets up everything in it.
          * Currently does very little to prevent ill-formed inputs and crashes. TODO: Implement stricter checks for validity
          */
-        std::ifstream inJsonStream(sceneFile);
-        json sceneJson = json::parse(inJsonStream);
+		std::ifstream inJsonStream(sceneFile);
+		json sceneJson;
+		try {
+			sceneJson = json::parse(inJsonStream);
+		}
+		catch (const std::exception &e) {
+			std::cerr << e.what() << std::endl;
+		}
         inJsonStream.close();
 
         //Construct film
