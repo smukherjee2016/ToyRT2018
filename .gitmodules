@@ -17,6 +17,3 @@
 [submodule "extern/tbbcmake"]
 	path = extern/tbbcmake
 	url = https://github.com/wjakob/tbb
-[submodule "extern/embree3"]
-	path = extern/embree3
-	url = https://github.com/embree/embree
