@@ -38,12 +38,6 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/glm/CMakeLists.txt"
-        OR NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/tinyobjloader/CMakeLists.txt"
-        OR NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/pcg-cpp/CMakeLists.txt")
-        message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
-endif()
-
 #GLM
 set(GLM_TEST_ENABLE OFF CACHE BOOL "")
 
@@ -51,9 +45,6 @@ add_subdirectory("extern/glm")
 
 #PCG
 add_subdirectory("extern/pcg-cpp")
-
-#TinyObjLoader
-add_subdirectory("extern/tinyobjloader")
 
 #TBB with CMake: https://github.com/wjakob/tbb
 set(TBB_BUILD_SHARED           OFF CACHE INTERNAL      "Build TBB shared library" )
@@ -123,14 +114,12 @@ target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${EMBREE_INCLUDE_DIRS
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
 
-SET(TOYRT_LINK_LIBRARY optimized ToyRT2018_lib debug ToyRT2018_lib)
 add_executable(ToyRT2018 src/main.cpp)
 target_link_libraries(ToyRT2018 PUBLIC ${EMBREE_LIBRARY})
-target_link_libraries(ToyRT2018 PUBLIC tinyobjloader)
 target_link_libraries(ToyRT2018 PUBLIC nlohmann_json::nlohmann_json)
 target_link_libraries(ToyRT2018 PUBLIC assimp::assimp)
 target_link_libraries(ToyRT2018 PUBLIC tbb_static)
-target_link_libraries(ToyRT2018 PUBLIC ${TOYRT_LINK_LIBRARY})
+target_link_libraries(ToyRT2018 PUBLIC ToyRT2018_lib)
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU" )
     target_compile_options( ToyRT2018 PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)
