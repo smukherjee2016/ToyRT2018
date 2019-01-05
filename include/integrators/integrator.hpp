@@ -7,6 +7,7 @@
 #include "path/pathsampler.hpp"
 #include "tbb/tbb.h"
 #include <optional>
+#include <thread>
 
 class Integrator {
     virtual void render(std::shared_ptr<Camera> camera, std::shared_ptr<Film> film, Scene &scene, const int sampleCount,

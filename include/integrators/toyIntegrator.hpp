@@ -148,7 +148,7 @@ public:
                 pixelValue /= (sampleCount);
                 film->pixels.at(positionInFilm) = pixelValue;
 
-                if ((unsigned) pthread_self() == 1 && x % film->screenWidth == 0) {
+                if (std::hash<std::thread::id>{}(std::this_thread::get_id()) == 1 && x % film->screenWidth == 0) {
                     std::cout << "Completed "
                               << (static_cast<Float>(positionInFilm) / (film->screenWidth * film->screenHeight)) * 100
                               << " percent.\n";

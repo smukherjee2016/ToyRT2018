@@ -1,5 +1,6 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #define ENABLE_STATIC_LIB
+#define NOMINMAX
 #include <iostream>
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
