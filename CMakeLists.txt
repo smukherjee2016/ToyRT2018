@@ -15,6 +15,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(TOYRT2018_USE_EXTERNAL_JSON OFF CACHE BOOL "Use an external JSON library")
+set_property(GLOBAL PROPERTY ALLOW_DUPLICATE_CUSTOM_TARGETS 1)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -55,27 +56,33 @@ add_subdirectory("extern/pcg-cpp")
 #TinyObjLoader
 add_subdirectory("extern/tinyobjloader")
 
-#Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
-if(WIN32)
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
-        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x64")
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
-        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x86")
-    endif()
-endif(WIN32)
-if (UNIX)
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
-        set(embree_DIR "/usr/lib64/cmake/embree-3.3.0/")
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
-        set(embree_DIR "/usr/lib32/cmake/embree-3.3.0/")
-    endif()
-endif(UNIX)
+#TBB with CMake: https://github.com/wjakob/tbb
+set(TBB_BUILD_SHARED           OFF CACHE INTERNAL      "Build TBB shared library" )
+set(TBB_BUILD_STATIC           ON CACHE INTERNAL       "Build TBB static library" )
+set(TBB_BUILD_TBBMALLOC        OFF CACHE INTERNAL      "Build TBB malloc library" OFF)
+set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library" OFF)
+set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable testing infrastructure" OFF)
+add_subdirectory(extern/tbbcmake)
 
-find_package(embree 3 REQUIRED)
-if(EMBREE_INCLUDE_DIRS)
-    message("Found embree at: " ${EMBREE_INCLUDE_DIRS} " and " ${EMBREE_LIBRARY})
-endif()
+#Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
+#if(WIN32)
+#    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
+#        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x64")
+#    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
+#        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x86")
+#    endif()
+#endif(WIN32)
+#if (UNIX)
+#    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
+#        set(embree_DIR "/usr/lib64/cmake/embree-3.3.0/")
+#    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
+#        set(embree_DIR "/usr/lib32/cmake/embree-3.3.0/")
+#    endif()
+#endif(UNIX)
+
 set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL "Build Embree with support for ISPC applications.")
+set(EMBREE_TUTORIALS OFF CACHE BOOL "Build Embree tutorials.")
+add_subdirectory(extern/embree3)
 
 #nlohmann_json
 if(TOYRT2018_USE_EXTERNAL_JSON)
@@ -98,14 +105,6 @@ if (POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
 add_subdirectory(extern/assimp)
-
-#TBB with CMake: https://github.com/wjakob/tbb
-set(TBB_BUILD_SHARED           OFF CACHE INTERNAL      "Build TBB shared library" )
-set(TBB_BUILD_STATIC           ON CACHE INTERNAL       "Build TBB static library" )
-set(TBB_BUILD_TBBMALLOC        OFF CACHE INTERNAL      "Build TBB malloc library" OFF)
-set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library" OFF)
-set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable testing infrastructure" OFF)
-add_subdirectory(extern/tbbcmake)
 
 #Define the library
 add_library(ToyRT2018_lib INTERFACE)

@@ -1,4 +1,5 @@
 #define TINYOBJLOADER_IMPLEMENTATION
+#define ENABLE_STATIC_LIB
 #include <iostream>
 #include "common/common.hpp"
 #include "camera/pinholecamera.hpp"
@@ -11,7 +12,7 @@
 #include "util/sampler.hpp"
 #include <chrono>
 
-const int sampleCount = 1024;
+const int sampleCount = 16;
 const int numBounces = 3;
 
 int main(void) {
