@@ -59,9 +59,9 @@ add_subdirectory("extern/tinyobjloader")
 #TBB with CMake: https://github.com/wjakob/tbb
 set(TBB_BUILD_SHARED           OFF CACHE INTERNAL      "Build TBB shared library" )
 set(TBB_BUILD_STATIC           ON CACHE INTERNAL       "Build TBB static library" )
-set(TBB_BUILD_TBBMALLOC        OFF CACHE INTERNAL      "Build TBB malloc library" OFF)
-set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library" OFF)
-set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable testing infrastructure" OFF)
+set(TBB_BUILD_TBBMALLOC        ON CACHE INTERNAL      "Build TBB malloc library")
+set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library")
+set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable testing infrastructure")
 add_subdirectory(extern/tbbcmake)
 
 #Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
@@ -82,6 +82,10 @@ add_subdirectory(extern/tbbcmake)
 
 set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL "Build Embree with support for ISPC applications.")
 set(EMBREE_TUTORIALS OFF CACHE BOOL "Build Embree tutorials.")
+SET(EMBREE_TBB_ROOT "")
+SET(TBB_INCLUDE_DIR "extern/tbbcmake/include")
+SET(TBB_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbb_static.a")
+SET(TBB_LIBRARY_MALLOC "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbbmalloc_static.a")
 add_subdirectory(extern/embree3)
 
 #nlohmann_json
@@ -110,12 +114,12 @@ add_subdirectory(extern/assimp)
 add_library(ToyRT2018_lib INTERFACE)
 
 #https://foonathan.net/blog/2018/10/17/cmake-warnings.html Use SYSTEM to suppress warnings
-target_include_directories(ToyRT2018_lib SYSTEM INTERFACE ${EMBREE_INCLUDE_DIRS})
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/glm/")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/pcg-cpp/include")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/nlohmann_json/single_include")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/assimp/include")
 target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/tbbcmake/include")
+target_include_directories(ToyRT2018_lib SYSTEM INTERFACE "${CMAKE_CURRENT_LIST_DIR}/extern/embree3/include")
 #set_target_properties(ToyRT2018_lib PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(ToyRT2018_lib INTERFACE include/)
 
