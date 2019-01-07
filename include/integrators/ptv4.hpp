@@ -14,6 +14,7 @@ public:
         tbb::parallel_for(tbb::blocked_range<size_t>(0, film->screenHeight * film->screenWidth),  [=, &scene](const tbb::blocked_range<size_t>& r) {
 
            for(size_t i = r.begin(); i != r.end(); ++i) {
+        // for(size_t i = 0; i < film->screenHeight * film->screenWidth; ++i) {
 
                 int positionInFilm = i;
                 int x = positionInFilm % film->screenWidth;
@@ -31,7 +32,7 @@ public:
                     PathSampler pathSampler{};
                     Path currentSampleBSDFPath = pathSampler.generatePath(scene, cameraRay, numBounces);
 
-                    size_t numVertices = currentSampleBSDFPath.vertices.size();
+                    int numVertices = currentSampleBSDFPath.vertices.size();
 
                     if(numVertices == 2) { //Direct hit emitter
                         Vertex lastVertex = currentSampleBSDFPath.vertices.at(numVertices - 1);
@@ -43,7 +44,7 @@ public:
 
                     //Emitter sampling
                     Spectrum attenuation(1.0);
-                    for(size_t vertexIndex = 1; vertexIndex <= (numVertices - 2); vertexIndex++) {
+                    for(int vertexIndex = 1; vertexIndex <= (numVertices - 2); vertexIndex++) {
                         auto doesSceneHaveEmitters = scene.selectRandomEmitter();
                         if(doesSceneHaveEmitters) {
                             auto emitter = doesSceneHaveEmitters.value();
