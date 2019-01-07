@@ -24,7 +24,7 @@ int main(void) {
     //std::cout << rng.generate1DUniform() << std::endl;
 
     Scene scene;
-    scene.makeScene("../scenes/testSphereCboxScene.json");
+    scene.makeScene("../scenes/testPlaneScene.json");
     //ToyIntegrator toyIntegrator;
     //toyIntegrator.render(pinholeCamera, film, scene, sampleCount);
     //PathTracingEmitterv4 ptIntegrator;
