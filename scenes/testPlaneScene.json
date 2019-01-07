@@ -3,13 +3,13 @@
     "XRes": 512,
     "YRes": 512,
     "distanceToFilm": 1.0,
-    "FOV": 30,
+    "FOV": 60,
     "isXFOV": false
   },
 
   "camera": {
     "cameraType": "pinhole",
-    "origin": [ 0, 1, 0 ],
+    "origin": [ 0, 2, 0 ],
     "lookAt": [ 0, 0, 0 ],
     "up": [ 1, 0, 0 ]
   },
@@ -19,7 +19,7 @@
     {
       "id": "bigEmitter",
       "emitterType": "area",
-      "Le": [ 0.1, 120.34, 120.34 ]
+      "Le": [ 0.1, 12.34, 12.34 ]
     }
   ],
 
@@ -44,7 +44,7 @@
       "id": "topWall",
       "type": "sphere",
 	  "center": [ 0, 0, 0 ],
-      "radius": 0.2,
+      "radius": 0.707,
       "material": "lambertMat"
     },
 
