@@ -64,9 +64,9 @@ if(WIN32)
 endif(WIN32)
 if (UNIX)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
-        set(embree_DIR "/usr/lib64/cmake/embree-3.3.0/")
+        set(embree_DIR "/usr/lib64/cmake/embree-3.4.0/")
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
-        set(embree_DIR "/usr/lib32/cmake/embree-3.3.0/")
+        set(embree_DIR "/usr/lib32/cmake/embree-3.4.0/")
     endif()
 endif(UNIX)
 
