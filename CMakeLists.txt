@@ -47,7 +47,7 @@ add_subdirectory("extern/glm")
 add_subdirectory("extern/pcg-cpp")
 
 #TBB with CMake: https://github.com/wjakob/tbb
-set(TBB_BUILD_SHARED           OFF CACHE INTERNAL      "Build TBB shared library" )
+set(TBB_BUILD_SHARED           ON CACHE INTERNAL      "Build TBB shared library" )
 set(TBB_BUILD_STATIC           ON CACHE INTERNAL       "Build TBB static library" )
 set(TBB_BUILD_TBBMALLOC        ON CACHE INTERNAL      "Build TBB malloc library")
 set(TBB_BUILD_TBBMALLOC_PROXY  OFF CACHE INTERNAL "Build TBB malloc proxy library" FORCE)
@@ -72,10 +72,10 @@ endif(UNIX)
 
 set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL "Build Embree with support for ISPC applications.")
 set(EMBREE_TUTORIALS OFF CACHE BOOL "Build Embree tutorials.")
-SET(EMBREE_TBB_ROOT "")
-SET(TBB_INCLUDE_DIR "extern/tbbcmake/include")
-SET(TBB_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbb_static.a")
-SET(TBB_LIBRARY_MALLOC "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbbmalloc_static.a")
+#SET(EMBREE_TBB_ROOT "")
+#SET(TBB_INCLUDE_DIR "extern/tbbcmake/include")
+#SET(TBB_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbb_static.a")
+#SET(TBB_LIBRARY_MALLOC "${CMAKE_CURRENT_BINARY_DIR}/extern/tbbcmake/libtbbmalloc_static.a")
 FIND_PACKAGE(embree 3.0 REQUIRED)
 
 #nlohmann_json
