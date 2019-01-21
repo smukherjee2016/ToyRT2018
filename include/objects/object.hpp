@@ -28,4 +28,7 @@ public:
 
     //IsEmitter
     virtual bool isEmitter() const = 0;
+
+protected:
+    virtual ~Object(){}
 };

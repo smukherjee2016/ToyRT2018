@@ -24,6 +24,7 @@ public:
     virtual Float heuristicEmitterSelection() const  = 0;
     virtual void setAssociatedObject(std::shared_ptr<Object> _associatedObject) = 0;
 
-
+protected:
+    virtual ~Emitter(){}
 
 };
