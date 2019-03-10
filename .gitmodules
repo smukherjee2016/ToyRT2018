@@ -10,3 +10,6 @@
 [submodule "extern/tbbcmake"]
 	path = extern/tbbcmake
 	url = https://github.com/wjakob/tbb
+[submodule "extern/tinyobjloader"]
+	path = extern/tinyobjloader
+	url = https://github.com/syoyo/tinyobjloader.git
