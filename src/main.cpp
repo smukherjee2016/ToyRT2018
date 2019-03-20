@@ -34,7 +34,7 @@ int main(void) {
     ptIntegrator.render(scene.camera, scene.film, scene, sampleCount, numBounces);
     auto end = std::chrono::steady_clock::now();
 
-    scene.film->writePixels("Assignment4_normals.pfm");
+    scene.film->writePixels("../../sandbox/Assignment4_normals.pfm");
 
     std::cout << "Time taken to render a " << resX << " by " << resY << " image using "
         << sampleCount << " samples and " << numBounces << " bounces: "
