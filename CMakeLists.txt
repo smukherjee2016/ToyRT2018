@@ -55,13 +55,6 @@ set(TBB_BUILD_TESTS            OFF CACHE INTERNAL "Build TBB tests and enable te
 add_subdirectory(extern/tbbcmake)
 
 #Embree, ref: https://github.com/embree/embree/blob/master/tutorials/find_embree/CMakeLists.txt
-if(WIN32)
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
-        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x64")
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) #x86
-        set(embree_DIR "C:\\Program Files\\Intel\\Embree3 x86")
-    endif()
-endif(WIN32)
 if (UNIX)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8) #x64
         set(embree_DIR "/usr/lib64/cmake/embree-3.4.0/")

@@ -24,5 +24,11 @@
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "variables": []
     }
+  ],
+
+  "environments": [
+    {
+      "embree_DIR": "C:\\Program Files\\Intel\\Embree3 x64"
+    }
   ]
 }
