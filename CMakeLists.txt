@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
+if(${CMAKE_VERSION} VERSION_LESS 3.14)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 else()
-    cmake_policy(VERSION 3.12)
+    cmake_policy(VERSION 3.14)
 endif()
 
 project(ToyRT2018 VERSION 0.2.0)
@@ -16,11 +16,20 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(TOYRT2018_USE_EXTERNAL_JSON OFF CACHE BOOL "Use an external JSON library")
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified.")
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-    "MinSizeRel" "RelWithDebInfo")
+get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(isMultiConfig)
+	if(NOT "Profile" IN_LIST CMAKE_CONFIGURATION_TYPES)
+		list(APPEND CMAKE_CONFIGURATION_TYPES Profile)
+	endif()
+else()
+	set(allowableBuildTypes Debug Release RelWithDebInfo)
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
+	STRINGS "${allowableBuildTypes}")
+	if(NOT CMAKE_BUILD_TYPE)
+		set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
+	elseif(NOT CMAKE_BUILD_TYPE IN_LIST allowableBuildTypes)
+		message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}")
+	endif()
 endif()
 
 find_package(Git QUIET)
